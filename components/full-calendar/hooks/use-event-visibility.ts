@@ -1,86 +1,50 @@
 "use client"
 
+
 import { useLayoutEffect, useMemo, useRef, useState } from "react"
 
-interface EventVisibilityOptions {
-  eventHeight: number
-  eventGap: number
-}
+// useEventVisibility hook: custom hook to calculate the number of visible events based on the container height using a ResizeObserver for efficient updates
+export function useEventVisibility({ eventHeight, eventGap }: { eventHeight: number, eventGap: number }): { contentRef: React.RefObject<HTMLDivElement | null>, contentHeight: number | null, getVisibleEventCount: (totalEvents: number) => number } {
+    // > Use the useRef hook to keep a reference to the content container
+    const contentRef = useRef<HTMLDivElement>(null)
 
-interface EventVisibilityResult {
-  contentRef: React.RefObject<HTMLDivElement>
-  contentHeight: number | null
-  getVisibleEventCount: (totalEvents: number) => number
-}
+    // > Use the useRef hook to keep a reference to the ResizeObserver
+    const observerRef = useRef<ResizeObserver | null>(null)
 
-/**
- * Hook for calculating event visibility based on container height
- * Uses ResizeObserver for efficient updates
- */
-export function useEventVisibility({
-  eventHeight,
-  eventGap,
-}: EventVisibilityOptions): EventVisibilityResult {
-  // Use the standard pattern for React refs
-  const contentRef = useRef<HTMLDivElement>(null)
-  const observerRef = useRef<ResizeObserver | null>(null)
-  const [contentHeight, setContentHeight] = useState<number | null>(null)
+    // > Use the useState hook to keep track of the content height
+    const [contentHeight, setContentHeight] = useState<number | null>(null)
 
-  // Use layout effect for synchronous measurement before paint
-  useLayoutEffect(() => {
-    if (!contentRef.current) return
-
-    // Function to update the content height
-    const updateHeight = () => {
-      if (contentRef.current) {
-        setContentHeight(contentRef.current.clientHeight)
-      }
-    }
-
-    // Initial measurement (synchronous)
-    updateHeight()
-
-    // Create observer only once and reuse it
-    if (!observerRef.current) {
-      observerRef.current = new ResizeObserver(() => {
-        // Just call updateHeight when resize is detected
+    // > Use the useLayoutEffect hook to measure the content height in a synchronous measurement before paint
+    useLayoutEffect(() => {
+        // >> If the content container is not available, return early
+        if (!contentRef.current) return
+        // >> If the content container is available, update the state for the content height to the current height of the content
+        function updateHeight() { if (contentRef.current) setContentHeight(contentRef.current.clientHeight) }
+        // >> Initial measurement (synchronous)
         updateHeight()
-      })
-    }
+        // >> If it's not yet initialized, use the updateHeight callback to initialize a ResizeObserver to track changes to the height of the content container
+        if (!observerRef.current) { observerRef.current = new ResizeObserver(() => { updateHeight() }) }
+        // >> Observe the content container for changes in height using the ResizeObserver
+        observerRef.current.observe(contentRef.current)
+        // >> Clean up function to disconnect observer when component unmounts
+        return () => { if (observerRef.current) { observerRef.current.disconnect() } }
+    }, [])
 
-    // Start observing the content container
-    observerRef.current.observe(contentRef.current)
+    // > Helper function to calculate visible events for a cell based on the total number of events that can fit in the container based on the content height
+    const getVisibleEventCount = useMemo(() => {
+        // >> Calculate the visible event count based on the total number of events
+        return (totalEvents: number): number => {
+            // >>> If the content height is not available, show all events
+            if (!contentHeight) return totalEvents
+            // >>> Calculate the maximum number of events that can fit within the height of the content container
+            const maxEvents = Math.floor(contentHeight / (eventHeight + eventGap))
+            // >>> If all events fit, show them all
+            if (totalEvents <= maxEvents) { return totalEvents }
+            // >>> Otherwise, show all events except the last one to allow for overflow or show no events if there is no space
+            return maxEvents > 0 ? maxEvents - 1 : 0
+        }
+    }, [contentHeight, eventHeight, eventGap])
 
-    // Clean up function
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-      }
-    }
-  }, [])
-
-  // Function to calculate visible events for a cell
-  const getVisibleEventCount = useMemo(() => {
-    return (totalEvents: number): number => {
-      if (!contentHeight) return totalEvents
-
-      // Calculate how many events can fit in the container
-      const maxEvents = Math.floor(contentHeight / (eventHeight + eventGap))
-
-      // If all events fit, show them all
-      if (totalEvents <= maxEvents) {
-        return totalEvents
-      } else {
-        // Otherwise, reserve space for "more" button by showing one less
-        return maxEvents > 0 ? maxEvents - 1 : 0
-      }
-    }
-  }, [contentHeight, eventHeight, eventGap])
-
-  // Use type assertion to satisfy TypeScript
-  return {
-    contentRef,
-    contentHeight,
-    getVisibleEventCount,
-  } as EventVisibilityResult
+    // > Return the content reference, content height, and the function to calculate the number of visible events, using a type assertion to the EventVisibilityResult type
+    return { contentRef, contentHeight, getVisibleEventCount }
 }
