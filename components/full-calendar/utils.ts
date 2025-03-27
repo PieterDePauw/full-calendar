@@ -5,10 +5,8 @@ import type { CalendarEvent, EventColor } from "@/components/full-calendar"
 /**
  * Get CSS classes for event colors
  */
-export function getEventColorClasses(color?: EventColor | string): string {
-  const eventColor = color || "sky"
-
-  switch (eventColor) {
+export function getEventColorClasses(color: EventColor | string = "sky"): string {
+  switch (color) {
     case "sky":
       return "bg-sky-200/50 hover:bg-sky-200/40 text-sky-950/80 dark:bg-sky-400/25 dark:hover:bg-sky-400/20 dark:text-sky-200 shadow-sky-700/8"
     case "amber":
@@ -29,39 +27,34 @@ export function getEventColorClasses(color?: EventColor | string): string {
 /**
  * Get CSS classes for border radius based on event position in multi-day events
  */
-export function getBorderRadiusClasses(
-  isFirstDay: boolean,
-  isLastDay: boolean
-): string {
-  if (isFirstDay && isLastDay) {
-    return "rounded" // Both ends rounded
-  } else if (isFirstDay) {
-    return "rounded-l rounded-r-none" // Only left end rounded
-  } else if (isLastDay) {
-    return "rounded-r rounded-l-none" // Only right end rounded
-  } else {
-    return "rounded-none" // No rounded corners
-  }
+export function getBorderRadiusClasses(isFirstDay: boolean, isLastDay: boolean): string {
+  // If it is both the first and last day of the event (single-day event), round all corners
+  if (isFirstDay && isLastDay) return "rounded"
+  // If it is the first day of the event, only round the left end
+  if (isFirstDay) return "rounded-l rounded-r-none"
+  // If it is the last day of the event, only round the right end
+  if (isLastDay) return "rounded-r rounded-l-none"
+  // If it is neither the first nor last day of the event, don't round any corners
+  return "rounded-none"
 }
 
 /**
  * Check if an event is a multi-day event
  */
 export function isMultiDayEvent(event: CalendarEvent): boolean {
-  const eventStart = new Date(event.start)
-  const eventEnd = new Date(event.end)
-  return event.allDay || eventStart.getDate() !== eventEnd.getDate()
+  // > Check if the event is an all-day event
+  const isAllDay = event.allDay === true
+  // > Check if the start of the event is on a different day than the end of the event
+  const isMultiDay = !isSameDay(new Date(event.start).getDate(), new Date(event.end).getDate())
+  // > Return true if either of the above conditions are met
+  return isAllDay || isMultiDay
 }
 
 /**
  * Filter events for a specific day
  */
-export function getEventsForDay(
-  events: CalendarEvent[],
-  day: Date
-): CalendarEvent[] {
-  return events
-    .filter((event) => {
+export function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+  return events.filter((event) => {
       const eventStart = new Date(event.start)
       return isSameDay(day, eventStart)
     })
@@ -86,10 +79,7 @@ export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
 /**
  * Get multi-day events that span across a specific day (but don't start on that day)
  */
-export function getSpanningEventsForDay(
-  events: CalendarEvent[],
-  day: Date
-): CalendarEvent[] {
+export function getSpanningEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
   return events.filter((event) => {
     if (!isMultiDayEvent(event)) return false
 
@@ -107,10 +97,7 @@ export function getSpanningEventsForDay(
 /**
  * Get all events visible on a specific day (starting, ending, or spanning)
  */
-export function getAllEventsForDay(
-  events: CalendarEvent[],
-  day: Date
-): CalendarEvent[] {
+export function getAllEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
   return events.filter((event) => {
     const eventStart = new Date(event.start)
     const eventEnd = new Date(event.end)
@@ -125,12 +112,8 @@ export function getAllEventsForDay(
 /**
  * Get all events for a day (for agenda view)
  */
-export function getAgendaEventsForDay(
-  events: CalendarEvent[],
-  day: Date
-): CalendarEvent[] {
-  return events
-    .filter((event) => {
+export function getAgendaEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+  return events.filter((event) => {
       const eventStart = new Date(event.start)
       const eventEnd = new Date(event.end)
       return (
