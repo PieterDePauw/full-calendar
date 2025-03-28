@@ -5,13 +5,13 @@ export { MonthView } from "@/components/full-calendar/views/month-view"
 export { WeekView } from "@/components/full-calendar/views/week-view"
 
 // Sub-component exports@
-export { DraggableEvent } from "./draggable-event"
-export { DroppableCell } from "./droppable-cell"
-export { EventDialog } from "./event-dialog"
-export { EventItem } from "./event-item"
-export { EventsPopup } from "./events-popup"
-export { FullCalendar } from "./full-calendar"
-export { CalendarDndProvider, useCalendarDnd } from "./calendar-dnd-context"
+export { CalendarDndProvider, useCalendarDnd } from "./dnd/calendar-dnd-context"
+export { DraggableEvent } from "./dnd/draggable-event"
+export { DroppableCell } from "./dnd/droppable-cell"
+export { EventDialog } from "./events/event-dialog"
+export { EventItem } from "./events/event-item"
+export { EventsPopup } from "./events/events-popup"
+export { FullCalendar } from "./events/full-calendar"
 
 // Constants and utility exports
 export * from "./constants"
@@ -22,4 +22,4 @@ export * from "./hooks/use-current-time-indicator"
 export * from "./hooks/use-event-visibility"
 
 // Type exports
-export type { CalendarEvent, CalendarView, EventColor } from "./types"
+export type { CalendarEvent, CalendarView, EventColor, DragHandlePositionType } from "./types"

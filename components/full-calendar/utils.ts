@@ -1,4 +1,4 @@
-import { isSameDay } from "date-fns"
+import { differenceInDays, isSameDay } from "date-fns"
 
 import type { CalendarEvent, EventColor } from "@/components/full-calendar"
 
@@ -41,13 +41,15 @@ export function getBorderRadiusClasses(isFirstDay: boolean, isLastDay: boolean):
 /**
  * Check if an event is a multi-day event
  */
-export function isMultiDayEvent(event: CalendarEvent): boolean {
+export function checkIfMultiDayEvent(event: CalendarEvent): boolean {
   // > Check if the event is an all-day event
   const isAllDay = event.allDay === true
   // > Check if the start of the event is on a different day than the end of the event
-  const isMultiDay = !isSameDay(new Date(event.start).getDate(), new Date(event.end).getDate())
+  const isMultiDay = !isSameDay(new Date(event.start), new Date(event.end))
+  // > Check if the event spans multiple days
+  const spansMultipleDays = differenceInDays(new Date(event.end), new Date(event.start)) >= 1
   // > Return true if either of the above conditions are met
-  return isAllDay || isMultiDay
+  return isAllDay || isMultiDay || spansMultipleDays
 }
 
 /**
@@ -66,8 +68,8 @@ export function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEve
  */
 export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
   return [...events].sort((a, b) => {
-    const aIsMultiDay = isMultiDayEvent(a)
-    const bIsMultiDay = isMultiDayEvent(b)
+    const aIsMultiDay = checkIfMultiDayEvent(a)
+    const bIsMultiDay = checkIfMultiDayEvent(b)
 
     if (aIsMultiDay && !bIsMultiDay) return -1
     if (!aIsMultiDay && bIsMultiDay) return 1
@@ -81,7 +83,8 @@ export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
  */
 export function getSpanningEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
   return events.filter((event) => {
-    if (!isMultiDayEvent(event)) return false
+    const isMultiDayEvent = checkIfMultiDayEvent(event)
+    if (!isMultiDayEvent) return false
 
     const eventStart = new Date(event.start)
     const eventEnd = new Date(event.end)

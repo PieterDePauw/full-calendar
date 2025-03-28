@@ -18,3 +18,12 @@ export type EventColor =
   | "rose"
   | "emerald"
   | "orange"
+
+export interface DragHandlePositionType {
+  x?: number
+  y?: number
+  data?: {
+    isFirstDay?: boolean
+    isLastDay?: boolean
+  }
+}

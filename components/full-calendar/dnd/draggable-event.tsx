@@ -1,16 +1,12 @@
 "use client"
 
+// Import modules
 import { useRef, useState } from "react"
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
-import { differenceInDays } from "date-fns"
+import { CalendarEvent, checkIfMultiDayEvent, EventItem, useCalendarDnd } from "@/components/full-calendar"
 
-import {
-  CalendarEvent,
-  EventItem,
-  useCalendarDnd,
-} from "@/components/full-calendar"
-
+// DraggableEventProps interface
 interface DraggableEventProps {
   event: CalendarEvent
   view: "month" | "week" | "day"
@@ -24,18 +20,8 @@ interface DraggableEventProps {
   "aria-hidden"?: boolean | "true" | "false"
 }
 
-export function DraggableEvent({
-  event,
-  view,
-  showTime,
-  onClick,
-  height,
-  isMultiDay,
-  multiDayWidth,
-  isFirstDay = true,
-  isLastDay = true,
-  "aria-hidden": ariaHidden,
-}: DraggableEventProps) {
+// DraggableEvent component
+export function DraggableEvent({ event, view, showTime, onClick, height, isMultiDay, multiDayWidth, isFirstDay = true, isLastDay = true, "aria-hidden": ariaHidden }: DraggableEventProps) {
   const { activeId } = useCalendarDnd()
   const elementRef = useRef<HTMLDivElement>(null)
   const [dragHandlePosition, setDragHandlePosition] = useState<{
@@ -43,11 +29,8 @@ export function DraggableEvent({
     y: number
   } | null>(null)
 
-  // Check if this is a multi-day event
-  const eventStart = new Date(event.start)
-  const eventEnd = new Date(event.end)
-  const isMultiDayEvent =
-    isMultiDay || event.allDay || differenceInDays(eventEnd, eventStart) >= 1
+  // Check if the event is a multi-day event
+  const isMultiDayEvent = checkIfMultiDayEvent(event)
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
