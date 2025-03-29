@@ -136,3 +136,24 @@ export function addHoursToDate(date: Date, hours: number): Date {
   result.setHours(result.getHours() + hours)
   return result
 }
+
+// Helper function to compare two dates and check if they are the same
+export function compareDateTime(dateA: Date, dateB: Date): boolean {
+  // Check if the year of both dates is the same
+  const isSameYear = dateA.getFullYear() === dateB.getFullYear()
+  // Check if the month of both dates are the same
+  const isSameMonth = dateA.getMonth() === dateB.getMonth()
+  // Check if the day of both dates are the same
+  const isSameDay = dateA.getDate() === dateB.getDate()
+  // Check if the hours of both dates are the same
+  const isSameHour = dateA.getHours() === dateB.getHours()
+  // Check if the minutes of both dates are the same
+  const isSameMinutes = dateA.getMinutes() === dateB.getMinutes()
+  // Return true if all components are the same
+  return isSameYear && isSameMonth && isSameDay && isSameHour && isSameMinutes
+}
+
+// Helper function to determine if an event should be hidden based on its index and visible count
+function isEventHidden(index: number, visibleCount: number | undefined): boolean {
+  return visibleCount !== undefined && index >= visibleCount
+}
