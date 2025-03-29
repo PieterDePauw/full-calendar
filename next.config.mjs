@@ -1,11 +1,7 @@
 /** @type {import('next').NextConfig} */
 export const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  reactStrictMode: true,
+  allowedDevOrigins: ['local-origin.dev', '*.local-origin.dev'],
   images: {
     unoptimized: true,
   },

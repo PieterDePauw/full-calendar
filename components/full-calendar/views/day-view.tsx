@@ -304,6 +304,17 @@ export function CurrentTimeIndicator({ currentTimePosition }: { currentTimePosit
 
 // TimeGrid component
 export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[]; currentDate: Date; onEventCreate: (startTime: Date) => void }) {
+    // > Define a helper function to generate a classname based on the specified quarter within each hour
+    function generateDroppableCell(quarter: number) {
+        return cn(
+            "absolute h-[calc(var(--week-cells-height)/4)] w-full",
+            quarter === 0 && "top-0",
+            quarter === 1 && "top-[calc(var(--week-cells-height)/4)]",
+            quarter === 2 && "top-[calc(var(--week-cells-height)/4*2)]",
+            quarter === 3 && "top-[calc(var(--week-cells-height)/4*3)]"
+        )
+    }
+    // > Return the JSX for the time grid component
     return (
         <div className="absolute inset-0 z-0">
             {hours.map((hour) => {
@@ -322,16 +333,7 @@ export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[];
                                             id={`day-cell-${currentDate.toISOString()}-${quarterHourTime}`}
                                             date={currentDate}
                                             time={quarterHourTime}
-                                            className={cn(
-                                                "absolute h-[calc(var(--week-cells-height)/4)] w-full",
-                                                quarter === 0 && "top-0",
-                                                quarter === 1 &&
-                                                "top-[calc(var(--week-cells-height)/4)]",
-                                                quarter === 2 &&
-                                                "top-[calc(var(--week-cells-height)/4*2)]",
-                                                quarter === 3 &&
-                                                "top-[calc(var(--week-cells-height)/4*3)]"
-                                            )}
+                                            className={generateDroppableCell(quarter)}
                                             onClick={() => {
                                                 const startTime = new Date(currentDate)
                                                 startTime.setHours(hourValue)
@@ -351,25 +353,9 @@ export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[];
 // EventsGrid component
 export function EventsGrid({ positionedEvents, onEventClick }: { positionedEvents: PositionedEvent[]; onEventClick: (event: CalendarEvent, e: React.MouseEvent) => void }) {
     return positionedEvents.map((positionedEvent) => (
-        <div
-            key={positionedEvent.event.id}
-            className="absolute z-10 px-0.5"
-            style={{
-                top: `${positionedEvent.top}px`,
-                height: `${positionedEvent.height}px`,
-                left: `${positionedEvent.left * 100}%`,
-                width: `${positionedEvent.width * 100}%`,
-                zIndex: positionedEvent.zIndex,
-            }}
-        >
+        <div key={positionedEvent.event.id} className="absolute z-10 px-0.5" style={{ top: `${positionedEvent.top}px`, height: `${positionedEvent.height}px`, left: `${positionedEvent.left * 100}%`, width: `${positionedEvent.width * 100}%`, zIndex: positionedEvent.zIndex }}>
             <div className="h-full w-full">
-                <DraggableEvent
-                    event={positionedEvent.event}
-                    view="day"
-                    onClick={(e) => onEventClick(positionedEvent.event, e)}
-                    showTime
-                    height={positionedEvent.height}
-                />
+                <DraggableEvent event={positionedEvent.event} view="day" onClick={(e) => onEventClick(positionedEvent.event, e)} showTime={true} height={positionedEvent.height} />
             </div>
         </div>
     ))
