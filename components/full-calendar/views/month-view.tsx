@@ -1,26 +1,21 @@
 "use client"
 
-import React, { useMemo } from "react"
+// Import modules
+import React, { useMemo, type CSSProperties, type MouseEvent } from "react"
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { type CalendarEvent, DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility } from "@/components/full-calendar"
 import { useMounted } from "@/hooks/use-mounted"
 
-interface MonthViewProps {
-    currentDate: Date
-    events: CalendarEvent[]
-    onEventSelect: (event: CalendarEvent) => void
-    onEventCreate: (startTime: Date) => void
-}
-
 // MonthView component
-export function MonthView({ currentDate, events, onEventSelect, onEventCreate }: MonthViewProps) {
+export function MonthView({ currentDate, events, onEventSelect, onEventCreate }: { currentDate: Date; events: CalendarEvent[]; onEventSelect: (event: CalendarEvent) => void; onEventCreate: (startTime: Date) => void }) {
     // > Get all the days of the month, beginning from the start of the week in which the month starts and ending at the end of the week in which the month ends
     const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(startOfMonth(currentDate), { weekStartsOn: 0 }), end: endOfWeek(endOfMonth(startOfMonth(currentDate)), { weekStartsOn: 0 }) }), [currentDate])
 
     // > Get all the days of the week, based on the current date
     const weekdays = useMemo(() => Array.from({ length: 7 }).map((_, i) => format(addDays(startOfWeek(new Date()), i), "EEE")), [])
 
+    // > Get all the weeks of the month, based on the days of the month
     const weeks = useMemo(() => {
         const result = []
         let week = []
@@ -37,7 +32,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
     }, [days])
 
     // > Define a helper function to handle the event click to select an event
-    function handleEventClick(event: CalendarEvent, e: React.MouseEvent) {
+    function handleEventClick(event: CalendarEvent, e: MouseEvent) {
         e.stopPropagation()
         onEventSelect(event)
     }
@@ -94,7 +89,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                                             <EventItem onClick={(e) => handleEventClick(event, e)} event={event} view="month" isFirstDay={isFirstDay} isLastDay={isLastDay}>
                                                                 <div className="invisible" aria-hidden={true}>
                                                                     {!event.allDay && <span>{format(new Date(event.start), "h:mm")}</span>}
-                                                                    {event.title}
+                                                                    {event.title && <span className="truncate">{event.title}</span>}
                                                                 </div>
                                                             </EventItem>
                                                         </div>
@@ -130,7 +125,7 @@ function HasMoreEventsPopover({ EventHeight, allEvents, currentDay, remainingCou
                 </button>
             </PopoverTrigger>
             {/* Content of the popover that lists all events for the current day */}
-            <PopoverContent align="center" className="max-w-52 p-3" style={{ "--event-height": `${EventHeight}px` } as React.CSSProperties}>
+            <PopoverContent align="center" className="max-w-52 p-3" style={{ "--event-height": `${EventHeight}px` } as CSSProperties}>
                 <div className="space-y-2">
                     <div className="text-sm font-medium">{format(currentDay, "EEE d")}</div>
                     <div className="space-y-1">

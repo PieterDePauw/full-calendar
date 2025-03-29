@@ -15,7 +15,7 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
     // > Use the useEffect hook to calculate the current time position
     useEffect(() => {
         // >> Calculate the current time position
-        const calculateTimePosition = () => {
+        function calculateTimePosition() {
             // >>> Get the current date and time in hours and minutes
             const now = new Date()
             const hours = now.getHours()
@@ -26,6 +26,7 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
 
             // >>> Define the start of the day as a number of minutes
             const dayStartMinutes = 0 // 12am
+
             // >>> Define the end of the day as a number of minutes
             const dayEndMinutes = 24 * 60 // 12am next day
 
@@ -35,7 +36,7 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
             // >>> Assign a variable to check if the current time is visible
             let isCurrentTimeVisible = false
             // >>> If the view is "day", check if the current time is on the same day to determine visibility
-            if (view === "day") { isCurrentTimeVisible = isSameDay(now, currentDate) }
+            if (view === "day") { isCurrentTimeVisible = isSameDay(now, currentDate)}
             // >>> If the view is "week", check if the current time is within the week to determine visibility
             if (view === "week") {
                 const startOfWeekDate = startOfWeek(currentDate, { weekStartsOn: 0 })

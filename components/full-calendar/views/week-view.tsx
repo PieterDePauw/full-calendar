@@ -60,7 +60,6 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
     const hours = useMemo(() => eachHourOfInterval({ start: startOfDay(currentDate), end: addHours(startOfDay(currentDate), 23) }), [currentDate])
 
     // Get all-day events and multi-day events for the week
-    // Include explicitly marked all-day events or multi-day events
     // prettier-ignore // biome-ignore
     const allDayEvents = useMemo(() => events.filter((event) => checkIfMultiDayEvent(event)).filter((event) => days.some((day) => isSameDay(day, new Date(event.start)) || isSameDay(day, new Date(event.end)) || (day > new Date(event.start) && day < new Date(event.end)))), [events, days])
 
@@ -163,7 +162,7 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
     }, [days, events])
 
     // > Define a helper function to handle event clicks
-    const handleEventClick = (event: CalendarEvent, e: React.MouseEvent) => {
+    function handleEventClick(event: CalendarEvent, e: React.MouseEvent) {
         e.stopPropagation()
         onEventSelect(event)
     }
@@ -183,49 +182,9 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
             {/* All-day events section */}
             {hasAllDayEvents && <AllDayEventsSection days={days} allDayEvents={allDayEvents} onEventClick={handleEventClick} weekStart={weekStart} />}
 
-            {/* {hasAllDayEvents && (
-                <div className="border-border/70 bg-muted/50 border-b">
-                    <div className="grid grid-cols-8">
-                        <div className="border-border/70 relative border-r">
-                            <span className="text-muted-foreground/70 absolute bottom-0 left-0 h-6 w-16 max-w-full pe-2 text-right text-[10px] sm:pe-4 sm:text-xs">
-                                All day
-                            </span>
-                        </div>
-                        {days.map((day, dayIndex) => {
-                            const dayAllDayEvents = allDayEvents.filter((event) => {
-                                const eventStart = new Date(event.start)
-                                const eventEnd = new Date(event.end)
-                                return (isSameDay(day, eventStart) || (day > eventStart && day < eventEnd) || isSameDay(day, eventEnd))
-                            })
-
-                            return (
-                                <div key={day.toString()} className="border-border/70 relative border-r p-1 last:border-r-0" data-today={isToday(day) || undefined}>
-                                    {dayAllDayEvents.map((event) => {
-                                        const eventStart = new Date(event.start)
-                                        const eventEnd = new Date(event.end)
-                                        const isFirstDay = isSameDay(day, eventStart)
-                                        const isLastDay = isSameDay(day, eventEnd)
-
-                                        // Check if this is the first day in the current week view
-                                        const isFirstVisibleDay = dayIndex === 0 && isBefore(eventStart, weekStart)
-                                        const shouldShowTitle = isFirstDay || isFirstVisibleDay
-
-                                        return (
-                                            <EventItem key={`spanning-${event.id}`} onClick={(e) => handleEventClick(event, e)} event={event} view="month" isFirstDay={isFirstDay} isLastDay={isLastDay}>
-                                                <div className={cn("truncate", !shouldShowTitle && "invisible")} aria-hidden={!shouldShowTitle}>
-                                                    {event.title}
-                                                </div>
-                                            </EventItem>
-                                        )
-                                    })}
-                                </div>
-                            )
-                        })}
-                    </div>
-                </div>
-            )} */}
-
+            {/* Time grid section */}
             <div className="grid flex-1 grid-cols-8">
+                {/* Time labels */}
                 <div className="border-border/70 border-r">
                     {hours.map((hour, index) => (
                         <div key={hour.toString()} className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0">
@@ -234,16 +193,11 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
                     ))}
                 </div>
 
+                {/* Event columns */}
                 {days.map((day, dayIndex) => (
                     <div key={day.toString()} className="border-border/70 relative border-r last:border-r-0" data-today={isToday(day) || undefined}>
                         {/* Positioned events */}
-                        {processedDayEvents[dayIndex].map((positionedEvent) => (
-                            <div key={positionedEvent.event.id} className="absolute z-10 px-0.5" style={{ top: `${positionedEvent.top}px`, height: `${positionedEvent.height}px`, left: `${positionedEvent.left * 100}%`, width: `${positionedEvent.width * 100}%`, zIndex: positionedEvent.zIndex }} onClick={(e) => e.stopPropagation()}>
-                                <div className="h-full w-full">
-                                    <DraggableEvent event={positionedEvent.event} view="week" onClick={(e) => handleEventClick(positionedEvent.event, e)} showTime={true} height={positionedEvent.height}/>
-                                </div>
-                            </div>
-                        ))}
+                        {processedDayEvents[dayIndex].map((positionedEvent) => <PositionedEvent key={positionedEvent.event.id} positionedEvent={positionedEvent} handleEventClick={handleEventClick} />)}
 
                         {/* Current time indicator - only show for today's column */}
                         {currentTimeVisible && isToday(day) && <CurrentTimeIndicator currentTimePosition={currentTimePosition} />}
@@ -338,6 +292,17 @@ export function WeekViewHeader({ days }: { days: Date[] }) {
                     <span className="max-sm:hidden">{format(day, "EEE dd")}</span>
                 </div>
             ))}
+        </div>
+    )
+}
+
+// PositionedEvent component
+export function PositionedEvent({ positionedEvent, handleEventClick }: { positionedEvent: PositionedEvent; handleEventClick: (event: CalendarEvent, e: React.MouseEvent) => void }) {
+    return (
+        <div key={positionedEvent.event.id} className="absolute z-10 px-0.5" style={{ top: `${positionedEvent.top}px`, height: `${positionedEvent.height}px`, left: `${positionedEvent.left * 100}%`, width: `${positionedEvent.width * 100}%`, zIndex: positionedEvent.zIndex }} onClick={(e) => e.stopPropagation()}>
+            <div className="h-full w-full">
+                <DraggableEvent event={positionedEvent.event} view="week" onClick={(e) => handleEventClick(positionedEvent.event, e)} showTime={true} height={positionedEvent.height} />
+            </div>
         </div>
     )
 }

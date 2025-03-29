@@ -3,8 +3,7 @@
 // Import modules
 import React, { useMemo } from "react"
 import { addHours, areIntervalsOverlapping, differenceInMinutes, eachHourOfInterval, format, getHours, getMinutes, isSameDay, startOfDay } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, WeekCellsHeight, type CalendarEvent } from "@/components/full-calendar"
-import { cn } from "@/lib/utils"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, WeekCellsHeight, type CalendarEvent, generateDroppableCell } from "@/components/full-calendar"
 
 // DayViewProps interface
 interface DayViewProps {
@@ -258,19 +257,11 @@ export function AllDayEventsSection({ allDayEvents, onEventClick, currentDate }:
                     </span>
                 </div>
                 <div className="border-border/70 relative border-r p-1 last:border-r-0">
-                    {allDayEvents.map((event) => {
-                        const eventStart = new Date(event.start)
-                        const eventEnd = new Date(event.end)
-                        const isFirstDay = isSameDay(currentDate, eventStart)
-                        const isLastDay = isSameDay(currentDate, eventEnd)
-
-                        return (
-                            <EventItem key={`spanning-${event.id}`} onClick={(e) => onEventClick(event, e)} event={event} view="month" isFirstDay={isFirstDay} isLastDay={isLastDay}>
-                                {/* Always show the title in day view for better usability */}
-                                <div>{event.title}</div>
-                            </EventItem>
-                        )
-                    })}
+                    {allDayEvents.map((event) =>
+                        <EventItem key={`spanning-${event.id}`} onClick={(e) => onEventClick(event, e)} event={event} view="month" isFirstDay={isSameDay(currentDate, new Date(event.start))} isLastDay={isSameDay(currentDate, new Date(event.end))}>
+                            <div>{event.title}</div>
+                        </EventItem>
+                    )}
                 </div>
             </div>
         </div>
@@ -304,48 +295,32 @@ export function CurrentTimeIndicator({ currentTimePosition }: { currentTimePosit
 
 // TimeGrid component
 export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[]; currentDate: Date; onEventCreate: (startTime: Date) => void }) {
-    // > Define a helper function to generate a classname based on the specified quarter within each hour
-    function generateDroppableCell(quarter: number) {
-        return cn(
-            "absolute h-[calc(var(--week-cells-height)/4)] w-full",
-            quarter === 0 && "top-0",
-            quarter === 1 && "top-[calc(var(--week-cells-height)/4)]",
-            quarter === 2 && "top-[calc(var(--week-cells-height)/4*2)]",
-            quarter === 3 && "top-[calc(var(--week-cells-height)/4*3)]"
-        )
-    }
     // > Return the JSX for the time grid component
     return (
         <div className="absolute inset-0 z-0">
-            {hours.map((hour) => {
-                        const hourValue = getHours(hour)
+            {hours.map((hour) => (
+                <div key={hour.toString()} className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0">
+                    {/* Quarter-hour intervals */}
+                    {[0, 1, 2, 3].map((quarter) => {
                         return (
-                            <div
-                                key={hour.toString()}
-                                className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0"
-                            >
-                                {/* Quarter-hour intervals */}
-                                {[0, 1, 2, 3].map((quarter) => {
-                                    const quarterHourTime = hourValue + quarter * 0.25
-                                    return (
-                                        <DroppableCell
-                                            key={`${hour.toString()}-${quarter}`}
-                                            id={`day-cell-${currentDate.toISOString()}-${quarterHourTime}`}
-                                            date={currentDate}
-                                            time={quarterHourTime}
-                                            className={generateDroppableCell(quarter)}
-                                            onClick={() => {
-                                                const startTime = new Date(currentDate)
-                                                startTime.setHours(hourValue)
-                                                startTime.setMinutes(quarter * 15)
-                                                onEventCreate(startTime)
-                                            }}
-                                        />
-                                    )
-                                })}
-                            </div>
+                            <DroppableCell
+                                key={`${hour.toString()}-${quarter}`}
+                                id={`day-cell-${currentDate.toISOString()}-${getHours(hour) + quarter * 0.25}`}
+                                date={currentDate}
+                                time={getHours(hour) + quarter * 0.25}
+                                className={generateDroppableCell(quarter)}
+                                onClick={() => {
+                                    const startTime = new Date(currentDate)
+                                    startTime.setHours(getHours(hour))
+                                    startTime.setMinutes(quarter * 15)
+                                    onEventCreate(startTime)
+                                }}
+                            />
                         )
                     })}
+                </div>
+
+            ))}
         </div>
     )
 }
