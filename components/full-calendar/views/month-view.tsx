@@ -80,6 +80,14 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
 
                                                 if (!visibleCount) return null
 
+                                                if (isFirstDay) {
+                                                    return (
+                                                        <div key={event.id} className="aria-hidden:hidden" aria-hidden={isHidden ? "true" : undefined}>
+                                                            <DraggableEvent event={event} view="month" onClick={(e) => handleEventClick(event, e)} isFirstDay={isFirstDay} isLastDay={isLastDay} />
+                                                        </div>
+                                                    )
+                                                }
+
                                                 if (!isFirstDay) {
                                                     return (
                                                         <div key={`spanning-${event.id}-${day.toISOString().slice(0, 10)}`} className="aria-hidden:hidden" aria-hidden={isHidden ? "true" : undefined}>
@@ -92,39 +100,10 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                                         </div>
                                                     )
                                                 }
-
-                                                return (
-                                                    <div key={event.id} className="aria-hidden:hidden" aria-hidden={isHidden ? "true" : undefined}>
-                                                        <DraggableEvent event={event} view="month" onClick={(e) => handleEventClick(event, e)} isFirstDay={isFirstDay} isLastDay={isLastDay} />
-                                                    </div>
-                                                )
                                             })}
 
+                                            {/* Additional events in a popover */}
                                             {hasMore && <HasMoreEventsPopover EventHeight={EventHeight} allEvents={allEvents} currentDay={day} remainingCount={remainingCount} handleEventClick={handleEventClick} />}
-                                            {/* {hasMore && (
-                                                <Popover modal>
-                                                    <PopoverTrigger asChild>
-                                                        <button className="focus-visible:border-ring focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground hover:bg-muted/50 mt-[var(--event-gap)] flex h-[var(--event-height)] w-full items-center overflow-hidden px-1 text-left text-[10px] backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2 sm:text-xs" onClick={(e) => e.stopPropagation()}><span>+ {remainingCount} <span className="max-sm:sr-only">more</span></span></button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent align="center" className="max-w-52 p-3" style={{ "--event-height": `${EventHeight}px` } as React.CSSProperties}>
-                                                        <div className="space-y-2">
-                                                            <div className="text-sm font-medium">{format(day, "EEE d")}</div>
-                                                            <div className="space-y-1">
-                                                                {sortEvents(allEvents).map((event) => {
-                                                                    const eventStart = new Date(event.start)
-                                                                    const eventEnd = new Date(event.end)
-                                                                    const isFirstDay = isSameDay(day, eventStart)
-                                                                    const isLastDay = isSameDay(day, eventEnd)
-
-                                                                    return (
-                                                                        <EventItem key={event.id} onClick={(e) => handleEventClick(event, e)} event={event} view="month" isFirstDay={isFirstDay} isLastDay={isLastDay} />
-                                                                    )
-                                                                })}
-                                                            </div>
-                                                        </div>
-                                                    </PopoverContent>
-                                                </Popover>
-                                            )} */}
                                         </div>
                                     </DroppableCell>
                                 </div>
