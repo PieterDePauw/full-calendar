@@ -4,7 +4,7 @@
 import { createContext, useContext, useId, useRef, useState, type ReactNode } from "react"
 import { DndContext, DragOverlay, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragOverEvent, type DragStartEvent, type UniqueIdentifier } from "@dnd-kit/core"
 import { addMinutes, differenceInMinutes } from "date-fns"
-import { type CalendarEvent, type DragHandlePositionType, EventItem } from "@/components/full-calendar"
+import { type CalendarEvent, compareDateTime, type DragHandlePositionType, EventItem } from "@/components/full-calendar"
 
 // Define the context type
 type CalendarDndContextType = {
@@ -33,13 +33,10 @@ const CalendarDndContext = createContext<CalendarDndContextType>({
 // Hook to use the context
 export const useCalendarDnd = () => useContext(CalendarDndContext)
 
-// Props for the provider
-interface CalendarDndProviderProps {
-    children: ReactNode
-    onEventUpdate: (event: CalendarEvent) => void
-}
-
-export function CalendarDndProvider({ children, onEventUpdate }: CalendarDndProviderProps) {
+// CalendarDndProvider component
+// This component provides the drag-and-drop context for the calendar
+// It uses the DndContext from dnd-kit to manage drag-and-drop interactions
+export function CalendarDndProvider({ children, onEventUpdate }: { children: ReactNode; onEventUpdate: (event: CalendarEvent) => void }) {
     const [activeEvent, setActiveEvent] = useState<CalendarEvent | null>(null)
     const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
     const [activeView, setActiveView] = useState<"month" | "week" | "day" | null>(null)
@@ -49,29 +46,22 @@ export function CalendarDndProvider({ children, onEventUpdate }: CalendarDndProv
     const [multiDayWidth, setMultiDayWidth] = useState<number | null>(null)
     const [dragHandlePosition, setDragHandlePosition] = useState<DragHandlePositionType | null>(null)
 
-    // > Store original event dimensions
+    // > Use the useRef hook to store the original height of the event to maintain the drag overlay size
     const eventDimensions = useRef<{ height: number }>({ height: 0 })
 
     // > Configure sensors for better drag detection
     const sensors = useSensors(
         useSensor(MouseSensor, {
             // Require the mouse to move by 5px before activating
-            activationConstraint: {
-                distance: 5,
-            },
+            activationConstraint: { distance: 5 },
         }),
         useSensor(TouchSensor, {
-            // Press delay of 250ms, with tolerance of 5px of movement
-            activationConstraint: {
-                delay: 250,
-                tolerance: 5,
-            },
+            // Require the touch to move by 5px before activating, after a 250ms delay
+            activationConstraint: { delay: 250, tolerance: 5 },
         }),
         useSensor(PointerSensor, {
             // Require the pointer to move by 5px before activating
-            activationConstraint: {
-                distance: 5,
-            },
+            activationConstraint: { distance: 5 },
         })
     )
 
@@ -79,119 +69,98 @@ export function CalendarDndProvider({ children, onEventUpdate }: CalendarDndProv
     const dndContextId = useId()
 
     // > Define a helper function to handle the drag start event
-    const handleDragStart = (event: DragStartEvent) => {
-        const { active } = event
-
-        // Add safety check for data.current
-        if (!active.data.current) {
-            console.error("Missing data in drag start event", event)
+    function handleDragStart(dragStartEvent: DragStartEvent) {
+        // >> Add safety check for data.current
+        if (!dragStartEvent.active.data.current) {
+            console.error("Missing data in drag start event", dragStartEvent)
             return
         }
 
-        const {
-            event: calendarEvent,
-            view,
-            height,
-            isMultiDay: eventIsMultiDay,
-            multiDayWidth: eventMultiDayWidth,
-            dragHandlePosition: eventDragHandlePosition,
-        } = active.data.current as {
-            event: CalendarEvent
-            view: "month" | "week" | "day"
-            height?: number
-            isMultiDay?: boolean
-            multiDayWidth?: number
-            dragHandlePosition?: {
-                x?: number
-                y?: number
-                data?: {
-                    isFirstDay?: boolean
-                    isLastDay?: boolean
-                }
-            }
-        }
+        // >> Store the active event and its properties
+        setActiveEvent(dragStartEvent.active.data.current.event)
+        setActiveId(dragStartEvent.active.id)
+        setActiveView(dragStartEvent.active.data.current.view)
+        setCurrentTime(new Date(dragStartEvent.active.data.current.event.start))
+        setIsMultiDay(dragStartEvent.active.data.current.isMultiDay || false)
+        setMultiDayWidth(dragStartEvent.active.data.current.multiDayWidth || null)
+        setDragHandlePosition(dragStartEvent.active.data.current.dragHandlePosition || null)
 
-        setActiveEvent(calendarEvent)
-        setActiveId(active.id)
-        setActiveView(view)
-        setCurrentTime(new Date(calendarEvent.start))
-        setIsMultiDay(eventIsMultiDay || false)
-        setMultiDayWidth(eventMultiDayWidth || null)
-        setDragHandlePosition(eventDragHandlePosition || null)
-
-        // Store event height if provided
-        if (height) {
-            eventDimensions.current.height = height
-            setEventHeight(height)
+        // >> Assign the event height to the ref for the drag overlay and store it in state
+        if (dragStartEvent.active.data.current.height) {
+            eventDimensions.current.height = dragStartEvent.active.data.current.height
+            setEventHeight(dragStartEvent.active.data.current.height)
         }
     }
 
     // > Define a helper function to handle the drag over event
-    const handleDragOver = (event: DragOverEvent) => {
-        const { over } = event
+    function handleDragOver(dragOverEvent: DragOverEvent) {
+        // >> Check if there is an active event
+        if (!activeEvent) {
+            console.error("No active event found during drag over", dragOverEvent)
+            return
+        }
 
-        if (over && activeEvent && over.data.current) {
-            const { date, time } = over.data.current as { date: Date; time?: number }
+        // Add robust error checking
+        if (!dragOverEvent.over || !dragOverEvent.over.data.current) {
+            console.error("We could either not find the over element or not find its data")
+            return
+        }
 
-            // Update time for week/day views
-            if (time !== undefined && activeView !== "month") {
-                const newTime = new Date(date)
+        const { date, time } = dragOverEvent.over.data.current as { date: Date; time?: number }
 
-                // Calculate hours and minutes with 15-minute precision
-                const hours = Math.floor(time)
-                const fractionalHour = time - hours
+        // Update time for week/day views
+        if (time !== undefined && activeView !== "month") {
+            const newTime = new Date(date)
 
-                // Map to nearest 15 minute interval (0, 0.25, 0.5, 0.75)
-                let minutes = 0
-                if (fractionalHour < 0.125) minutes = 0
-                else if (fractionalHour < 0.375) minutes = 15
-                else if (fractionalHour < 0.625) minutes = 30
-                else minutes = 45
+            // Calculate hours and minutes with 15-minute precision
+            const hours = Math.floor(time)
+            const fractionalHour = time - hours
 
-                newTime.setHours(hours, minutes, 0, 0)
+            // Map to nearest 15 minute interval (0, 0.25, 0.5, 0.75)
+            let minutes = 0
+            if (fractionalHour < 0.125) minutes = 0
+            else if (fractionalHour < 0.375) minutes = 15
+            else if (fractionalHour < 0.625) minutes = 30
+            else minutes = 45
 
-                // Only update if time has changed
-                if (
-                    !currentTime ||
-                    newTime.getHours() !== currentTime.getHours() ||
-                    newTime.getMinutes() !== currentTime.getMinutes() ||
-                    newTime.getDate() !== currentTime.getDate() ||
-                    newTime.getMonth() !== currentTime.getMonth() ||
-                    newTime.getFullYear() !== currentTime.getFullYear()
-                ) {
-                    setCurrentTime(newTime)
-                }
-            } else if (activeView === "month") {
-                // For month view, just update the date but preserve time
-                const newTime = new Date(date)
-                if (currentTime) {
-                    newTime.setHours(
-                        currentTime.getHours(),
-                        currentTime.getMinutes(),
-                        currentTime.getSeconds(),
-                        currentTime.getMilliseconds()
-                    )
-                }
+            newTime.setHours(hours, minutes, 0, 0)
 
-                // Only update if date has changed
-                if (
-                    !currentTime ||
-                    newTime.getDate() !== currentTime.getDate() ||
-                    newTime.getMonth() !== currentTime.getMonth() ||
-                    newTime.getFullYear() !== currentTime.getFullYear()
-                ) {
-                    setCurrentTime(newTime)
-                }
+            // Only update if time has changed
+            if (!currentTime ||
+                newTime.getHours() !== currentTime.getHours() ||
+                newTime.getMinutes() !== currentTime.getMinutes() ||
+                newTime.getDate() !== currentTime.getDate() ||
+                newTime.getMonth() !== currentTime.getMonth() ||
+                newTime.getFullYear() !== currentTime.getFullYear()) {
+                setCurrentTime(newTime)
+            }
+        } else if (activeView === "month") {
+            // For month view, just update the date but preserve time
+            const newTime = new Date(date)
+            if (currentTime) {
+                newTime.setHours(
+                    currentTime.getHours(),
+                    currentTime.getMinutes(),
+                    currentTime.getSeconds(),
+                    currentTime.getMilliseconds()
+                )
+            }
+
+            // Only update if date has changed
+            if (!currentTime ||
+                newTime.getDate() !== currentTime.getDate() ||
+                newTime.getMonth() !== currentTime.getMonth() ||
+                newTime.getFullYear() !== currentTime.getFullYear()) {
+                setCurrentTime(newTime)
             }
         }
+
     }
 
     // > Define a helper function to handle the drag end event
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event
-
+    const handleDragEnd = (dragEndEvent: DragEndEvent) => {
         // Add robust error checking
-        if (!over || !activeEvent || !currentTime) {
+        if (!dragEndEvent.over || !activeEvent || !currentTime) {
             // Reset state and exit early
             setActiveEvent(null)
             setActiveId(null)
@@ -206,32 +175,25 @@ export function CalendarDndProvider({ children, onEventUpdate }: CalendarDndProv
 
         try {
             // Safely access data with checks
-            if (!active.data.current || !over.data.current) {
-                throw new Error("Missing data in drag event")
+            if (!dragEndEvent.active.data.current || !dragEndEvent.over.data.current) {
+                throw new Error("Missing data in drag dragEndEvent")
             }
 
-            const activeData = active.data.current as {
-                event?: CalendarEvent
-                view?: string
-            }
-            const overData = over.data.current as { date?: Date; time?: number }
+            const activeData = dragEndEvent.active.data.current as { event?: CalendarEvent; view?: string }
+            const overData = dragEndEvent.over.data.current as { date?: Date; time?: number }
 
             // Verify we have all required data
             if (!activeData.event || !overData.date) {
                 throw new Error("Missing required event data")
             }
 
-            const calendarEvent = activeData.event
-            const date = overData.date
-            const time = overData.time
-
             // Calculate new start time
-            const newStart = new Date(date)
+            const newStart = new Date(overData.date)
 
             // If time is provided (for week/day views), set the hours and minutes
-            if (time !== undefined) {
-                const hours = Math.floor(time)
-                const fractionalHour = time - hours
+            if (overData.time !== undefined) {
+                const hours = Math.floor(overData.time)
+                const fractionalHour = overData.time - hours
 
                 // Map to nearest 15 minute interval (0, 0.25, 0.5, 0.75)
                 let minutes = 0
@@ -251,27 +213,20 @@ export function CalendarDndProvider({ children, onEventUpdate }: CalendarDndProv
                 )
             }
 
+            // Get the original start and end times from the active event
+            const originalStart = new Date(activeData.event.start)
+            const originalEnd = new Date(activeData.event.end)
+
             // Calculate new end time based on the original duration
-            const originalStart = new Date(calendarEvent.start)
-            const originalEnd = new Date(calendarEvent.end)
             const durationMinutes = differenceInMinutes(originalEnd, originalStart)
             const newEnd = addMinutes(newStart, durationMinutes)
 
-            // Only update if the start time has actually changed
-            const hasStartTimeChanged =
-                originalStart.getFullYear() !== newStart.getFullYear() ||
-                originalStart.getMonth() !== newStart.getMonth() ||
-                originalStart.getDate() !== newStart.getDate() ||
-                originalStart.getHours() !== newStart.getHours() ||
-                originalStart.getMinutes() !== newStart.getMinutes()
+            // Check if the start time has actually changed
+            const hasStartTimeChanged = compareDateTime(originalStart, newStart)
 
+            // Update the event only if the time has changed
             if (hasStartTimeChanged) {
-                // Update the event only if the time has changed
-                onEventUpdate({
-                    ...calendarEvent,
-                    start: newStart,
-                    end: newEnd,
-                })
+                onEventUpdate({ ...activeData.event, start: newStart, end: newEnd })
             }
         } catch (error) {
             console.error("Error in drag end handler:", error)

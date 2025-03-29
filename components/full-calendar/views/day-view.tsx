@@ -33,13 +33,12 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
     // biome-ignore
     const dayEvents = useMemo(() => events.filter((event) => isSameDay(currentDate, new Date(event.start)) || isSameDay(currentDate, new Date(event.end)) || (currentDate > new Date(event.start) && currentDate < new Date(event.end))).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()), [currentDate, events])
 
-    // Filter all-day events
-    // Include explicitly marked all-day events or multi-day events
+    // Filter all-day events, including those explicitly marked as all-day events or events that span multiple days
     // biome-ignore
     const allDayEvents = useMemo(() => dayEvents.filter((event) => event.allDay || checkIfMultiDayEvent(event)), [dayEvents])
 
     // > Check if there are any all-day events
-    const hasAllDayEvents = useMemo(() => allDayEvents.length > 0, [allDayEvents])
+    const hasAllDayEvents = useMemo(() => allDayEvents.length >= 0, [allDayEvents])
 
     // Get only single-day time-based events
     // biome-ignore
@@ -266,14 +265,7 @@ export function AllDayEventsSection({ allDayEvents, onEventClick, currentDate }:
                         const isLastDay = isSameDay(currentDate, eventEnd)
 
                         return (
-                            <EventItem
-                                key={`spanning-${event.id}`}
-                                onClick={(e) => onEventClick(event, e)}
-                                event={event}
-                                view="month"
-                                isFirstDay={isFirstDay}
-                                isLastDay={isLastDay}
-                            >
+                            <EventItem key={`spanning-${event.id}`} onClick={(e) => onEventClick(event, e)} event={event} view="month" isFirstDay={isFirstDay} isLastDay={isLastDay}>
                                 {/* Always show the title in day view for better usability */}
                                 <div>{event.title}</div>
                             </EventItem>
