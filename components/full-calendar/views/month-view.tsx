@@ -1,10 +1,10 @@
 "use client"
 
 // Import modules
-import React, { useMemo, type CSSProperties, type MouseEvent } from "react"
+import { Fragment, useMemo, type CSSProperties, type MouseEvent } from "react"
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { type CalendarEvent, DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
 import { useMounted } from "@/hooks/use-mounted"
 
 // MonthView component
@@ -16,20 +16,26 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
     const weekdays = useMemo(() => Array.from({ length: 7 }).map((_, i) => format(addDays(startOfWeek(new Date()), i), "EEE")), [])
 
     // > Get all the weeks of the month, based on the days of the month
-    const weeks = useMemo(() => {
-        const result = []
-        let week = []
+    // const weeks = useMemo(() => {
+    //     const result = []
+    //     let week = []
 
-        for (let i = 0; i < days.length; i++) {
-            week.push(days[i])
-            if (week.length === 7 || i === days.length - 1) {
-                result.push(week)
-                week = []
-            }
-        }
+    //     for (let i = 0; i < days.length; i++) {
+    //         week.push(days[i])
+    //         if (week.length === 7 || i === days.length - 1) {
+    //             result.push(week)
+    //             week = []
+    //         }
+    //     }
 
-        return result
-    }, [days])
+    //     return result
+    // }, [days])
+
+    // > Get all the weeks of the month, based on the days of the month
+    // const weeks = useMemo(() => Array.from({ length: Math.ceil(days.length / 7) }, (_, i) => days.slice(i * 7, i * 7 + 7)), [days]);
+
+    // > Get all the weeks of the month, based on the days of the month
+    const weeks = useMemo(() => { const result = []; let week = []; for (let i = 0; i < days.length; i++) { week.push(days[i]); if (week.length === 7 || i === days.length - 1) { result.push(week); week = [] } } return result }, [days])
 
     // > Define a helper function to handle the event click to select an event
     function handleEventClick(event: CalendarEvent, e: MouseEvent) {
@@ -44,7 +50,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
     const { contentRef, getVisibleEventCount } = useEventVisibility({ eventHeight: EventHeight, eventGap: EventGap })
 
     return (
-        <>
+        <Fragment>
             <div className="border-border/70 grid grid-cols-7 border-b">
                 {weekdays.map((day) => <div key={day} className="text-muted-foreground/70 py-2 text-center text-sm">{day}</div>)}
             </div>
@@ -107,7 +113,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                     </div>
                 ))}
             </div>
-        </>
+        </Fragment>
     )
 }
 
@@ -124,6 +130,7 @@ function HasMoreEventsPopover({ EventHeight, allEvents, currentDay, remainingCou
                     </span>
                 </button>
             </PopoverTrigger>
+
             {/* Content of the popover that lists all events for the current day */}
             <PopoverContent align="center" className="max-w-52 p-3" style={{ "--event-height": `${EventHeight}px` } as CSSProperties}>
                 <div className="space-y-2">
