@@ -44,8 +44,6 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                             const spanningEvents = getSpanningEventsForDay(events, day)
                             const allDayEvents = [...spanningEvents, ...dayEvents]
                             const allEvents = getAllEventsForDay(events, day)
-
-                            const isReferenceCell = weekIndex === 0 && dayIndex === 0
                             const visibleCount = isMounted ? getVisibleEventCount(allDayEvents.length) : undefined
                             const hasMore = visibleCount !== undefined && allDayEvents.length > visibleCount
                             const remainingCount = hasMore ? allDayEvents.length - visibleCount : 0
@@ -54,13 +52,15 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                 <div key={day.toString()} className="group border-border/70 data-outside-cell:bg-muted/25 data-outside-cell:text-muted-foreground/70 border-r border-b last:border-r-0" data-today={isToday(day) || undefined} data-outside-cell={!isCurrentMonth || undefined}>
                                     <DroppableCell id={`month-cell-${day.toISOString()}`} date={day} onClick={() => { const startTime = new Date(day); startTime.setHours(9, 0, 0); onEventCreate(startTime); }}>
                                         <div className="group-data-today:bg-primary group-data-today:text-primary-foreground mt-1 inline-flex size-6 items-center justify-center rounded-full text-sm">{format(day, "d")}</div>
-                                        <div ref={isReferenceCell ? contentRef : null} className="min-h-[calc((var(--event-height)+var(--event-gap))*2)] sm:min-h-[calc((var(--event-height)+var(--event-gap))*3)] lg:min-h-[calc((var(--event-height)+var(--event-gap))*4)]">
+                                        <div ref={weekIndex === 0 && dayIndex === 0 ? contentRef : null} className="min-h-[calc((var(--event-height)+var(--event-gap))*2)] sm:min-h-[calc((var(--event-height)+var(--event-gap))*3)] lg:min-h-[calc((var(--event-height)+var(--event-gap))*4)]">
                                             {sortEvents(allDayEvents).map((event, index) => {
                                                 const isFirstDay = isSameDay(day, new Date(event.start))
                                                 const isLastDay = isSameDay(day, new Date(event.end))
                                                 const isHidden = isMounted && visibleCount && index >= visibleCount
 
-                                                if (!visibleCount) return null
+                                                if (!visibleCount) {
+                                                    return null
+                                                }
 
                                                 if (isFirstDay) {
                                                     return (
