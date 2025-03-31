@@ -305,7 +305,7 @@ export function positionEvents(events: CalendarEvent[], currentDate: Date): Posi
 
         // >> Calculate horizontal position & layering.
         const isFirstColumn = columnIndex === 0;
-        const width = isFirstColumn ? 1 : 0.9;
+        const width = isFirstColumn ? 1 : 1 - (columnIndex * 0.1);
         const left = isFirstColumn ? 0 : columnIndex * 0.1;
         const zIndex = 10 + columnIndex;
 
