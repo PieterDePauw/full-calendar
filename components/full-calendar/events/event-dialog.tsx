@@ -130,7 +130,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         setError(null)
     }
 
-    // Memoize time options so they're only calculated once
+    // > Memoize time options so they're only calculated once
     const timeOptions = useMemo(() => {
         const options = []
         for (let hour = 0; hour < 24; hour++) {
@@ -191,6 +191,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         onDelete(event.id)
     }
 
+    // > Return the JSX for the event dialog component
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-[425px]">
