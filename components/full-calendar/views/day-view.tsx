@@ -3,7 +3,7 @@
 // Import modules
 import { Fragment, useMemo, type MouseEvent } from "react"
 import { addHours, eachHourOfInterval, format, getHours, isSameDay, startOfDay } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, getDroppableCellClasses, positionEvents } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, getDroppableCellClasses, positionEvents, getAllEventsForDay } from "@/components/full-calendar"
 
 // DayViewProps interface
 interface DayViewProps {
@@ -21,15 +21,23 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
 
     // > Filter events that are happening on the current date
     // biome-ignore
-    const dayEvents = useMemo(() => events.filter((event) => isSameDay(currentDate, new Date(event.start)) || isSameDay(currentDate, new Date(event.end)) || (currentDate > new Date(event.start) && currentDate < new Date(event.end))).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()), [currentDate, events])
+    // const dayEvents = useMemo(() => events.filter((event) => isSameDay(currentDate, new Date(event.start)) || isSameDay(currentDate, new Date(event.end)) || (currentDate > new Date(event.start) && currentDate < new Date(event.end))).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()), [currentDate, events])
+
+    // > Filter events that are happening on the current date
+    // biome-ignore
+    // const dayEvents = useMemo(() => getAllEventsForDay(events, currentDate), [currentDate, events])
 
     // > Get only single-day time-based events and process these events to calculate their positions
     // biome-ignore
-    const positionedEvents = useMemo(() => positionEvents(dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), currentDate), [currentDate, dayEvents])
+    // const positionedEvents = useMemo(() => positionEvents(dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), currentDate), [currentDate, dayEvents])
+
+    // > Get only single-day time-based events and process these events to calculate their positions
+    // biome-ignore
+    const positionedEvents = useMemo(() => positionEvents(getAllEventsForDay(events, currentDate).filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), currentDate), [currentDate, events])
 
     // > Filter all-day events, including those explicitly marked as all-day events or events that span multiple days
     // biome-ignore
-    const allDayEvents = useMemo(() => dayEvents.filter((event) => event.allDay || checkIfMultiDayEvent(event)), [dayEvents])
+    const allDayEvents = useMemo(() => getAllEventsForDay(events, currentDate).filter((event) => event.allDay || checkIfMultiDayEvent(event)), [currentDate, events])
 
     // > Check if there are any all-day events
     const hasAllDayEvents = useMemo(() => allDayEvents.length >= 1, [allDayEvents])
