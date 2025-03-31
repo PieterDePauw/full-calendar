@@ -1,6 +1,6 @@
 "use client"
 
-// Import modules
+// Import modules and types
 import { Fragment, useMemo, type CSSProperties, type MouseEvent } from "react"
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -85,7 +85,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                             })}
 
                                             {/* Additional events in a popover */}
-                                            {hasMore && <HasMoreEventsPopover EventHeight={EventHeight} allEvents={allEvents} currentDay={day} remainingCount={remainingCount} handleEventClick={handleEventClick} />}
+                                            {hasMore && <HasMoreEventsPopover EventHeight={EventHeight} allEvents={allEvents} day={day} remainingCount={remainingCount} handleEventClick={handleEventClick} />}
                                         </div>
                                     </DroppableCell>
                                 </div>
@@ -100,12 +100,16 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
 
 
 // HasMoreEventsPopover
-function HasMoreEventsPopover({ EventHeight, allEvents, currentDay, remainingCount, handleEventClick }: { EventHeight: number, allEvents: CalendarEvent[], currentDay: Date, remainingCount: number, handleEventClick: (event: CalendarEvent, e: React.MouseEvent) => void }) {
+function HasMoreEventsPopover({ EventHeight, allEvents, day, remainingCount, handleEventClick }: { EventHeight: number, allEvents: CalendarEvent[], day: Date, remainingCount: number, handleEventClick: (event: CalendarEvent, e: React.MouseEvent) => void }) {
+    // > Use the useMemo hook to create a style object for the popover content
+    const style = useMemo(() => ({ "--event-height": `${EventHeight}px` } as CSSProperties), [EventHeight])
+
+    // > Return the JSX for the popover component
     return (
         <Popover modal={true}>
             {/* Trigger to open the popover */}
             <PopoverTrigger asChild={true}>
-                <button className="focus-visible:border-ring focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground hover:bg-muted/50 mt-[var(--event-gap)] flex h-[var(--event-height)] w-full items-center overflow-hidden px-1 text-left text-[10px] backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2 sm:text-xs" onClick={(e) => e.stopPropagation()}>
+                <button onClick={(e) => e.stopPropagation()} className="focus-visible:border-ring focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground hover:bg-muted/50 mt-[var(--event-gap)] flex h-[var(--event-height)] w-full items-center overflow-hidden px-1 text-left text-[10px] backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2 sm:text-xs">
                     <span>+ {remainingCount}{" "}
                         <span className="max-sm:sr-only">more</span>
                     </span>
@@ -113,11 +117,15 @@ function HasMoreEventsPopover({ EventHeight, allEvents, currentDay, remainingCou
             </PopoverTrigger>
 
             {/* Content of the popover that lists all events for the current day */}
-            <PopoverContent align="center" className="max-w-52 p-3" style={{ "--event-height": `${EventHeight}px` } as CSSProperties}>
+            <PopoverContent align="center" className="max-w-52 p-3" style={style}>
                 <div className="space-y-2">
-                    <div className="text-sm font-medium">{format(currentDay, "EEE d")}</div>
+                    <div className="text-sm font-medium">{
+                        format(day, "EEE d")}
+                    </div>
                     <div className="space-y-1">
-                        {sortEvents(allEvents).map((event) => <EventItem key={event.id} onClick={(e) => handleEventClick(event, e)} event={event} view="month" isFirstDay={isSameDay(currentDay, new Date(event.start))} isLastDay={isSameDay(currentDay, new Date(event.end))} />)}
+                        {sortEvents(allEvents).map((event) => {
+                            return <EventItem key={event.id} view="month" onClick={(e) => handleEventClick(event, e)} event={event} isFirstDay={isSameDay(day, new Date(event.start))} isLastDay={isSameDay(day, new Date(event.end))} />
+                        })}
                     </div>
                 </div>
             </PopoverContent>
