@@ -37,14 +37,14 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
     // > Process events to calculate positions
     const positionedEvents = useMemo(() => positionEvents(timeEvents, currentDate), [currentDate, timeEvents])
 
+    // > Use the useCurrentTimeIndicator hook to get the current time position and visibility
+    const { currentTimePosition, currentTimeVisible } = useCurrentTimeIndicator(currentDate, "day")
+
     // > Define a helper function to handle event clicks
     const handleEventClick = (event: CalendarEvent, e: MouseEvent) => {
         e.stopPropagation()
         onEventSelect(event)
     }
-
-    // > Use the useCurrentTimeIndicator hook to get the current time position and visibility
-    const { currentTimePosition, currentTimeVisible } = useCurrentTimeIndicator(currentDate, "day")
 
     // > Return the JSX for the day view component
     return (
