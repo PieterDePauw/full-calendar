@@ -37,20 +37,10 @@ export function DraggableEvent({ event, view, showTime, onClick, height, multiDa
     const id = useMemo(() => `${event.id}-${view}`, [event.id, view])
 
     // > Use the useDraggable hook to make the event draggable
-    const { attributes, listeners, setNodeRef, transform, isDragging } =
-        useDraggable({
-            id: id,
-            data: {
-                event: event,
-                view: view,
-                isFirstDay: isFirstDay,
-                isLastDay: isLastDay,
-                isMultiDay: isMultiDayEvent,
-                multiDayWidth: multiDayWidth,
-                height: height || elementRef.current?.offsetHeight || null,
-                dragHandlePosition: dragHandlePosition,
-            },
-        })
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+        id: id,
+        data: { event: event, view: view, isFirstDay: isFirstDay, isLastDay: isLastDay, isMultiDay: isMultiDayEvent, multiDayWidth: multiDayWidth, height: height || elementRef.current?.offsetHeight || null, dragHandlePosition: dragHandlePosition },
+    })
 
     // > Define a helper function to handle the mouse down event to track where on the event the user clicked
     function handleMouseDown(e: React.MouseEvent) {
@@ -82,20 +72,7 @@ export function DraggableEvent({ event, view, showTime, onClick, height, multiDa
     // > Return the JSX for the draggable event
     return (
         <div ref={(node) => {setNodeRef(node); if (elementRef) elementRef.current = node}} style={style} className="touch-none">
-            <EventItem
-                event={event}
-                view={view}
-                showTime={showTime}
-                isFirstDay={isFirstDay}
-                isLastDay={isLastDay}
-                isDragging={isDragging}
-                onClick={onClick}
-                onMouseDown={handleMouseDown}
-                onTouchStart={handleTouchStart}
-                dndListeners={listeners}
-                dndAttributes={attributes}
-                aria-hidden={ariaHidden}
-            />
+            <EventItem event={event} view={view} showTime={showTime} isFirstDay={isFirstDay} isLastDay={isLastDay} isDragging={isDragging} onClick={onClick} onMouseDown={handleMouseDown} onTouchStart={handleTouchStart} dndListeners={listeners} dndAttributes={attributes} aria-hidden={ariaHidden} />
         </div>
     )
 }

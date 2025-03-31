@@ -1,6 +1,7 @@
 // Import modules
+import { type ClassValue } from "clsx"
 import { addHours, areIntervalsOverlapping, differenceInDays, differenceInMinutes, getHours, getMinutes, isSameDay, startOfDay } from "date-fns"
-import { WeekCellsHeight, type CalendarEvent, type PositionedEvent, type EventColor } from "@/components/full-calendar"
+import { WeekCellsHeight, type CalendarEvent, type PositionedEvent, type EventColor, type CalendarView } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
 /**
@@ -37,6 +38,44 @@ export function getBorderRadiusClasses(isFirstDay: boolean, isLastDay: boolean):
     if (isLastDay) return "rounded-r rounded-l-none"
     // If it is neither the first nor last day of the event, don't round any corners
     return "rounded-none"
+}
+
+// Define a helper function to generate the classname for the event wrapper
+export function getEventWrapperClasses({ isFirstDay, isLastDay, eventColor, className }: { isFirstDay: boolean, isLastDay: boolean, eventColor?: EventColor, className?: ClassValue }): string {
+    return cn(
+        "focus-visible:border-ring focus-visible:ring-ring/50 flex h-full w-full overflow-hidden px-1 text-left font-medium backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2",
+        getEventColorClasses(eventColor),
+        getBorderRadiusClasses(isFirstDay, isLastDay),
+        className
+    )
+}
+
+// Define a helper function to generate the classname for events in the day view or the week view
+export function getDayWeekEventClasses({ durationInMinutes, view, className }: { durationInMinutes: number, view: CalendarView, className: ClassValue }): string {
+    return cn(
+        "py-1",
+        durationInMinutes < 45 ? "items-center" : "flex-col",
+        view === "week" ? "text-[10px] sm:text-xs" : "text-xs",
+        className
+    )
+}
+
+// Define a helper function to generate the classname for events in the month view
+export function getMonthEventClasses({ className }: { className: ClassValue }): string {
+    return cn(
+        "mt-[var(--event-gap)] h-[var(--event-height)] items-center text-[10px] sm:text-xs",
+        className
+
+    )
+}
+
+// Define a helper function to generate the classname for events in the agenda view
+export function getAgendaEventClasses({ eventColor, className }: { eventColor?: EventColor, className?: ClassValue }): string {
+    return cn(
+        "focus-visible:border-ring focus-visible:ring-ring/50 flex w-full flex-col gap-1 rounded p-2 text-left transition outline-none focus-visible:ring-[3px] data-past-event:line-through data-past-event:opacity-90",
+        getEventColorClasses(eventColor),
+        className
+    )
 }
 
 /**
