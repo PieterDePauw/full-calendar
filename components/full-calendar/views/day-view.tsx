@@ -1,9 +1,9 @@
 "use client"
 
 // Import modules
-import React, { useMemo } from "react"
-import { addHours, areIntervalsOverlapping, differenceInMinutes, eachHourOfInterval, format, getHours, getMinutes, isSameDay, startOfDay } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, WeekCellsHeight, type CalendarEvent, generateDroppableCell } from "@/components/full-calendar"
+import React, { Fragment, useMemo } from "react"
+import { addHours, areIntervalsOverlapping, eachHourOfInterval, format, getHours, getMinutes, isSameDay, startOfDay } from "date-fns"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, WeekCellsHeight, type CalendarEvent, generateDroppableCell, sortEventsByStartTimeAndDuration } from "@/components/full-calendar"
 
 // DayViewProps interface
 interface DayViewProps {
@@ -25,55 +25,64 @@ interface PositionedEvent {
 
 // DayView component
 export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: DayViewProps) {
-    // Get all of the hours in the current date
+    // > Get all of the hours in the current date
+    // biome-ignore
     const hours = useMemo(() => eachHourOfInterval({ start: startOfDay(currentDate), end: addHours(startOfDay(currentDate), 23) }), [currentDate])
 
-    // Filter events that are happening on the current date
+    // > Filter events that are happening on the current date
     // biome-ignore
     const dayEvents = useMemo(() => events.filter((event) => isSameDay(currentDate, new Date(event.start)) || isSameDay(currentDate, new Date(event.end)) || (currentDate > new Date(event.start) && currentDate < new Date(event.end))).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()), [currentDate, events])
 
-    // Filter all-day events, including those explicitly marked as all-day events or events that span multiple days
+    // > Filter all-day events, including those explicitly marked as all-day events or events that span multiple days
     // biome-ignore
     const allDayEvents = useMemo(() => dayEvents.filter((event) => event.allDay || checkIfMultiDayEvent(event)), [dayEvents])
 
     // > Check if there are any all-day events
     const hasAllDayEvents = useMemo(() => allDayEvents.length >= 0, [allDayEvents])
 
-    // Get only single-day time-based events
+    // > Get only single-day time-based events
     // biome-ignore
     const timeEvents = useMemo(() => dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), [dayEvents])
 
-    // Process events to calculate positions
+    // > Process events to calculate positions
     // biome-ignore
     const positionedEvents = useMemo(() => {
+        // // Sort events by start time and duration
+        // const sortedEvents = [...timeEvents].sort((a, b) => {
+        //     const aStart = new Date(a.start)
+        //     const bStart = new Date(b.start)
+        //     const aEnd = new Date(a.end)
+        //     const bEnd = new Date(b.end)
+
+        //     // First sort by start time
+        //     if (aStart < bStart) return -1
+        //     if (aStart > bStart) return 1
+
+        //     // If start times are equal, sort by duration (longer events first)
+        //     const aDuration = differenceInMinutes(aEnd, aStart)
+        //     const bDuration = differenceInMinutes(bEnd, bStart)
+        //     return bDuration - aDuration
+        // })
+
+        // >> Define a result array to hold positioned events
         const result: PositionedEvent[] = []
+
+        // >> Define the start of the day
         const dayStart = startOfDay(currentDate)
 
-        // Sort events by start time and duration
-        const sortedEvents = [...timeEvents].sort((a, b) => {
-            const aStart = new Date(a.start)
-            const bStart = new Date(b.start)
-            const aEnd = new Date(a.end)
-            const bEnd = new Date(b.end)
+        // >> Sort events by start time and duration
+        const sortedEvents = sortEventsByStartTimeAndDuration(timeEvents)
 
-            // First sort by start time
-            if (aStart < bStart) return -1
-            if (aStart > bStart) return 1
-
-            // If start times are equal, sort by duration (longer events first)
-            const aDuration = differenceInMinutes(aEnd, aStart)
-            const bDuration = differenceInMinutes(bEnd, bStart)
-            return bDuration - aDuration
-        })
-
-        // Track columns for overlapping events
+        // >> Define an array to hold columns for overlapping events
         const columns: { event: CalendarEvent; end: Date }[][] = []
 
+        // >> Loop through each event to calculate its position
         sortedEvents.forEach((event) => {
+            // >>> Get the start and end times of the event
             const eventStart = new Date(event.start)
             const eventEnd = new Date(event.end)
 
-            // Adjust start and end times if they're outside this day
+            // >>> Adjust start and end times if they're outside this day
             const adjustedStart = isSameDay(currentDate, eventStart)
                 ? eventStart
                 : dayStart
@@ -81,13 +90,15 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
                 ? eventEnd
                 : addHours(dayStart, 24)
 
-            // Calculate top position and height
+            // >>> Calculate the start time and the end time as hours in decimals
             const startHour = getHours(adjustedStart) + getMinutes(adjustedStart) / 60
             const endHour = getHours(adjustedEnd) + getMinutes(adjustedEnd) / 60
+
+            // >>> Calculate top position and height
             const top = startHour * WeekCellsHeight
             const height = (endHour - startHour) * WeekCellsHeight
 
-            // Find a column for this event
+            // >>> Find a column for this event
             let columnIndex = 0
             let placed = false
 
@@ -119,14 +130,11 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
             const width = columnIndex === 0 ? 1 : 0.9
             const left = columnIndex === 0 ? 0 : columnIndex * 0.1
 
-            result.push({
-                event,
-                top,
-                height,
-                left,
-                width,
-                zIndex: 10 + columnIndex, // Higher columns get higher z-index
-            })
+            // Higher columns get higher z-index
+            const adjustedZIndex = 10 + columnIndex
+
+            // Add event to result
+            result.push({ event, top, height, left, width, zIndex: adjustedZIndex })
         })
 
         return result
@@ -141,108 +149,26 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
     // > Use the useCurrentTimeIndicator hook to get the current time position and visibility
     const { currentTimePosition, currentTimeVisible } = useCurrentTimeIndicator(currentDate, "day")
 
+    // > Return the JSX for the day view component
     return (
-        <>
-            {/* {hasAllDayEvents && (
-                <div className="border-border/70 bg-muted/50 border-t">
-                    <div className="grid grid-cols-[3rem_1fr] sm:grid-cols-[4rem_1fr]">
-                        <div className="relative">
-                            <span className="text-muted-foreground/70 absolute bottom-0 left-0 h-6 w-16 max-w-full pe-2 text-right text-[10px] sm:pe-4 sm:text-xs">
-                                All day
-                            </span>
-                        </div>
-                        <div className="border-border/70 relative border-r p-1 last:border-r-0">
-                            {allDayEvents.map((event) => {
-                                const eventStart = new Date(event.start)
-                                const eventEnd = new Date(event.end)
-                                const isFirstDay = isSameDay(currentDate, eventStart)
-                                const isLastDay = isSameDay(currentDate, eventEnd)
-
-                                return (
-                                    <EventItem
-                                        key={`spanning-${event.id}`}
-                                        onClick={(e) => handleEventClick(event, e)}
-                                        event={event}
-                                        view="month"
-                                        isFirstDay={isFirstDay}
-                                        isLastDay={isLastDay}
-                                    >
-                                        <div>{event.title}</div>
-                                    </EventItem>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )} */}
+        <Fragment>
+            {/* All-day events section */}
             {hasAllDayEvents && <AllDayEventsSection allDayEvents={allDayEvents} onEventClick={handleEventClick} currentDate={currentDate} />}
-
             {/* Time grid */}
             <div className="border-border/70 grid flex-1 grid-cols-[3rem_1fr] border-t sm:grid-cols-[4rem_1fr]">
-                {/*
-                <div>
-                     {hours.map((hour, index) => (
-                        <div
-                            key={hour.toString()}
-                            className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0"
-                        >
-                            {index > 0 && (
-                                <span className="bg-background text-muted-foreground/70 absolute -top-3 left-0 flex h-6 w-16 max-w-full items-center justify-end pe-2 text-[10px] sm:pe-4 sm:text-xs">
-                                    {format(hour, "h a")}
-                                </span>
-                            )}
-                        </div>
-                    ))}
-                </div>*/}
-
+                {/* Hour labels */}
                 <HourLabels hours={hours} />
-
+                {/* Event grid */}
                 <div className="relative">
                     {/* Positioned events */}
                     {positionedEvents && <EventsGrid positionedEvents={positionedEvents} onEventClick={handleEventClick} />}
-                    {/* {positionedEvents.map((positionedEvent) => (
-                        <div
-                            key={positionedEvent.event.id}
-                            className="absolute z-10 px-0.5"
-                            style={{
-                                top: `${positionedEvent.top}px`,
-                                height: `${positionedEvent.height}px`,
-                                left: `${positionedEvent.left * 100}%`,
-                                width: `${positionedEvent.width * 100}%`,
-                                zIndex: positionedEvent.zIndex,
-                            }}
-                        >
-                            <div className="h-full w-full">
-                                <DraggableEvent
-                                    event={positionedEvent.event}
-                                    view="day"
-                                    onClick={(e) => handleEventClick(positionedEvent.event, e)}
-                                    showTime
-                                    height={positionedEvent.height}
-                                />
-                            </div>
-                        </div>
-                    ))} */}
-
                     {/* Current time indicator */}
                     {currentTimeVisible && <CurrentTimeIndicator currentTimePosition={currentTimePosition} />}
-                    {/* {currentTimeVisible && (
-                        <div
-                            className="pointer-events-none absolute right-0 left-0 z-20"
-                            style={{ top: `${currentTimePosition}%` }}
-                        >
-                            <div className="relative flex items-center">
-                                <div className="bg-primary absolute -left-1 h-2 w-2 rounded-full"></div>
-                                <div className="bg-primary h-[2px] w-full"></div>
-                            </div>
-                        </div>
-                    )} */}
-
                     {/* Time grid */}
                     {hours && <TimeGrid hours={hours} currentDate={currentDate} onEventCreate={onEventCreate} />}
                 </div>
             </div>
-        </>
+        </Fragment>
     )
 }
 

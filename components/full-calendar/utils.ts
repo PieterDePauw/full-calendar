@@ -1,4 +1,4 @@
-import { differenceInDays, isSameDay } from "date-fns"
+import { differenceInDays, differenceInMinutes, isSameDay } from "date-fns"
 
 import type { CalendarEvent, EventColor } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
@@ -168,4 +168,32 @@ export function generateDroppableCell(quarter: number) {
         quarter === 2 && "top-[calc(var(--week-cells-height)/4*2)]",
         quarter === 3 && "top-[calc(var(--week-cells-height)/4*3)]"
     )
+}
+
+// Define a helper function to sort events based on their start time and duration
+export function sortEventsByStartTimeAndDuration(events: CalendarEvent[]): CalendarEvent[] {
+    // > Get the sorted events by start time and duration
+    const sortedEvents = [...events].sort((eventA, eventB) => {
+        // >> Get the start time for each of the events
+        const eventAStart = new Date(eventA.start)
+        const eventBStart = new Date(eventB.start)
+
+        // >> If the start times are different, sort by start time
+        if (eventAStart < eventBStart) return -1
+        if (eventAStart > eventBStart) return 1
+
+        // >> Get the end time for each of the events
+        const eventAEnd = new Date(eventA.end)
+        const eventBEnd = new Date(eventB.end)
+
+        // >> Get the duration for each of the events
+        const aDuration = differenceInMinutes(eventAEnd, eventAStart)
+        const bDuration = differenceInMinutes(eventBEnd, eventBStart)
+
+        // >> If start times are equal, sort by duration (longer events first)
+        return bDuration - aDuration
+    })
+
+    // > Return the sorted events
+    return sortedEvents
 }
