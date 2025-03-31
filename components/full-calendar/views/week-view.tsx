@@ -146,7 +146,7 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
                 columns[columnIndex].push({ event, end: adjustedEnd })
 
                 // Calculate width and left position based on number of columns
-                const width = columnIndex === 0 ? 1 : 0.9
+                const width = columnIndex === 0 ? 1 : 1 - (columnIndex * 0.9)
                 const left = columnIndex === 0 ? 0 : columnIndex * 0.1
 
                 // Higher columns get higher z-index
@@ -168,7 +168,7 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
     }
 
     // > Check if there are any all-day events
-    const hasAllDayEvents = useMemo(() => allDayEvents.length >= 0, [allDayEvents])
+    const hasAllDayEvents = useMemo(() => allDayEvents.length >= 1, [allDayEvents])
 
     // > Check if there are any events for the current week
     const { currentTimePosition, currentTimeVisible } = useCurrentTimeIndicator(currentDate, "week")
