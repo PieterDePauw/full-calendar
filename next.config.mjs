@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 export const nextConfig = {
     reactStrictMode: true,
-    allowedDevOrigins: ['local-origin.dev', '*.local-origin.dev'],
+    allowedDevOrigins: ["192.168.0.37d"],
     images: { unoptimized: true },
     experimental: {
         webpackBuildWorker: true,
