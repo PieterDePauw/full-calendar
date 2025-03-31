@@ -228,12 +228,12 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         }
     }, [currentDate, view])
 
-    // > Use the useMemo hook to calculate the style for the calendar based on the view
-    const style = useMemo(() => ({
+    // > Define the style object for the calendar component based on the event height, the event gap, and week cells height
+    const style = {
         "--event-height": `${EventHeight}px`,
         "--event-gap": `${EventGap}px`,
         "--week-cells-height": `${WeekCellsHeight}px`,
-    } as CSSProperties), [EventHeight, EventGap, WeekCellsHeight])
+    } as CSSProperties
 
     // > Define a helper function to handle the event create button click
     function handleEventCreateClick() {
