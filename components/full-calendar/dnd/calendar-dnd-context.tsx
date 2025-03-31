@@ -49,20 +49,14 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
     // > Use the useRef hook to store the original height of the event to maintain the drag overlay size
     const eventDimensions = useRef<{ height: number }>({ height: 0 })
 
-    // > Configure sensors for better drag detection
+    // > Use the useSensors hook to define the sensors for drag-and-drop interactions
     const sensors = useSensors(
-        useSensor(MouseSensor, {
-            // Require the mouse to move by 5px before activating
-            activationConstraint: { distance: 5 },
-        }),
-        useSensor(TouchSensor, {
-            // Require the touch to move by 5px before activating, after a 250ms delay
-            activationConstraint: { delay: 250, tolerance: 5 },
-        }),
-        useSensor(PointerSensor, {
-            // Require the pointer to move by 5px before activating
-            activationConstraint: { distance: 5 },
-        })
+        // >> Use the useSensor hook to define the mouse sensor and require the mouse to move by 5px before activating
+        useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+        // >> Use the useSensor hook to define the pointer sensor and require the pointer to move by 5px before activating
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        // >> Use the useSensor hook to define the touch sensor and require the touch to move by 5px before activating, after a 250ms delay
+        useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
     )
 
     // > Generate a stable ID for the DndContext
