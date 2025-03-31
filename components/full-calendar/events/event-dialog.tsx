@@ -195,25 +195,32 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-[425px]">
+                {/* Dialog header with title and description */}
                 <DialogHeader>
                     <DialogTitle>{(event && event.id) ? "Edit Event" : "Create Event"}</DialogTitle>
-                    <DialogDescription className="sr-only">
-                        {(event && event.id) ? "Edit the details of this event" : "Add a new event to your calendar"}
-                    </DialogDescription>
+                    <DialogDescription className="sr-only">{(event && event.id) ? "Edit the details of this event" : "Add a new event to your calendar"}</DialogDescription>
                 </DialogHeader>
+
+                {/* Error message if any */}
                 {error && <div className="bg-destructive/15 text-destructive rounded-md px-3 py-2 text-sm">{error}</div>}
+
+                {/* Form fields for event details */}
                 <div className="grid gap-4 py-4">
+                    {/* > Title field */}
                     <div className="*:not-first:mt-1.5">
                         <Label htmlFor="title">Title</Label>
                         <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)}/>
                     </div>
 
+                    {/* > Description field */}
                     <div className="*:not-first:mt-1.5">
                         <Label htmlFor="description">Description</Label>
                         <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3}/>
                     </div>
 
+                    {/* > Start date and time fields */}
                     <div className="flex gap-4">
+                        {/* >> Start date field */}
                         <div className="flex-1 *:not-first:mt-1.5">
                             <Label htmlFor="start-date">Start Date</Label>
                             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
@@ -242,6 +249,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                             </Popover>
                         </div>
 
+                        {/* >> Start time field */}
                         {!allDay && (
                             <div className="min-w-28 *:not-first:mt-1.5">
                                 <Label htmlFor="start-time">Start Time</Label>
@@ -250,18 +258,16 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                         <SelectValue placeholder="Select time" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {timeOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
+                                        {timeOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
                                     </SelectContent>
                                 </Select>
                             </div>
                         )}
                     </div>
 
+                    {/* > End date and time fields */}
                     <div className="flex gap-4">
+                        {/* >> End date field */}
                         <div className="flex-1 *:not-first:mt-1.5">
                             <Label htmlFor="end-date">End Date</Label>
                             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
@@ -286,6 +292,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                             </Popover>
                         </div>
 
+                        {/* >> End time field */}
                         {!allDay && (
                             <div className="min-w-28 *:not-first:mt-1.5">
                                 <Label htmlFor="end-time">End Time</Label>
@@ -294,52 +301,39 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                         <SelectValue placeholder="Select time" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {timeOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
+                                        {timeOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
                                     </SelectContent>
                                 </Select>
                             </div>
                         )}
                     </div>
 
+                    {/* > All day checkbox */}
                     <div className="flex items-center gap-2">
                         <Checkbox id="all-day" checked={allDay} onCheckedChange={(checked) => setAllDay(checked === true)} />
                         <Label htmlFor="all-day">All day</Label>
                     </div>
 
+                    {/* > Location field */}
                     <div className="*:not-first:mt-1.5">
                         <Label htmlFor="location">Location</Label>
                         <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
                     </div>
+
+                    {/* > Color radio buttons */}
                     <fieldset className="space-y-4">
                         <legend className="text-foreground text-sm leading-none font-medium">
                             Etiquette
                         </legend>
-                        <RadioGroup
-                            className="flex gap-1.5"
-                            defaultValue={colorOptions[0].value}
-                            value={color}
-                            onValueChange={(value: EventColor) => setColor(value)}
-                        >
+                        <RadioGroup className="flex gap-1.5" defaultValue={colorOptions[0].value} value={color} onValueChange={(value: EventColor) => setColor(value)}>
                             {colorOptions.map((colorOption) => (
-                                <RadioGroupItem
-                                    key={colorOption.value}
-                                    id={`color-${colorOption.value}`}
-                                    value={colorOption.value}
-                                    aria-label={colorOption.label}
-                                    className={cn(
-                                        "size-6 shadow-none",
-                                        colorOption.bgClass,
-                                        colorOption.borderClass
-                                    )}
-                                />
+                                <RadioGroupItem key={colorOption.value} id={`color-${colorOption.value}`} value={colorOption.value} aria-label={colorOption.label} className={cn("size-6 shadow-none", colorOption.bgClass, colorOption.borderClass)}/>
                             ))}
                         </RadioGroup>
                     </fieldset>
                 </div>
+
+                {/* Dialog footer with cancel and save buttons */}
                 <DialogFooter className="flex-row sm:justify-between">
                     {(event && event.id) && (
                         <Button variant="outline" size="icon" onClick={handleDelete} aria-label="Delete event">
