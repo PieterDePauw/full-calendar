@@ -6,7 +6,12 @@ import { DndContext, DragOverlay, MouseSensor, PointerSensor, TouchSensor, useSe
 import { addMinutes, differenceInMinutes } from "date-fns"
 import { type CalendarEvent, compareDateTime, type DragHandlePositionType, EventItem } from "@/components/full-calendar"
 
-// Define the context type
+// Define the type for event dimensions
+type EventDimensions = {
+    height: number
+}
+
+// Define the type for drag-and-drop context
 type CalendarDndContextType = {
     activeEvent: CalendarEvent | null
     activeId: UniqueIdentifier | null
@@ -18,7 +23,7 @@ type CalendarDndContextType = {
     dragHandlePosition: DragHandlePositionType | null
 }
 
-// Create the context
+// Create the context for the calendar drag-and-drop functionality
 const CalendarDndContext = createContext<CalendarDndContextType>({
     activeEvent: null,
     activeId: null,
@@ -30,7 +35,7 @@ const CalendarDndContext = createContext<CalendarDndContextType>({
     dragHandlePosition: null,
 })
 
-// Hook to use the context
+// Create a custom hook to use the calendar drag-and-drop context
 export const useCalendarDnd = () => useContext(CalendarDndContext)
 
 // CalendarDndProvider component
@@ -47,7 +52,7 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
     const [dragHandlePosition, setDragHandlePosition] = useState<DragHandlePositionType | null>(null)
 
     // > Use the useRef hook to store the original height of the event to maintain the drag overlay size
-    const eventDimensions = useRef<{ height: number }>({ height: 0 })
+    const eventDimensions = useRef<EventDimensions>({ height: 0 })
 
     // > Use the useSensors hook to define the sensors for drag-and-drop interactions
     const sensors = useSensors(
