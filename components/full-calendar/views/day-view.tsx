@@ -123,28 +123,26 @@ export function CurrentTimeIndicator({ currentTimePosition }: { currentTimePosit
 
 // TimeGrid component
 export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[]; currentDate: Date; onEventCreate: (startTime: Date) => void }) {
+    // > Define a helper function to handle droppable cell clicks
+    function handleDroppableCellClick(hour: Date, quarter: number) {
+        return () => {
+            const startTime = new Date(currentDate)
+            startTime.setHours(getHours(hour))
+            startTime.setMinutes(quarter * 15)
+            onEventCreate(startTime)
+        }
+    }
+
     // > Return the JSX for the time grid component
     return (
         <div className="absolute inset-0 z-0">
             {hours.map((hour) => (
-                <div key={hour.toString()} className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0">
+                <div key={`${hour}`} className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0">
                     {/* Quarter-hour intervals */}
                     {[0, 1, 2, 3].map((quarter) => {
-                        return (
-                            <DroppableCell
-                                key={`${hour.toString()}-${quarter}`}
-                                id={`day-cell-${currentDate.toISOString()}-${getHours(hour) + quarter * 0.25}`}
-                                date={currentDate}
-                                time={getHours(hour) + quarter * 0.25}
-                                className={getDroppableCellClasses(quarter)}
-                                onClick={() => {
-                                    const startTime = new Date(currentDate)
-                                    startTime.setHours(getHours(hour))
-                                    startTime.setMinutes(quarter * 15)
-                                    onEventCreate(startTime)
-                                }}
-                            />
-                        )
+                        const time = getHours(hour) + quarter * 0.25
+                        const className = getDroppableCellClasses(quarter)
+                        return <DroppableCell key={`${hour}-${quarter}`} id={`day-cell-${currentDate.toISOString()}-${time}`} date={currentDate} time={time} className={className} onClick={handleDroppableCellClick(hour, quarter)} />
                     })}
                 </div>
 
