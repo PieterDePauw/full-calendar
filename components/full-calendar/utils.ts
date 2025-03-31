@@ -313,5 +313,6 @@ export function positionEvents(events: CalendarEvent[], currentDate: Date): Posi
         result.push({ event, top, height, left, width, zIndex });
     }
 
+    // > Return the array of positioned events
     return result;
 }
