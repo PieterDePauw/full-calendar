@@ -11,6 +11,16 @@ export interface CalendarEvent {
   location?: string
 }
 
+// PositionedEvent interface
+export interface PositionedEvent {
+    event: CalendarEvent
+    top: number
+    height: number
+    left: number
+    width: number
+    zIndex: number
+}
+
 export type EventColor =
   | "sky"
   | "amber"

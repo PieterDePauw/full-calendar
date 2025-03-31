@@ -2,8 +2,8 @@
 
 // Import modules
 import React, { Fragment, useMemo } from "react"
-import { addHours, areIntervalsOverlapping, eachHourOfInterval, format, getHours, getMinutes, isSameDay, startOfDay } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, WeekCellsHeight, type CalendarEvent, generateDroppableCell, sortEventsByStartTimeAndDuration } from "@/components/full-calendar"
+import { addHours, eachHourOfInterval, format, getHours, isSameDay, startOfDay } from "date-fns"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, generateDroppableCell, positionEvents } from "@/components/full-calendar"
 
 // DayViewProps interface
 interface DayViewProps {
@@ -11,16 +11,6 @@ interface DayViewProps {
     events: CalendarEvent[]
     onEventSelect: (event: CalendarEvent) => void
     onEventCreate: (startTime: Date) => void
-}
-
-// PositionedEvent interface
-interface PositionedEvent {
-    event: CalendarEvent
-    top: number
-    height: number
-    left: number
-    width: number
-    zIndex: number
 }
 
 // DayView component
@@ -46,83 +36,86 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
 
     // > Process events to calculate positions
     // biome-ignore
-    const positionedEvents = useMemo(() => {
-        // >> Define a result array to hold positioned events
-        const result: PositionedEvent[] = []
+    // const positionedEvents = useMemo(() => {
+    //     // >> Define a result array to hold positioned events
+    //     const result: PositionedEvent[] = []
 
-        // >> Define the start of the day
-        const dayStart = startOfDay(currentDate)
+    //     // >> Define the start of the day
+    //     const dayStart: Date = startOfDay(currentDate)
 
-        // >> Sort events by start time and duration
-        const sortedEvents = sortEventsByStartTimeAndDuration(timeEvents)
+    //     // >> Sort events by start time and duration
+    //     const sortedEvents: CalendarEvent[] = sortEventsByStartTimeAndDuration(timeEvents)
 
-        // >> Define an array to hold columns for overlapping events
-        const columns: { event: CalendarEvent; end: Date }[][] = []
+    //     // >> Define an array to hold columns for overlapping events
+    //     const columns: { event: CalendarEvent; end: Date }[][] = []
 
-        // >> Loop through each event to calculate its position
-        sortedEvents.forEach((event) => {
-            // >>> Get the start and end times of the event
-            const eventStart = new Date(event.start)
-            const eventEnd = new Date(event.end)
+    //     // >> Loop through each event to calculate its position
+    //     sortedEvents.forEach((event) => {
+    //         // >>> Get the start and end times of the event
+    //         const eventStart = new Date(event.start)
+    //         const eventEnd = new Date(event.end)
 
-            // >>> Adjust start and end times if they're outside this day
-            const adjustedStart = isSameDay(currentDate, eventStart)
-                ? eventStart
-                : dayStart
-            const adjustedEnd = isSameDay(currentDate, eventEnd)
-                ? eventEnd
-                : addHours(dayStart, 24)
+    //         // >>> Adjust start and end times if they're outside this day
+    //         const adjustedStart = isSameDay(currentDate, eventStart)
+    //             ? eventStart
+    //             : dayStart
+    //         const adjustedEnd = isSameDay(currentDate, eventEnd)
+    //             ? eventEnd
+    //             : addHours(dayStart, 24)
 
-            // >>> Calculate the start time and the end time as hours in decimals
-            const startHour = getHours(adjustedStart) + getMinutes(adjustedStart) / 60
-            const endHour = getHours(adjustedEnd) + getMinutes(adjustedEnd) / 60
+    //         // >>> Calculate the start time and the end time as hours in decimals
+    //         const startHour = getHours(adjustedStart) + getMinutes(adjustedStart) / 60
+    //         const endHour = getHours(adjustedEnd) + getMinutes(adjustedEnd) / 60
 
-            // >>> Calculate top position and height
-            const top = startHour * WeekCellsHeight
-            const height = (endHour - startHour) * WeekCellsHeight
+    //         // >>> Calculate top position and height
+    //         const top = startHour * WeekCellsHeight
+    //         const height = (endHour - startHour) * WeekCellsHeight
 
-            // >>> Find a column for this event
-            let columnIndex = 0
-            let placed = false
+    //         // >>> Find a column for this event
+    //         let columnIndex = 0
+    //         let placed = false
 
-            while (!placed) {
-                if (!columns[columnIndex]) {
-                    columns[columnIndex] = []
-                    placed = true
-                } else {
-                    // Check if this event overlaps with any event in this column
-                    const overlaps = columns[columnIndex].some((col) =>
-                        areIntervalsOverlapping(
-                            { start: adjustedStart, end: adjustedEnd },
-                            { start: new Date(col.event.start), end: new Date(col.event.end) }
-                        )
-                    )
+    //         while (!placed) {
+    //             if (!columns[columnIndex]) {
+    //                 columns[columnIndex] = []
+    //                 placed = true
+    //             } else {
+    //                 // Check if this event overlaps with any event in this column
+    //                 const overlaps = columns[columnIndex].some((col) =>
+    //                     areIntervalsOverlapping(
+    //                         { start: adjustedStart, end: adjustedEnd },
+    //                         { start: new Date(col.event.start), end: new Date(col.event.end) }
+    //                     )
+    //                 )
 
-                    if (!overlaps) {
-                        placed = true
-                    } else {
-                        columnIndex++
-                    }
-                }
-            }
+    //                 if (!overlaps) {
+    //                     placed = true
+    //                 } else {
+    //                     columnIndex++
+    //                 }
+    //             }
+    //         }
 
-            // Add event to its column
-            columns[columnIndex].push({ event, end: adjustedEnd })
+    //         // Add event to its column
+    //         columns[columnIndex].push({ event, end: adjustedEnd })
 
-            // First column takes full width, others are indented by 10% and take 90% width
-            const width = columnIndex === 0 ? 1 : 0.9
-            const left = columnIndex === 0 ? 0 : columnIndex * 0.1
+    //         // First column takes full width, others are indented by 10% and take 90% width
+    //         const width = columnIndex === 0 ? 1 : 0.9
+    //         const left = columnIndex === 0 ? 0 : columnIndex * 0.1
 
-            // Higher columns get higher z-index
-            const adjustedZIndex = 10 + columnIndex
+    //         // Higher columns get higher z-index
+    //         const adjustedZIndex = 10 + columnIndex
 
-            // Add event to result
-            result.push({ event, top, height, left, width, zIndex: adjustedZIndex })
-        })
+    //         // Add event to result
+    //         result.push({ event, top, height, left, width, zIndex: adjustedZIndex })
+    //     })
 
-        // >> Return the result array holding the positioned events
-        return result
-    }, [currentDate, timeEvents])
+    //     // >> Return the result array holding the positioned events
+    //     return result
+    // }, [currentDate, timeEvents])
+
+    // > Process events to calculate positions
+    const positionedEvents = useMemo(() => positionEvents(timeEvents, currentDate), [currentDate, timeEvents])
 
     // > Define a helper function to handle event clicks
     const handleEventClick = (event: CalendarEvent, e: React.MouseEvent) => {

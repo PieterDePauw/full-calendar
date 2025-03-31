@@ -22,4 +22,4 @@ export * from "./hooks/use-current-time-indicator"
 export * from "./hooks/use-event-visibility"
 
 // Type exports
-export type { CalendarEvent, CalendarView, EventColor, DragHandlePositionType } from "./types"
+export type { CalendarEvent, PositionedEvent, CalendarView, EventColor, DragHandlePositionType } from "./types"
