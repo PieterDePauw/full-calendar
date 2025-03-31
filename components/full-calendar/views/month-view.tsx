@@ -17,25 +17,31 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
 
     // > Get all the weeks of the month, based on the days of the month
     // const weeks = useMemo(() => {
-    //     const result = []
-    //     let week = []
-
+    //     // >> Initialize an empty array to hold the weeks
+    //     const result = [];
+    //     // >> Initialize an empty array to hold the current week
+    //     let currentWeek = [];
+    //     // >> Loop through the days of the month
     //     for (let i = 0; i < days.length; i++) {
-    //         week.push(days[i])
-    //         if (week.length === 7 || i === days.length - 1) {
-    //             result.push(week)
-    //             week = []
+    //         // >>> Push the current day into the current week
+    //         currentWeek.push(days[i]);
+    //         // >>> If the current week has 7 days or if it's the last day of the month, ...
+    //         if (currentWeek.length === 7 || i === days.length - 1) {
+    //             // >>>> Push the current week into the result array
+    //             result.push(currentWeek);
+    //             // >>>> Reset the current week to an empty array
+    //             currentWeek = []
     //         }
     //     }
-
+    //     // >> Return the result array containing all the weeks of the month
     //     return result
     // }, [days])
 
     // > Get all the weeks of the month, based on the days of the month
-    // const weeks = useMemo(() => Array.from({ length: Math.ceil(days.length / 7) }, (_, i) => days.slice(i * 7, i * 7 + 7)), [days]);
-
-    // > Get all the weeks of the month, based on the days of the month
-    const weeks = useMemo(() => { const result = []; let week = []; for (let i = 0; i < days.length; i++) { week.push(days[i]); if (week.length === 7 || i === days.length - 1) { result.push(week); week = [] } } return result }, [days])
+    const weeks = useMemo(() => {
+        const daysPerWeek = 7
+        return Array.from({ length: Math.ceil(days.length / daysPerWeek) }, (_, i) => days.slice(i * daysPerWeek, i * daysPerWeek + daysPerWeek))
+    }, [days])
 
     // > Define a helper function to handle the event click to select an event
     function handleEventClick(event: CalendarEvent, e: MouseEvent) {
@@ -125,7 +131,7 @@ function HasMoreEventsPopover({ EventHeight, allEvents, currentDay, remainingCou
             {/* Trigger to open the popover */}
             <PopoverTrigger asChild={true}>
                 <button className="focus-visible:border-ring focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground hover:bg-muted/50 mt-[var(--event-gap)] flex h-[var(--event-height)] w-full items-center overflow-hidden px-1 text-left text-[10px] backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2 sm:text-xs" onClick={(e) => e.stopPropagation()}>
-                    <span>+ {remainingCount}
+                    <span>+ {remainingCount}{" "}
                         <span className="max-sm:sr-only">more</span>
                     </span>
                 </button>
