@@ -4,9 +4,7 @@ import { addHours, areIntervalsOverlapping, differenceInDays, differenceInMinute
 import { WeekCellsHeight, type CalendarEvent, type PositionedEvent, type EventColor, type CalendarView } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
-/**
- * Get CSS classes for event colors
- */
+// Define a helper function to generate CSS classes for event colors
 export function getEventColorClasses(color: EventColor | string = "sky"): string {
     switch (color) {
         case "sky":
@@ -26,9 +24,7 @@ export function getEventColorClasses(color: EventColor | string = "sky"): string
     }
 }
 
-/**
- * Get CSS classes for border radius based on event position in multi-day events
- */
+// Define a helper function to generate CSS classes for border radius based on event position in multi-day events
 export function getBorderRadiusClasses(isFirstDay: boolean, isLastDay: boolean): string {
     // If it is both the first and last day of the event (single-day event), round all corners
     if (isFirstDay && isLastDay) return "rounded"
@@ -78,9 +74,18 @@ export function getAgendaEventClasses({ eventColor, className }: { eventColor?: 
     )
 }
 
-/**
- * Check if an event is a multi-day event
- */
+// Define a helper function to generate the classname for the droppable cell based on which quarter of the hour is specified
+export function getDroppableCellClasses(quarter: number) {
+    return cn(
+        "absolute h-[calc(var(--week-cells-height)/4)] w-full",
+        quarter === 0 && "top-0",
+        quarter === 1 && "top-[calc(var(--week-cells-height)/4)]",
+        quarter === 2 && "top-[calc(var(--week-cells-height)/4*2)]",
+        quarter === 3 && "top-[calc(var(--week-cells-height)/4*3)]"
+    )
+}
+
+// Define a helper function to check if an event is a multi-day event
 export function checkIfMultiDayEvent(event: CalendarEvent): boolean {
     // > Check if the event is an all-day event
     const isAllDay = event.allDay === true
@@ -92,92 +97,86 @@ export function checkIfMultiDayEvent(event: CalendarEvent): boolean {
     return isAllDay || isMultiDay || spansMultipleDays
 }
 
-/**
- * Filter events for a specific day
- */
+// Define a helper function to filter events for a specific day (i.e. only events starting on the specified day)
 export function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+    // >> Return the filtered and sorted events
     return events
+        // >>> Filter the events to include only those that are starting on the specified day
         .filter((event) => isSameDay(day, new Date(event.start)))
-        .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+        // >>> Sort the events by start time
+        .toSorted((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
 }
 
-/**
- * Sort events with multi-day events first, then by start time
- */
+// Define a helper function to sort an array of events by their start time, with multi-day events sorted first
 export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
-    return events.toSorted((a, b) => {
-        const aIsMultiDay = checkIfMultiDayEvent(a)
-        const bIsMultiDay = checkIfMultiDayEvent(b)
+    // >> Return the sorted events
+    return events.toSorted((eventA, eventB) => {
+        // >>> Check if the events are multi-day events
+        const aIsMultiDay = checkIfMultiDayEvent(eventA)
+        const bIsMultiDay = checkIfMultiDayEvent(eventB)
 
-        if (aIsMultiDay && !bIsMultiDay) return -1
-        if (!aIsMultiDay && bIsMultiDay) return 1
+        // >>> Sort multi-day events before single-day events
+        if (aIsMultiDay && !bIsMultiDay) { return -1 }
+        if (!aIsMultiDay && bIsMultiDay) { return 1 }
 
-        return new Date(a.start).getTime() - new Date(b.start).getTime()
+        // >>> If both events are multi-day or single-day, sort by start time
+        return new Date(eventA.start).getTime() - new Date(eventB.start).getTime()
     })
 }
 
-/**
- * Get multi-day events that span across a specific day (but don't start on that day)
- */
+// Define a helper function to get all multi-day events that span across a specific day (but don't start on that day)
 export function getSpanningEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+    // >> Filter the events to include only those that are multi-day events and span the specified day
     return events.filter((event) => {
+        // >>> Check if the event is a multi-day event
         const isMultiDayEvent = checkIfMultiDayEvent(event)
+
+        // >>> If the event is not a multi-day event, return false to exclude it
         if (!isMultiDayEvent) return false
 
-        const eventStart = new Date(event.start)
-        const eventEnd = new Date(event.end)
+        // >>> If the specified day is the same as the start date of the event, return false to exclude it
+        if (isSameDay(day, new Date(event.start))) return false
 
-        // Only include if it's not the start day but is either the end day or a middle day
-        return (
-            !isSameDay(day, eventStart) &&
-            (isSameDay(day, eventEnd) || (day > eventStart && day < eventEnd))
-        )
+        // >>> If the specified day is the same as the end date of the event, return true to include it
+        if (isSameDay(day, new Date(event.end))) return true
+
+        // >>> If the specified day is between the start and end dates of the event, return true to include it
+        if (day > new Date(event.start) && day < new Date(event.end)) return true
+
+        // >>> Otherwise, return false to exclude the event
+        return false
     })
 }
 
-/**
- * Get all events visible on a specific day (starting, ending, or spanning)
- */
+// Define a helper function to get all events that take place on a specific day (regardless of whether they are starting on, ending on, or spanning the current day)
 export function getAllEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
-    return events.filter((event) => {
-        const eventStart = new Date(event.start)
-        const eventEnd = new Date(event.end)
-        return (
-            isSameDay(day, eventStart) ||
-            isSameDay(day, eventEnd) ||
-            (day > eventStart && day < eventEnd)
-        )
-    })
+    // > Return the filtered events
+    return events.filter((event) => isSameDay(day, new Date(event.start)) || isSameDay(day, new Date(event.end)) || (day > new Date(event.start) && day < new Date(event.end)))
 }
 
-/**
- * Get all events for a day (for agenda view)
- */
+// Define a helper function to get all events for a specific day in the agenda view (regardless of whether they are starting on, ending on, or spanning the current day)
 export function getAgendaEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+    // >> Return the filtered and sorted events
     return events
-        .filter((event) => {
-            const eventStart = new Date(event.start)
-            const eventEnd = new Date(event.end)
-            return (
-                isSameDay(day, eventStart) ||
-                isSameDay(day, eventEnd) ||
-                (day > eventStart && day < eventEnd)
-            )
-        })
-        .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+        // >>> Filter the events to include only those that are either starting, ending on the specified day, or spanning the day
+        .filter((event) => isSameDay(day, new Date(event.start)) || isSameDay(day, new Date(event.end)) || (day > new Date(event.start) && day < new Date(event.end)))
+        // >>> Sort the events by start time
+        .toSorted((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
 }
 
-/**
- * Add hours to a date
- */
+// Define a helper function to add hours to a specified date
 export function addHoursToDate(date: Date, hours: number): Date {
+    // >> If the hours value is not an integer, throw an error
     if (!Number.isInteger(hours)) { throw new Error("To add hours to the date, the value for hours must be an integer"); }
+    // >> If the hours value is an integer, create a new date object
     const result = new Date(date)
+    // >> Add the specified number of hours to the date
     result.setHours(result.getHours() + hours)
+    // >> Return the new date object
     return result
 }
 
-// Helper function to compare two dates and check if they are the same
+// Define a helper function to compare two dates and check if they are the same
 export function compareDateTime(dateA: Date, dateB: Date): boolean {
     // Check if the year of both dates is the same
     const isSameYear = dateA.getFullYear() === dateB.getFullYear()
@@ -198,28 +197,20 @@ export function compareDateTime(dateA: Date, dateB: Date): boolean {
 //     return (!!visibleCount && index >= visibleCount)
 // }
 
-// Define a helper function to generate the class name for the droppable cell based on which quarter of the hour is specified
-export function generateDroppableCell(quarter: number) {
-    return cn(
-        "absolute h-[calc(var(--week-cells-height)/4)] w-full",
-        quarter === 0 && "top-0",
-        quarter === 1 && "top-[calc(var(--week-cells-height)/4)]",
-        quarter === 2 && "top-[calc(var(--week-cells-height)/4*2)]",
-        quarter === 3 && "top-[calc(var(--week-cells-height)/4*3)]"
-    )
-}
-
-// Helper to adjust event start/end times to the current day boundaries
-function adjustEventTimes(event: CalendarEvent, currentDate: Date): { adjustedStart: Date; adjustedEnd: Date}  {
+// Define a helper function to adjust event start/end times to the current day boundaries
+function adjustEventTimes(event: CalendarEvent, currentDate: Date): { adjustedStart: Date; adjustedEnd: Date }  {
+    // > Get the start time of the current day
     const dayStart = startOfDay(currentDate)
+    // > Get the end time of the current day (24 hours after the start time)
     const dayEnd = addHours(dayStart, 24)
+    // > Get the start and end times of the event
     const eventStart = new Date(event.start)
     const eventEnd = new Date(event.end)
-
-    return {
-        adjustedStart: isSameDay(currentDate, eventStart) ? eventStart : dayStart,
-        adjustedEnd: isSameDay(currentDate, eventEnd) ? eventEnd : dayEnd,
-    }
+    // > Adjust the start and end times of the event to fit within the current day boundaries
+    const adjustedStart = isSameDay(currentDate, eventStart) ? eventStart : dayStart
+    const adjustedEnd = isSameDay(currentDate, eventEnd) ? eventEnd : dayEnd
+    // > Return the adjusted start and end times
+    return { adjustedStart, adjustedEnd }
 }
 
 // Define a helper function to get the decimal hour from a specified date/time
@@ -228,9 +219,9 @@ function getDecimalHour(date: Date): number {
 }
 
 // Define a helper function to sort events based on their start time and duration
-export function sortEventsByStartTimeAndDuration(events: CalendarEvent[]): CalendarEvent[] {
-    // > Get the sorted events by start time and duration
-    const sortedEvents = events.toSorted((eventA, eventB) => {
+function sortEventsByStartTimeAndDuration(events: CalendarEvent[]): CalendarEvent[] {
+    // > Return the sorted events by start time and duration
+    return events.toSorted((eventA, eventB) => {
         // >> Get the start time for each of the events
         const eventAStart = new Date(eventA.start)
         const eventBStart = new Date(eventB.start)
@@ -250,12 +241,9 @@ export function sortEventsByStartTimeAndDuration(events: CalendarEvent[]): Calen
         // >> If start times are equal, sort by duration (longer events first)
         return bDuration - aDuration
     })
-
-    // > Return the sorted events
-    return sortedEvents
 }
 
-// Helper to find a column index for the event
+// Define a helper function to find a column index for the event
 function findColumnIndex(columns: { event: CalendarEvent; end: Date }[][], adjustedStart: Date, adjustedEnd: Date): number {
     // > Define a variable to keep track of the column index
     let columnIndex = 0

@@ -3,7 +3,7 @@
 // Import modules
 import { Fragment, useMemo, type MouseEvent } from "react"
 import { addHours, eachHourOfInterval, format, getHours, isSameDay, startOfDay } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, generateDroppableCell, positionEvents } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, getDroppableCellClasses, positionEvents } from "@/components/full-calendar"
 
 // DayViewProps interface
 interface DayViewProps {
@@ -131,7 +131,7 @@ export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[];
                                 id={`day-cell-${currentDate.toISOString()}-${getHours(hour) + quarter * 0.25}`}
                                 date={currentDate}
                                 time={getHours(hour) + quarter * 0.25}
-                                className={generateDroppableCell(quarter)}
+                                className={getDroppableCellClasses(quarter)}
                                 onClick={() => {
                                     const startTime = new Date(currentDate)
                                     startTime.setHours(getHours(hour))

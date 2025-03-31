@@ -25,7 +25,7 @@ import {
     checkIfMultiDayEvent,
     useCurrentTimeIndicator,
     WeekCellsHeight,
-    generateDroppableCell,
+    getDroppableCellClasses,
     type CalendarEvent,
 } from "@/components/full-calendar"
 import { CurrentTimeIndicator } from "./day-view"
@@ -227,7 +227,7 @@ export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[];
             {hours.map((hour) => (
                 <div key={hour.toString()} className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0">
                     {/* Quarter-hour intervals */}
-                    {[0, 1, 2, 3].map((quarter) => <DroppableCell id={`week-cell-${currentDate.toISOString()}-${getHours(hour) + quarter * 0.25}`} key={`${hour.toString()}-${quarter}`} date={currentDate} time={getHours(hour) + quarter * 0.25} className={generateDroppableCell(quarter)} onClick={() => handleDroppableCellClick(currentDate, getHours(hour), quarter)} />)}
+                    {[0, 1, 2, 3].map((quarter) => <DroppableCell id={`week-cell-${currentDate.toISOString()}-${getHours(hour) + quarter * 0.25}`} key={`${hour.toString()}-${quarter}`} date={currentDate} time={getHours(hour) + quarter * 0.25} className={getDroppableCellClasses(quarter)} onClick={() => handleDroppableCellClick(currentDate, getHours(hour), quarter)} />)}
                 </div>
             ))}
         </div>
