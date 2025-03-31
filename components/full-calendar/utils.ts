@@ -133,6 +133,7 @@ export function getAgendaEventsForDay(events: CalendarEvent[], day: Date): Calen
  * Add hours to a date
  */
 export function addHoursToDate(date: Date, hours: number): Date {
+    if (!Number.isInteger(hours)) { throw new Error("To add hours to the date, the value for hours must be an integer"); }
     const result = new Date(date)
     result.setHours(result.getHours() + hours)
     return result
@@ -150,14 +151,14 @@ export function compareDateTime(dateA: Date, dateB: Date): boolean {
     const isSameHour = dateA.getHours() === dateB.getHours()
     // Check if the minutes of both dates are the same
     const isSameMinutes = dateA.getMinutes() === dateB.getMinutes()
-    // Return true if all components are the same
-    return isSameYear && isSameMonth && isSameDay && isSameHour && isSameMinutes
+    // Return true if any of the above checks are not true
+    return !isSameYear || !isSameMonth || !isSameDay || !isSameHour || !isSameMinutes
 }
 
 // Helper function to determine if an event should be hidden based on its index and visible count
-export function isEventHidden(index: number, visibleCount: number | undefined): boolean {
-    return (!!visibleCount && index >= visibleCount)
-}
+// function checkEventVisibility(index: number, visibleCount: number | undefined): boolean {
+//     return (!!visibleCount && index >= visibleCount)
+// }
 
 // Define a helper function to generate the class name for the droppable cell based on which quarter of the hour is specified
 export function generateDroppableCell(quarter: number) {
