@@ -76,6 +76,10 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
 
 // AllDayEventsSection component
 export function AllDayEventsSection({ allDayEvents, onEventClick, currentDate }: { allDayEvents: CalendarEvent[]; onEventClick: (event: CalendarEvent, e: MouseEvent) => void; currentDate: Date }) {
+    // > If there are no all-day events, return null (i.e., don't render anything)
+    if (!allDayEvents || allDayEvents.length === 0) return null
+
+    // > Return the JSX for the all-day events section
     return (
         <div className="border-border/70 bg-muted/50 border-t">
             <div className="grid grid-cols-[3rem_1fr] sm:grid-cols-[4rem_1fr]">
