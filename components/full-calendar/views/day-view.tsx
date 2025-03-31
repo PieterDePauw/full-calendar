@@ -28,7 +28,7 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
     const allDayEvents = useMemo(() => dayEvents.filter((event) => event.allDay || checkIfMultiDayEvent(event)), [dayEvents])
 
     // > Check if there are any all-day events
-    const hasAllDayEvents = useMemo(() => allDayEvents.length >= 0, [allDayEvents])
+    const hasAllDayEvents = useMemo(() => allDayEvents.length >= 1, [allDayEvents])
 
     // > Get only single-day time-based events
     // biome-ignore
