@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type CSSProperties } from "react"
 import { RiCalendarCheckLine } from "@remixicon/react"
 import { addDays, addMonths, addWeeks, endOfWeek, format, isSameMonth, startOfWeek, subMonths, subWeeks } from "date-fns"
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react"
@@ -22,8 +22,11 @@ export interface FullCalendarProps {
 
 // FullCalendar component
 export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDelete, className, initialView = "month" }: FullCalendarProps) {
+    // > Define the initial date as today
+    const today = new Date()
+
     // > Use the useState hook to manage the current date
-    const [currentDate, setCurrentDate] = useState(new Date())
+    const [currentDate, setCurrentDate] = useState(today)
 
     // > Use the useState hook to manage the current view
     const [view, setView] = useState<CalendarView>(initialView)
@@ -67,7 +70,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     }, [isEventDialogOpen])
 
     // > Define a helper function to handle the previous button click
-    const handlePrevious = () => {
+    function handleGoToPrevious() {
         if (view === "month") {
             setCurrentDate(subMonths(currentDate, 1))
         } else if (view === "week") {
@@ -75,13 +78,12 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         } else if (view === "day") {
             setCurrentDate(addDays(currentDate, -1))
         } else if (view === "agenda") {
-            // For agenda view, go back 30 days (a full month)
             setCurrentDate(addDays(currentDate, -AgendaDaysToShow))
         }
     }
 
     // > Define a helper function to handle the next button click
-    const handleNext = () => {
+    function handleGoToNext() {
         if (view === "month") {
             setCurrentDate(addMonths(currentDate, 1))
         } else if (view === "week") {
@@ -89,19 +91,18 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         } else if (view === "day") {
             setCurrentDate(addDays(currentDate, 1))
         } else if (view === "agenda") {
-            // For agenda view, go forward 30 days (a full month)
             setCurrentDate(addDays(currentDate, AgendaDaysToShow))
         }
     }
 
     // > Define a helper function to handle the today button click
-    const handleToday = () => {
+    function handleGoToToday() {
         // >> Set the current date to the current date
-        setCurrentDate(new Date())
+        setCurrentDate(today)
     }
 
     // > Define a helper function to handle selecting an event
-    const handleEventSelect = (event: CalendarEvent) => {
+    function handleEventSelect(event: CalendarEvent) {
         // >> Log the selected event to the console
         console.log("Event selected:", event)
         // >> Set the selected event to the selected event
@@ -111,7 +112,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     }
 
     // > Define a helper function to handle creating a new event
-    const handleEventCreate = (startTime: Date) => {
+    function handleEventCreate(startTime: Date) {
         // >> Log the start time of the new event
         console.log("Creating new event at:", startTime) // Debug log
 
@@ -139,7 +140,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     }
 
     // > Define a helper function to handle saving an event
-    const handleEventSave = (event: CalendarEvent) => {
+    function handleEventSave(event: CalendarEvent) {
         if (event.id) {
             onEventUpdate?.(event)
             // Show toast notification when an event is updated
@@ -163,7 +164,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     }
 
     // > Define a helper function to handle deleting an event
-    const handleEventDelete = (eventId: string) => {
+    function handleEventDelete(eventId: string) {
         // >> Find the event to be deleted
         const deletedEvent = events.find((e) => e.id === eventId)
         // >> If the event is not found, return early
@@ -179,13 +180,14 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     }
 
     // > Define a helper function to handle updating an event
-    const handleEventUpdate = (updatedEvent: CalendarEvent) => {
+    function handleEventUpdate(updatedEvent: CalendarEvent) {
         // >> Call the onEventUpdate callback with the updated event
         onEventUpdate?.(updatedEvent)
         // >> Show toast notification when an event is updated via drag and drop
         toast(`Event "${updatedEvent.title}" moved`, { description: format(new Date(updatedEvent.start), "MMM d, yyyy"), position: "bottom-left" })
     }
 
+    // > Use the useMemo hook to calculate the view title based on the current date and view
     const viewTitle = useMemo(() => {
         if (view === "month") {
             return format(currentDate, "MMMM yyyy")
@@ -226,53 +228,42 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         }
     }, [currentDate, view])
 
+    // > Use the useMemo hook to calculate the style for the calendar based on the view
+    const style = useMemo(() => ({
+        "--event-height": `${EventHeight}px`,
+        "--event-gap": `${EventGap}px`,
+        "--week-cells-height": `${WeekCellsHeight}px`,
+    } as CSSProperties), [EventHeight, EventGap, WeekCellsHeight])
+
+    // > Define a helper function to handle the event create button click
+    function handleEventCreateClick() {
+        setSelectedEvent(null)
+        setIsEventDialogOpen(true)
+    }
+
+    // > Define a helper function to handle the event dialog close
+    function handleDialogClose() {
+        setIsEventDialogOpen(false)
+        setSelectedEvent(null)
+    }
+
     // > Return the FullCalendar component
     return (
-        <div
-            className="flex flex-1 flex-col rounded-lg border"
-            style={
-                {
-                    "--event-height": `${EventHeight}px`,
-                    "--event-gap": `${EventGap}px`,
-                    "--week-cells-height": `${WeekCellsHeight}px`,
-                } as React.CSSProperties
-            }
-        >
+        <div className="flex flex-1 flex-col rounded-lg border" style={style}>
             <CalendarDndProvider onEventUpdate={handleEventUpdate}>
-                <div
-                    className={cn(
-                        "flex items-center justify-between p-2 sm:p-4",
-                        className
-                    )}
-                >
+                {/* Calendar header */}
+                <div className={cn("flex items-center justify-between p-2 sm:p-4", className)}>
+                    {/* Calendar header with buttons and view selector */}
                     <div className="flex items-center gap-1 sm:gap-4">
-                        <Button
-                            variant="outline"
-                            className="aspect-square max-[479px]:p-0!"
-                            onClick={handleToday}
-                        >
-                            <RiCalendarCheckLine
-                                className="min-[480px]:hidden"
-                                size={16}
-                                aria-hidden="true"
-                            />
+                        <Button variant="outline" className="aspect-square max-[479px]:p-0!" onClick={handleGoToToday}>
+                            <RiCalendarCheckLine className="min-[480px]:hidden" size={16} aria-hidden="true" />
                             <span className="max-[479px]:sr-only">Today</span>
                         </Button>
                         <div className="flex items-center sm:gap-2">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handlePrevious}
-                                aria-label="Previous"
-                            >
+                            <Button variant="ghost" size="icon" onClick={handleGoToPrevious} aria-label="Previous">
                                 <ChevronLeftIcon size={16} aria-hidden="true" />
                             </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleNext}
-                                aria-label="Next"
-                            >
+                            <Button variant="ghost" size="icon" onClick={handleGoToNext} aria-label="Next">
                                 <ChevronRightIcon size={16} aria-hidden="true" />
                             </Button>
                         </div>
@@ -280,9 +271,12 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
                             {viewTitle}
                         </h2>
                     </div>
+
+                    {/* View selector and new event button */}
                     <div className="flex items-center gap-2">
+                        {/* View selector dropdown */}
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                            <DropdownMenuTrigger asChild={true}>
                                 <Button variant="outline" className="gap-1.5 max-[479px]:h-8">
                                     <span>
                                         <span className="min-[480px]:hidden" aria-hidden="true">
@@ -292,11 +286,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
                                             {view.charAt(0).toUpperCase() + view.slice(1)}
                                         </span>
                                     </span>
-                                    <ChevronDownIcon
-                                        className="-me-1 opacity-60"
-                                        size={16}
-                                        aria-hidden="true"
-                                    />
+                                    <ChevronDownIcon className="-me-1 opacity-60" size={16} aria-hidden="true"/>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="min-w-32">
@@ -314,67 +304,33 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        <Button
-                            className="aspect-square max-[479px]:p-0!"
-                            onClick={() => {
-                                setSelectedEvent(null) // Ensure we're creating a new event
-                                setIsEventDialogOpen(true)
-                            }}
-                        >
-                            <PlusIcon
-                                className="opacity-60 sm:-ms-1"
-                                size={16}
-                                aria-hidden="true"
-                            />
+
+                        {/* New event button */}
+                        <Button className="aspect-square max-[479px]:p-0!" onClick={handleEventCreateClick}>
+                            <PlusIcon className="opacity-60 sm:-ms-1" size={16} />
                             <span className="max-sm:sr-only">New event</span>
                         </Button>
                     </div>
                 </div>
 
+                {/* Calendar main content */}
                 <div className="flex flex-1 flex-col">
                     {view === "month" && (
-                        <MonthView
-                            currentDate={currentDate}
-                            events={events}
-                            onEventSelect={handleEventSelect}
-                            onEventCreate={handleEventCreate}
-                        />
+                        <MonthView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />
                     )}
                     {view === "week" && (
-                        <WeekView
-                            currentDate={currentDate}
-                            events={events}
-                            onEventSelect={handleEventSelect}
-                            onEventCreate={handleEventCreate}
-                        />
+                        <WeekView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />
                     )}
                     {view === "day" && (
-                        <DayView
-                            currentDate={currentDate}
-                            events={events}
-                            onEventSelect={handleEventSelect}
-                            onEventCreate={handleEventCreate}
-                        />
+                        <DayView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />
                     )}
                     {view === "agenda" && (
-                        <AgendaView
-                            currentDate={currentDate}
-                            events={events}
-                            onEventSelect={handleEventSelect}
-                        />
+                        <AgendaView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} />
                     )}
                 </div>
 
-                <EventDialog
-                    event={selectedEvent}
-                    isOpen={isEventDialogOpen}
-                    onClose={() => {
-                        setIsEventDialogOpen(false)
-                        setSelectedEvent(null)
-                    }}
-                    onSave={handleEventSave}
-                    onDelete={handleEventDelete}
-                />
+                {/* Event dialog for creating or editing events */}
+                <EventDialog event={selectedEvent} isOpen={isEventDialogOpen} onClose={handleDialogClose} onSave={handleEventSave} onDelete={handleEventDelete} />
             </CalendarDndProvider>
         </div>
     )
