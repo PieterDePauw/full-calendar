@@ -18,11 +18,14 @@ interface EventsPopupProps {
 export function EventsPopup({ date, events, position, onClose, onEventSelect }: EventsPopupProps) {
     // > Use ref to get æ ref to the popup element
     const popupRef = useRef<HTMLDivElement>(null)
+
     // > Use the useEffect hook to handle clicks outside the popup
     useEffect(() => {
         // >> Define the handleClickOutside function
         const handleClickOutside = (event: MouseEvent) => {
-            if (popupRef.current && !popupRef.current.contains(event.target as Node)) { onClose() }
+            if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+                onClose()
+            }
         }
         // >> Add the handleClickOutside function to the event listener for mousedown
         document.addEventListener("mousedown", handleClickOutside)
@@ -50,25 +53,30 @@ export function EventsPopup({ date, events, position, onClose, onEventSelect }: 
 
     // Adjust position to ensure popup stays within viewport
     const adjustedPosition = useMemo(() => {
+        // > Create a copy of the position object
         const positionCopy = { ...position }
 
-        // Check if we need to adjust the position to fit in the viewport
+        // > Check if we need to adjust the position to fit in the viewport
         if (popupRef.current) {
+            // >> Get the bounding rectangle of the popup element
             const rect = popupRef.current.getBoundingClientRect()
+
+            // >> Get the viewport's inner width and inner height (the visible area of the browser window)
             const viewportWidth = window.innerWidth
             const viewportHeight = window.innerHeight
 
-            // Adjust horizontally if needed
+            // >> Adjust the horizontal position if the popup goes outside the viewport
             if (positionCopy.left + rect.width > viewportWidth) {
                 positionCopy.left = Math.max(0, viewportWidth - rect.width)
             }
 
-            // Adjust vertically if needed
+            // >> Adjust the vertical position if the popup goes outside the viewport
             if (positionCopy.top + rect.height > viewportHeight) {
                 positionCopy.top = Math.max(0, viewportHeight - rect.height)
             }
         }
 
+        // > Return the adjusted position object
         return positionCopy
     }, [position])
 
