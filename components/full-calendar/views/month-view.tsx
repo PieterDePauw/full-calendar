@@ -4,7 +4,7 @@
 import { Fragment, useMemo, type CSSProperties, type MouseEvent } from "react"
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
+import { DaysPerWeek, DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
 import { useMounted } from "@/hooks/use-mounted"
 
 // MonthView component
@@ -13,35 +13,10 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
     const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(startOfMonth(currentDate), { weekStartsOn: 0 }), end: endOfWeek(endOfMonth(startOfMonth(currentDate)), { weekStartsOn: 0 }) }), [currentDate])
 
     // > Get all the days of the week, based on the current date
-    const weekdays = useMemo(() => Array.from({ length: 7 }).map((_, i) => format(addDays(startOfWeek(new Date()), i), "EEE")), [])
+    const weekdays = useMemo(() => Array.from({ length: DaysPerWeek }).map((_, i) => format(addDays(startOfWeek(new Date()), i), "EEE")), [])
 
     // > Get all the weeks of the month, based on the days of the month
-    // const weeks = useMemo(() => {
-    //     // >> Initialize an empty array to hold the weeks
-    //     const result = [];
-    //     // >> Initialize an empty array to hold the current week
-    //     let currentWeek = [];
-    //     // >> Loop through the days of the month
-    //     for (let i = 0; i < days.length; i++) {
-    //         // >>> Push the current day into the current week
-    //         currentWeek.push(days[i]);
-    //         // >>> If the current week has 7 days or if it's the last day of the month, ...
-    //         if (currentWeek.length === 7 || i === days.length - 1) {
-    //             // >>>> Push the current week into the result array
-    //             result.push(currentWeek);
-    //             // >>>> Reset the current week to an empty array
-    //             currentWeek = []
-    //         }
-    //     }
-    //     // >> Return the result array containing all the weeks of the month
-    //     return result
-    // }, [days])
-
-    // > Get all the weeks of the month, based on the days of the month
-    const weeks = useMemo(() => {
-        const daysPerWeek = 7
-        return Array.from({ length: Math.ceil(days.length / daysPerWeek) }, (_, i) => days.slice(i * daysPerWeek, i * daysPerWeek + daysPerWeek))
-    }, [days])
+    const weeks = useMemo(() => Array.from({ length: Math.ceil(days.length / DaysPerWeek) }, (_, i) => days.slice(i * DaysPerWeek, i * DaysPerWeek + DaysPerWeek)), [days])
 
     // > Define a helper function to handle the event click to select an event
     function handleEventClick(event: CalendarEvent, e: MouseEvent) {
@@ -64,9 +39,9 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                 {weeks.map((week, weekIndex) => (
                     <div key={`week-${weekIndex}`} className="grid grid-cols-7 [&:last-child>*]:border-b-0">
                         {week.map((day, dayIndex) => {
+                            const isCurrentMonth = isSameMonth(day, currentDate)
                             const dayEvents = getEventsForDay(events, day)
                             const spanningEvents = getSpanningEventsForDay(events, day)
-                            const isCurrentMonth = isSameMonth(day, currentDate)
                             const allDayEvents = [...spanningEvents, ...dayEvents]
                             const allEvents = getAllEventsForDay(events, day)
 

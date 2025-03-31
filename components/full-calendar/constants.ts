@@ -9,3 +9,6 @@ export const WeekCellsHeight = 64
 
 // Number of days to show in the agenda view
 export const AgendaDaysToShow = 30
+
+// Number of days in a week
+export const DaysPerWeek = 7
