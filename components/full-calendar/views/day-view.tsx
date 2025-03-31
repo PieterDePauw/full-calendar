@@ -32,10 +32,10 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
 
     // > Get only single-day time-based events
     // biome-ignore
-    const timeEvents = useMemo(() => dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), [dayEvents])
+    // const timeEvents = useMemo(() => dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), [dayEvents])
 
     // > Process events to calculate positions
-    const positionedEvents = useMemo(() => positionEvents(timeEvents, currentDate), [currentDate, timeEvents])
+    const positionedEvents = useMemo(() => positionEvents(dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), currentDate), [currentDate, dayEvents])
 
     // > Use the useCurrentTimeIndicator hook to get the current time position and visibility
     const { currentTimePosition, currentTimeVisible } = useCurrentTimeIndicator(currentDate, "day")
