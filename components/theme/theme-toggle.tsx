@@ -6,7 +6,7 @@ import { RiMoonClearLine, RiSunLine } from "@remixicon/react"
 import { useTheme } from "next-themes"
 
 // ThemeToggle component
-export default function ThemeToggle() {
+export function ThemeToggle() {
     // > Use the useId hook to generate a unique ID for the input element
     const id = useId()
 

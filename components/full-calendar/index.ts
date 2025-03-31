@@ -1,8 +1,8 @@
 // Calendar view exports
-export { AgendaView } from "@/components/full-calendar/views/agenda-view"
-export { DayView } from "@/components/full-calendar/views/day-view"
-export { MonthView } from "@/components/full-calendar/views/month-view"
-export { WeekView } from "@/components/full-calendar/views/week-view"
+export { AgendaView } from "./views/agenda-view"
+export { DayView } from "./views/day-view"
+export { MonthView } from "./views/month-view"
+export { WeekView } from "./views/week-view"
 
 // Sub-component exports@
 export { CalendarDndProvider, useCalendarDnd } from "./dnd/calendar-dnd-context"
