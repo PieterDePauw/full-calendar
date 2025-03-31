@@ -1,6 +1,6 @@
 "use client"
 
-
+// Import modules
 import { useLayoutEffect, useMemo, useRef, useState } from "react"
 
 // useEventVisibility hook: custom hook to calculate the number of visible events based on the container height using a ResizeObserver for efficient updates

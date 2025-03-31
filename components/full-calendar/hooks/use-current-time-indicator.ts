@@ -35,27 +35,36 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
 
             // >>> Assign a variable to check if the current time is visible
             let isCurrentTimeVisible = false
+
             // >>> If the view is "day", check if the current time is on the same day to determine visibility
-            if (view === "day") { isCurrentTimeVisible = isSameDay(now, currentDate)}
+            if (view === "day") {
+                isCurrentTimeVisible = isSameDay(now, currentDate)
+            }
+
             // >>> If the view is "week", check if the current time is within the week to determine visibility
             if (view === "week") {
                 const startOfWeekDate = startOfWeek(currentDate, { weekStartsOn: 0 })
                 const endOfWeekDate = endOfWeek(currentDate, { weekStartsOn: 0 })
                 isCurrentTimeVisible = isWithinInterval(now, { start: startOfWeekDate, end: endOfWeekDate })
             }
+
             // >>> Update the current time position
             setCurrentTimePosition(position)
+
             // >>> Update the current time visibility
             setCurrentTimeVisible(isCurrentTimeVisible)
         }
 
         // >> Calculate the initial time position when the component mounts
         calculateTimePosition()
+
         // >> Update every minute (60000ms) to keep the current time indicator up to date
         const interval = setInterval(calculateTimePosition, 60000)
+
         // >> Return a cleanup function to clear the interval when the component unmounts
         return () => clearInterval(interval)
     }, [currentDate, view])
 
+    // > Return the current time position and time visibility status
     return { currentTimePosition, currentTimeVisible }
 }
