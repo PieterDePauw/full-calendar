@@ -47,23 +47,6 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
     // > Process events to calculate positions
     // biome-ignore
     const positionedEvents = useMemo(() => {
-        // // Sort events by start time and duration
-        // const sortedEvents = [...timeEvents].sort((a, b) => {
-        //     const aStart = new Date(a.start)
-        //     const bStart = new Date(b.start)
-        //     const aEnd = new Date(a.end)
-        //     const bEnd = new Date(b.end)
-
-        //     // First sort by start time
-        //     if (aStart < bStart) return -1
-        //     if (aStart > bStart) return 1
-
-        //     // If start times are equal, sort by duration (longer events first)
-        //     const aDuration = differenceInMinutes(aEnd, aStart)
-        //     const bDuration = differenceInMinutes(bEnd, bStart)
-        //     return bDuration - aDuration
-        // })
-
         // >> Define a result array to hold positioned events
         const result: PositionedEvent[] = []
 
@@ -137,6 +120,7 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
             result.push({ event, top, height, left, width, zIndex: adjustedZIndex })
         })
 
+        // >> Return the result array holding the positioned events
         return result
     }, [currentDate, timeEvents])
 
