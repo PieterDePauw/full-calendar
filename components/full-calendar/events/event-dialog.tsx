@@ -120,8 +120,8 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
     function resetForm() {
         setTitle("")
         setDescription("")
-        setStartDate(new Date(today))
-        setEndDate(new Date())
+        setStartDate(today)
+        setEndDate(today)
         setStartTime(formatTimeForInput(today))
         setEndTime(formatTimeForInput(today))
         setAllDay(false)
