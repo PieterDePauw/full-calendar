@@ -58,16 +58,15 @@ export function DraggableEvent({ event, view, showTime, onClick, height, multiDa
         }
     }
 
-    // > Define a default style object
-    const defaultStyle = useMemo(() => ({ height: height ? `${height}` : "auto", width: isMultiDayEvent && multiDayWidth ? `${multiDayWidth}%` : undefined }), [height, isMultiDayEvent, multiDayWidth])
-
     // > Don't render if this event is being dragged
     if (isDragging || activeId === id) {
         return <div ref={setNodeRef} className="opacity-0" style={{ height: height || "auto" }} />
     }
 
     // > Define a style object based on the transform property
-    const style = transform ? { ...defaultStyle, transform: CSS.Translate.toString(transform) } : defaultStyle
+    const style = transform
+        ? { transform: CSS.Translate.toString(transform), height: height || "auto", width: isMultiDayEvent && multiDayWidth ? `${multiDayWidth}%` : undefined }
+        : { height: height || "auto", width: isMultiDayEvent && multiDayWidth ? `${multiDayWidth}%` : undefined }
 
     // > Return the JSX for the draggable event
     return (
