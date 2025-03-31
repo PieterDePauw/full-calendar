@@ -251,7 +251,7 @@ export function EventDialog({
                         <div className="flex-1 *:not-first:mt-1.5">
                             <Label htmlFor="start-date">Start Date</Label>
                             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
-                                <PopoverTrigger asChild>
+                                <PopoverTrigger asChild={true}>
                                     <Button
                                         id="start-date"
                                         variant={"outline"}
@@ -319,7 +319,7 @@ export function EventDialog({
                         <div className="flex-1 *:not-first:mt-1.5">
                             <Label htmlFor="end-date">End Date</Label>
                             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-                                <PopoverTrigger asChild>
+                                <PopoverTrigger asChild={true}>
                                     <Button
                                         id="end-date"
                                         variant={"outline"}
