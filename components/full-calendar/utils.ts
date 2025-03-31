@@ -186,7 +186,7 @@ function adjustEventTimes(event: CalendarEvent, currentDate: Date): { adjustedSt
 
 // Define a helper function to get the decimal hour from a specified date/time
 function getDecimalHour(date: Date): number {
-    return getHours(date) + getMinutes(date) / 60
+    return getHours(date) + (getMinutes(date) / 60)
 }
 
 // Define a helper function to sort events based on their start time and duration
@@ -227,26 +227,25 @@ function findColumnIndex(columns: { event: CalendarEvent; end: Date }[][], adjus
 
     // > Loop until the event is placed in a column
     while (!placed) {
-        // If the column doesn't exist, create it and use it.
+        // >> If the column doesn't exist, create it and use it.
         if (!columns[columnIndex]) {
             columns[columnIndex] = []
             placed = true
         }
 
-        // Check if event overlaps with any in the current column.
+        // >> Check if event overlaps with any in the current column.
         const overlaps = columns[columnIndex].some(col => areIntervalsOverlapping({ start: adjustedStart, end: adjustedEnd }, { start: new Date(col.event.start), end: new Date(col.event.end) }))
-        // If it doesn't overlap, place the event in this column.
+        // >> If it doesn't overlap, place the event in this column, otherwise move to the next column.
         if (!overlaps) {
             placed = true
+        } else {
+            columnIndex++
         }
-        // If it does overlap, move to the next column.
-        columnIndex++
     }
 
     // Once the column is determined, return the column index where the event should be placed
     return columnIndex
 }
-
 
 // Define a helper function to position events in columns based on their start and end times
 export function positionEvents(events: CalendarEvent[], currentDate: Date): PositionedEvent[] {
@@ -254,7 +253,7 @@ export function positionEvents(events: CalendarEvent[], currentDate: Date): Posi
     const result: PositionedEvent[] = [];
 
     // > Define a columns array to hold the events in columns to avoid overlapping events
-    const columns: { event: CalendarEvent; end: Date }[][] = [];
+    const columns: (({ event: CalendarEvent; end: Date })[])[] = [];
 
     // > Sort events by start time and duration
     const sortedEvents = sortEventsByStartTimeAndDuration(events);
