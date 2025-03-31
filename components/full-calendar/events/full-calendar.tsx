@@ -26,13 +26,13 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     const today = new Date()
 
     // > Use the useState hook to manage the current date
-    const [currentDate, setCurrentDate] = useState(today)
+    const [currentDate, setCurrentDate] = useState<Date>(today)
 
     // > Use the useState hook to manage the current view
     const [view, setView] = useState<CalendarView>(initialView)
 
     // > Use the useState hook to manage the event dialog state
-    const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
+    const [isEventDialogOpen, setIsEventDialogOpen] = useState<boolean>(false)
 
     // > Use the useState hook to manage the selected event
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
@@ -243,8 +243,8 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
     // > Define a helper function to handle the event dialog close
     function handleDialogClose() {
+        setSelectedEvent(null);
         setIsEventDialogOpen(false)
-        setSelectedEvent(null)
     }
 
     // > Return the FullCalendar component
