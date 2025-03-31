@@ -1,7 +1,7 @@
 "use client"
 
 // Import modules
-import React, { Fragment, useMemo } from "react"
+import { Fragment, useMemo, type MouseEvent } from "react"
 import { addHours, eachHourOfInterval, format, getHours, isSameDay, startOfDay } from "date-fns"
 import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, generateDroppableCell, positionEvents } from "@/components/full-calendar"
 
@@ -38,7 +38,7 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
     const positionedEvents = useMemo(() => positionEvents(timeEvents, currentDate), [currentDate, timeEvents])
 
     // > Define a helper function to handle event clicks
-    const handleEventClick = (event: CalendarEvent, e: React.MouseEvent) => {
+    const handleEventClick = (event: CalendarEvent, e: MouseEvent) => {
         e.stopPropagation()
         onEventSelect(event)
     }
@@ -70,7 +70,7 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
 }
 
 // AllDayEventsSection component
-export function AllDayEventsSection({ allDayEvents, onEventClick, currentDate }: { allDayEvents: CalendarEvent[]; onEventClick: (event: CalendarEvent, e: React.MouseEvent) => void; currentDate: Date }) {
+export function AllDayEventsSection({ allDayEvents, onEventClick, currentDate }: { allDayEvents: CalendarEvent[]; onEventClick: (event: CalendarEvent, e: MouseEvent) => void; currentDate: Date }) {
     return (
         <div className="border-border/70 bg-muted/50 border-t">
             <div className="grid grid-cols-[3rem_1fr] sm:grid-cols-[4rem_1fr]">
@@ -149,7 +149,7 @@ export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[];
 }
 
 // EventsGrid component
-export function EventsGrid({ positionedEvents, onEventClick }: { positionedEvents: PositionedEvent[]; onEventClick: (event: CalendarEvent, e: React.MouseEvent) => void }) {
+export function EventsGrid({ positionedEvents, onEventClick }: { positionedEvents: PositionedEvent[]; onEventClick: (event: CalendarEvent, e: MouseEvent) => void }) {
     return positionedEvents.map((positionedEvent) => (
         <div key={positionedEvent.event.id} className="absolute z-10 px-0.5" style={{ top: `${positionedEvent.top}px`, height: `${positionedEvent.height}px`, left: `${positionedEvent.left * 100}%`, width: `${positionedEvent.width * 100}%`, zIndex: positionedEvent.zIndex }}>
             <div className="h-full w-full">
