@@ -23,19 +23,16 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: 
     // biome-ignore
     const dayEvents = useMemo(() => events.filter((event) => isSameDay(currentDate, new Date(event.start)) || isSameDay(currentDate, new Date(event.end)) || (currentDate > new Date(event.start) && currentDate < new Date(event.end))).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()), [currentDate, events])
 
+    // > Get only single-day time-based events and process these events to calculate their positions
+    // biome-ignore
+    const positionedEvents = useMemo(() => positionEvents(dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), currentDate), [currentDate, dayEvents])
+
     // > Filter all-day events, including those explicitly marked as all-day events or events that span multiple days
     // biome-ignore
     const allDayEvents = useMemo(() => dayEvents.filter((event) => event.allDay || checkIfMultiDayEvent(event)), [dayEvents])
 
     // > Check if there are any all-day events
     const hasAllDayEvents = useMemo(() => allDayEvents.length >= 1, [allDayEvents])
-
-    // > Get only single-day time-based events
-    // biome-ignore
-    // const timeEvents = useMemo(() => dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), [dayEvents])
-
-    // > Process events to calculate positions
-    const positionedEvents = useMemo(() => positionEvents(dayEvents.filter((event) => !event.allDay && !checkIfMultiDayEvent(event)), currentDate), [currentDate, dayEvents])
 
     // > Use the useCurrentTimeIndicator hook to get the current time position and visibility
     const { currentTimePosition, currentTimeVisible } = useCurrentTimeIndicator(currentDate, "day")
