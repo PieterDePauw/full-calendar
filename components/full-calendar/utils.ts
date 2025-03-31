@@ -96,10 +96,8 @@ export function checkIfMultiDayEvent(event: CalendarEvent): boolean {
  * Filter events for a specific day
  */
 export function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
-    return events.filter((event) => {
-        const eventStart = new Date(event.start)
-        return isSameDay(day, eventStart)
-    })
+    return events
+        .filter((event) => isSameDay(day, new Date(event.start)))
         .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
 }
 
@@ -107,7 +105,7 @@ export function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEve
  * Sort events with multi-day events first, then by start time
  */
 export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
-    return [...events].sort((a, b) => {
+    return events.toSorted((a, b) => {
         const aIsMultiDay = checkIfMultiDayEvent(a)
         const bIsMultiDay = checkIfMultiDayEvent(b)
 
@@ -156,15 +154,16 @@ export function getAllEventsForDay(events: CalendarEvent[], day: Date): Calendar
  * Get all events for a day (for agenda view)
  */
 export function getAgendaEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
-    return events.filter((event) => {
-        const eventStart = new Date(event.start)
-        const eventEnd = new Date(event.end)
-        return (
-            isSameDay(day, eventStart) ||
-            isSameDay(day, eventEnd) ||
-            (day > eventStart && day < eventEnd)
-        )
-    })
+    return events
+        .filter((event) => {
+            const eventStart = new Date(event.start)
+            const eventEnd = new Date(event.end)
+            return (
+                isSameDay(day, eventStart) ||
+                isSameDay(day, eventEnd) ||
+                (day > eventStart && day < eventEnd)
+            )
+        })
         .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
 }
 
@@ -231,7 +230,7 @@ function getDecimalHour(date: Date): number {
 // Define a helper function to sort events based on their start time and duration
 export function sortEventsByStartTimeAndDuration(events: CalendarEvent[]): CalendarEvent[] {
     // > Get the sorted events by start time and duration
-    const sortedEvents = [...events].sort((eventA, eventB) => {
+    const sortedEvents = events.toSorted((eventA, eventB) => {
         // >> Get the start time for each of the events
         const eventAStart = new Date(eventA.start)
         const eventBStart = new Date(eventB.start)
@@ -328,124 +327,3 @@ export function positionEvents(events: CalendarEvent[], currentDate: Date): Posi
 
     return result;
 }
-
-// // Define a helper function to position events in columns based on their start and end times
-// function assignColumn(columns: { event: CalendarEvent; end: Date }[][], event: CalendarEvent, adjustedStart: Date, adjustedEnd: Date): number {
-//     // > Define a variable to keep track of the column index
-//     let columnIndex = 0;
-
-//     // > Define a variable to keep track of whether the event has been placed
-//     let placed = false;
-
-//     // > Create an object that holds the start and end times of the event
-//     const currentInterval = { start: adjustedStart, end: adjustedEnd };
-
-//     // > Loop until the event is placed in a column
-//     while (!placed) {
-//         // >> Define a variable to hold the current column
-//         const currentColumn = columns[columnIndex];
-
-//         // >> If no column exists at this index, ...
-//         if (!currentColumn) {
-//             // >>> Initialize the column as an empty array in the columns array
-//             columns[columnIndex] = [];
-//             // >>> Mark the event as placed
-//             placed = true;
-//         }
-
-//         // >> If a column does exist at this index, ....
-//         if (currentColumn) {
-//             // >>> Check if the event overlaps with any existing events within this column
-//             const overlaps = currentColumn.some((col) => areIntervalsOverlapping(currentInterval, { start: new Date(col.event.start), end: new Date(col.event.end) }));
-
-//             // >>> If the event does not overlap with any existing events, mark it as placed; otherwise, move to the next column
-//             if (!overlaps) {
-//                 placed = true;
-//             } else {
-//                 columnIndex++;
-//             }
-//         }
-//     }
-
-//     // Once the column is determined, push the event into it
-//     columns[columnIndex].push({ event, end: adjustedEnd });
-
-//     // Return the column index where the event was placed
-//     return columnIndex;
-// }
-
-// // > Process events to calculate positions
-// export function positionEvents({ timeEvents, currentDate }: { timeEvents: CalendarEvent[]; currentDate: Date }): PositionedEvent[] {
-//     // >> Define a result array to hold positioned events
-//     const result: PositionedEvent[] = []
-
-//     // >> Define the start of the day
-//     const dayStart: Date = startOfDay(currentDate)
-
-//     // >> Sort events by start time and duration
-//     const sortedEvents: CalendarEvent[] = sortEventsByStartTimeAndDuration(timeEvents)
-
-//     // >> Define an array to hold columns for overlapping events
-//     const columns: { event: CalendarEvent; end: Date }[][] = []
-
-//     // >> Loop through each event to calculate its position
-//     sortedEvents.forEach((event) => {
-//         // >>> Get the start and end times of the event
-//         const eventStart = new Date(event.start)
-//         const eventEnd = new Date(event.end)
-
-//         // >>> Adjust start and end times if they're outside this day
-//         const adjustedStart = isSameDay(currentDate, eventStart) ? eventStart : dayStart
-//         const adjustedEnd = isSameDay(currentDate, eventEnd) ? eventEnd : addHours(dayStart, 24)
-
-//         // >>> Calculate the start time and the end time as hours in decimals
-//         const startHour = getHours(adjustedStart) + getMinutes(adjustedStart) / 60
-//         const endHour = getHours(adjustedEnd) + getMinutes(adjustedEnd) / 60
-
-//         // >>> Calculate top position and height
-//         const top = startHour * WeekCellsHeight
-//         const height = (endHour - startHour) * WeekCellsHeight
-
-//         // >>> Find a column for this event
-//         let columnIndex = 0
-//         let placed = false
-
-//         // >> Loop until the event is placed in a column
-//         while (!placed) {
-//             if (!columns[columnIndex]) {
-//                 columns[columnIndex] = []
-//                 placed = true
-//             } else {
-//                 // Check if this event overlaps with any event in this column
-//                 const overlaps = columns[columnIndex].some((col) =>
-//                     areIntervalsOverlapping(
-//                         { start: adjustedStart, end: adjustedEnd },
-//                         { start: new Date(col.event.start), end: new Date(col.event.end) }
-//                     )
-//                 )
-
-//                 if (!overlaps) {
-//                     placed = true
-//                 } else {
-//                     columnIndex++
-//                 }
-//             }
-//         }
-
-//         // Add event to its column
-//         columns[columnIndex].push({ event, end: adjustedEnd })
-
-//         // First column takes full width, others are indented by 10% and take 90% width
-//         const width = columnIndex === 0 ? 1 : 0.9
-//         const left = columnIndex === 0 ? 0 : columnIndex * 0.1
-
-//         // Higher columns get higher z-index
-//         const adjustedZIndex = 10 + columnIndex
-
-//         // Add event to result
-//         result.push({ event, top, height, left, width, zIndex: adjustedZIndex })
-//     })
-
-//     // >> Return the result array holding the positioned events
-//     return result
-// }
