@@ -4,6 +4,16 @@ import { addHours, areIntervalsOverlapping, differenceInDays, differenceInMinute
 import { WeekCellsHeight, type CalendarEvent, type PositionedEvent, type EventColor, type CalendarView } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
+// Define a helper function to format the time for the input field
+export function formatTimeForInput(date: Date): string {
+    // > Get the hours from the date object and format them to 2 digits
+    const hours = (date.getHours()).toString().padStart(2, "0")
+    // > Get the minutes from the date object, round them to the nearest 15 minutes, and format them to 2 digits
+    const minutes = (Math.floor(date.getMinutes() / 15) * 15).toString().padStart(2, "0")
+    // > Return the formatted time string
+    return `${hours}:${minutes}`
+}
+
 // Define a helper function to generate CSS classes for event colors
 export function getEventColorClasses(color: EventColor | string = "sky"): string {
     switch (color) {

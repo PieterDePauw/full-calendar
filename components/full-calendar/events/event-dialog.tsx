@@ -1,110 +1,133 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+// Import modules
+import { useState, useEffect, useMemo } from "react"
 import { RiCalendarLine, RiDeleteBinLine } from "@remixicon/react"
 import { format, isBefore } from "date-fns"
-
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { CalendarEvent, EventColor } from "@/components/full-calendar"
+import { cn } from "@/lib/utils"
+import { formatTimeForInput, type CalendarEvent, type EventColor } from "@/components/full-calendar"
 
-interface EventDialogProps {
-    event: CalendarEvent | null
-    isOpen: boolean
-    onClose: () => void
-    onSave: (event: CalendarEvent) => void
-    onDelete: (eventId: string) => void
-}
+// Define the color options for the event dialog@
+const colorOptions: { value: EventColor; label: string; bgClass: string; borderClass: string }[] = [
+    {
+        value: "sky",
+        label: "Sky",
+        bgClass: "bg-sky-400 data-[state=checked]:bg-sky-400",
+        borderClass: "border-sky-400 data-[state=checked]:border-sky-400",
+    },
+    {
+        value: "amber",
+        label: "Amber",
+        bgClass: "bg-amber-400 data-[state=checked]:bg-amber-400",
+        borderClass: "border-amber-400 data-[state=checked]:border-amber-400",
+    },
+    {
+        value: "violet",
+        label: "Violet",
+        bgClass: "bg-violet-400 data-[state=checked]:bg-violet-400",
+        borderClass: "border-violet-400 data-[state=checked]:border-violet-400",
+    },
+    {
+        value: "rose",
+        label: "Rose",
+        bgClass: "bg-rose-400 data-[state=checked]:bg-rose-400",
+        borderClass: "border-rose-400 data-[state=checked]:border-rose-400",
+    },
+    {
+        value: "emerald",
+        label: "Emerald",
+        bgClass: "bg-emerald-400 data-[state=checked]:bg-emerald-400",
+        borderClass: "border-emerald-400 data-[state=checked]:border-emerald-400",
+    },
+    {
+        value: "orange",
+        label: "Orange",
+        bgClass: "bg-orange-400 data-[state=checked]:bg-orange-400",
+        borderClass: "border-orange-400 data-[state=checked]:border-orange-400",
+    },
+]
 
-export function EventDialog({
-    event,
-    isOpen,
-    onClose,
-    onSave,
-    onDelete,
-}: EventDialogProps) {
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [startDate, setStartDate] = useState<Date>(new Date())
-    const [endDate, setEndDate] = useState<Date>(new Date())
-    const [startTime, setStartTime] = useState("09:00")
-    const [endTime, setEndTime] = useState("10:00")
-    const [allDay, setAllDay] = useState(false)
-    const [location, setLocation] = useState("")
-    const [color, setColor] = useState<EventColor>("sky")
+// EventDialogProps interface
+// interface EventDialogProps {
+//     event: CalendarEvent | null
+//     isOpen: boolean
+//     onClose: () => void
+//     onSave: (event: CalendarEvent) => void
+//     onDelete: (eventId: string) => void
+// }
+
+// EventDialog component
+export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { event: CalendarEvent | null; isOpen: boolean; onClose: () => void; onSave: (event: CalendarEvent) => void; onDelete: (eventId: string) => void }) {
+    // > Define the initial start and end dates as today
+    const today = new Date()
+    // > Use the useState hook to manage the state of the title input field
+    const [title, setTitle] = useState<string>("")
+    // > Use the useState hook to manage the state of the description input field
+    const [description, setDescription] = useState<string>("")
+    // > Use the useState hook to manage the state of the start date input field
+    const [startDate, setStartDate] = useState<Date>(today)
+    // > Use the useState hook to manage the state of the end date input field
+    const [endDate, setEndDate] = useState<Date>(today)
+    // > Use the useState hook to manage the state of the start time input field
+    const [startTime, setStartTime] = useState<string>("09:00")
+    // > Use the useState hook to manage the state of the end time input field
+    const [endTime, setEndTime] = useState<string>("10:00")
+    // > Use the useState hook to manage the state of the all-day checkbox
+    const [allDay, setAllDay] = useState<boolean>(false)
+    // > Use the useState hook to manage the state of the location input field
+    const [location, setLocation] = useState<string>("")
+    // > Use the useState hook to manage the state of the color radio button
+    const [color, setColor] = useState<EventColor>(colorOptions[0].value)
+    // > Use the useState hook to manage the state of the error message
     const [error, setError] = useState<string | null>(null)
-    const [startDateOpen, setStartDateOpen] = useState(false)
-    const [endDateOpen, setEndDateOpen] = useState(false)
+    // > Use the useState hook to manage the state of the start date date input dialog
+    const [startDateOpen, setStartDateOpen] = useState<boolean>(false)
+    // > Use the useState hook to manage the state of the end date date input dialog
+    const [endDateOpen, setEndDateOpen] = useState<boolean>(false)
 
-    // Debug log to check what event is being passed
-    useEffect(() => {
-        console.log("EventDialog received event:", event)
-    }, [event])
+    // > Use the useEffect hook to log the event, whenever it changes, for debugging purposes
+    useEffect(() => console.log("EventDialog received event:", event), [event])
 
+    // > Use the useEffect hook to set the initial state of the dialog whenever the event prop changes
     useEffect(() => {
         if (event) {
             setTitle(event.title || "")
             setDescription(event.description || "")
-
-            const start = new Date(event.start)
-            const end = new Date(event.end)
-
-            setStartDate(start)
-            setEndDate(end)
-            setStartTime(formatTimeForInput(start))
-            setEndTime(formatTimeForInput(end))
+            setStartDate(new Date(event.start) || today)
+            setEndDate(new Date(event.end) || today)
+            setStartTime(formatTimeForInput(new Date(event.start)) || formatTimeForInput(today))
+            setEndTime(formatTimeForInput(new Date(event.end)) || formatTimeForInput(today))
             setAllDay(event.allDay || false)
             setLocation(event.location || "")
-            setColor((event.color as EventColor) || "sky")
-            setError(null) // Reset error when opening dialog
+            setColor(event.color || colorOptions[0].value)
+            setError(null)
         } else {
             resetForm()
         }
     }, [event])
 
-    const resetForm = () => {
+    // > Define a helper function to reset the form fields to their initial values
+    function resetForm() {
         setTitle("")
         setDescription("")
-        setStartDate(new Date())
+        setStartDate(new Date(today))
         setEndDate(new Date())
-        setStartTime("09:00")
-        setEndTime("10:00")
+        setStartTime(formatTimeForInput(today))
+        setEndTime(formatTimeForInput(today))
         setAllDay(false)
         setLocation("")
-        setColor("sky")
+        setColor(colorOptions[0].value)
         setError(null)
-    }
-
-    const formatTimeForInput = (date: Date) => {
-        const hours = date.getHours().toString().padStart(2, "0")
-        const minutes = Math.floor(date.getMinutes() / 15) * 15
-        return `${hours}:${minutes.toString().padStart(2, "0")}`
     }
 
     // Memoize time options so they're only calculated once
@@ -124,127 +147,69 @@ export function EventDialog({
         return options
     }, []) // Empty dependency array ensures this only runs once
 
-    const handleSave = () => {
+    // > Define a function to handle the save button click
+    function handleSave() {
+        // >> Define the start and end dates based on the state
         const start = new Date(startDate)
         const end = new Date(endDate)
-
+        // >> If the event is not set to all-day, set the start and end times based on the selected time
         if (!allDay) {
+            // >>> Parse the start time from the start time string
             const [startHours, startMinutes] = startTime.split(":").map(Number)
+            // >>> Parse the end time from the end time string
             const [endHours, endMinutes] = endTime.split(":").map(Number)
-
+            // >>> Set the hours, minutes, seconds to the start object
             start.setHours(startHours, startMinutes, 0)
+            // >>> Set the hours, minutes, seconds to the end object
             end.setHours(endHours, endMinutes, 0)
-        } else {
+        }
+        // >> If the event is all-day, set the start and end objects to the beginning and end of the day
+        if (allDay) {
+            // >>> Set the start object to the beginning of the day
             start.setHours(0, 0, 0, 0)
+            // >>> Set the end object to the ending of the day
             end.setHours(23, 59, 59, 999)
         }
-
-        // Validate that end date is not before start date
+        // >> If the end date is before the start date, set an error message and return early
         if (isBefore(end, start)) {
             setError("End date cannot be before start date")
             return
         }
-
-        // Use generic title if empty
+        // >> If the event doesn't have an ID, keep it empty
+        const eventId = event?.id || ""
+        // >> Use generic title if empty
         const eventTitle = title.trim() ? title : "(no title)"
-
-        onSave({
-            id: event?.id || "",
-            title: eventTitle,
-            description,
-            start,
-            end,
-            allDay,
-            location,
-            color,
-        })
+        // >> Call the onSave function with the event data
+        onSave({ id: eventId, title: eventTitle, description, start, end, allDay, location, color })
     }
 
-    const handleDelete = () => {
-        if (event?.id) {
-            onDelete(event.id)
-        }
+    // > Define a function to handle the delete button click
+    function handleDelete() {
+        // >> If the event doesn't exist or doesn't have an ID, return early
+        if (!event || !event.id) return
+        // >> Call the onDelete function with the event ID
+        onDelete(event.id)
     }
-
-    // Updated color options to match types.ts
-    const colorOptions: Array<{
-        value: EventColor
-        label: string
-        bgClass: string
-        borderClass: string
-    }> = [
-            {
-                value: "sky",
-                label: "Sky",
-                bgClass: "bg-sky-400 data-[state=checked]:bg-sky-400",
-                borderClass: "border-sky-400 data-[state=checked]:border-sky-400",
-            },
-            {
-                value: "amber",
-                label: "Amber",
-                bgClass: "bg-amber-400 data-[state=checked]:bg-amber-400",
-                borderClass: "border-amber-400 data-[state=checked]:border-amber-400",
-            },
-            {
-                value: "violet",
-                label: "Violet",
-                bgClass: "bg-violet-400 data-[state=checked]:bg-violet-400",
-                borderClass: "border-violet-400 data-[state=checked]:border-violet-400",
-            },
-            {
-                value: "rose",
-                label: "Rose",
-                bgClass: "bg-rose-400 data-[state=checked]:bg-rose-400",
-                borderClass: "border-rose-400 data-[state=checked]:border-rose-400",
-            },
-            {
-                value: "emerald",
-                label: "Emerald",
-                bgClass: "bg-emerald-400 data-[state=checked]:bg-emerald-400",
-                borderClass: "border-emerald-400 data-[state=checked]:border-emerald-400",
-            },
-            {
-                value: "orange",
-                label: "Orange",
-                bgClass: "bg-orange-400 data-[state=checked]:bg-orange-400",
-                borderClass: "border-orange-400 data-[state=checked]:border-orange-400",
-            },
-        ]
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{event?.id ? "Edit Event" : "Create Event"}</DialogTitle>
+                    <DialogTitle>{(event && event.id) ? "Edit Event" : "Create Event"}</DialogTitle>
                     <DialogDescription className="sr-only">
-                        {event?.id
-                            ? "Edit the details of this event"
-                            : "Add a new event to your calendar"}
+                        {(event && event.id) ? "Edit the details of this event" : "Add a new event to your calendar"}
                     </DialogDescription>
                 </DialogHeader>
-                {error && (
-                    <div className="bg-destructive/15 text-destructive rounded-md px-3 py-2 text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="bg-destructive/15 text-destructive rounded-md px-3 py-2 text-sm">{error}</div>}
                 <div className="grid gap-4 py-4">
                     <div className="*:not-first:mt-1.5">
                         <Label htmlFor="title">Title</Label>
-                        <Input
-                            id="title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
+                        <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)}/>
                     </div>
 
                     <div className="*:not-first:mt-1.5">
                         <Label htmlFor="description">Description</Label>
-                        <Textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            rows={3}
-                        />
+                        <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3}/>
                     </div>
 
                     <div className="flex gap-4">
@@ -252,35 +217,15 @@ export function EventDialog({
                             <Label htmlFor="start-date">Start Date</Label>
                             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                                 <PopoverTrigger asChild={true}>
-                                    <Button
-                                        id="start-date"
-                                        variant={"outline"}
-                                        className={cn(
-                                            "group bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]",
-                                            !startDate && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "truncate",
-                                                !startDate && "text-muted-foreground"
-                                            )}
-                                        >
+                                    <Button id="start-date" variant={"outline"} className={cn("group bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]", !startDate && "text-muted-foreground")}>
+                                        <span className={cn("truncate", !startDate && "text-muted-foreground")}>
                                             {startDate ? format(startDate, "PPP") : "Pick a date"}
                                         </span>
-                                        <RiCalendarLine
-                                            size={16}
-                                            className="text-muted-foreground/80 shrink-0"
-                                            aria-hidden="true"
-                                        />
+                                        <RiCalendarLine size={16} className="text-muted-foreground/80 shrink-0" aria-hidden="true"/>
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={startDate}
-                                        defaultMonth={startDate}
-                                        onSelect={(date) => {
+                                    <Calendar mode="single" selected={startDate} defaultMonth={startDate} onSelect={(date) => {
                                             if (date) {
                                                 setStartDate(date)
                                                 // If end date is before the new start date, update it to match the start date
@@ -320,36 +265,15 @@ export function EventDialog({
                             <Label htmlFor="end-date">End Date</Label>
                             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                                 <PopoverTrigger asChild={true}>
-                                    <Button
-                                        id="end-date"
-                                        variant={"outline"}
-                                        className={cn(
-                                            "group bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]",
-                                            !endDate && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "truncate",
-                                                !endDate && "text-muted-foreground"
-                                            )}
-                                        >
+                                    <Button id="end-date" variant={"outline"} className={cn("group bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]", !endDate && "text-muted-foreground")}>
+                                        <span className={cn("truncate", !endDate && "text-muted-foreground")}>
                                             {endDate ? format(endDate, "PPP") : "Pick a date"}
                                         </span>
-                                        <RiCalendarLine
-                                            size={16}
-                                            className="text-muted-foreground/80 shrink-0"
-                                            aria-hidden="true"
-                                        />
+                                        <RiCalendarLine size={16} className="text-muted-foreground/80 shrink-0" aria-hidden="true" />
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={endDate}
-                                        defaultMonth={endDate}
-                                        disabled={{ before: startDate }}
-                                        onSelect={(date) => {
+                                    <Calendar mode="single" selected={endDate} defaultMonth={endDate} disabled={{ before: startDate }} onSelect={(date) => {
                                             if (date) {
                                                 setEndDate(date)
                                                 setError(null)
@@ -381,21 +305,13 @@ export function EventDialog({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="all-day"
-                            checked={allDay}
-                            onCheckedChange={(checked) => setAllDay(checked === true)}
-                        />
+                        <Checkbox id="all-day" checked={allDay} onCheckedChange={(checked) => setAllDay(checked === true)} />
                         <Label htmlFor="all-day">All day</Label>
                     </div>
 
                     <div className="*:not-first:mt-1.5">
                         <Label htmlFor="location">Location</Label>
-                        <Input
-                            id="location"
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                        />
+                        <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
                     </div>
                     <fieldset className="space-y-4">
                         <legend className="text-foreground text-sm leading-none font-medium">
@@ -424,20 +340,13 @@ export function EventDialog({
                     </fieldset>
                 </div>
                 <DialogFooter className="flex-row sm:justify-between">
-                    {event?.id && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handleDelete}
-                            aria-label="Delete event"
-                        >
+                    {(event && event.id) && (
+                        <Button variant="outline" size="icon" onClick={handleDelete} aria-label="Delete event">
                             <RiDeleteBinLine size={16} aria-hidden="true" />
                         </Button>
                     )}
                     <div className="flex flex-1 justify-end gap-2">
-                        <Button variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
+                        <Button variant="outline" onClick={onClose}>Cancel</Button>
                         <Button onClick={handleSave}>Save</Button>
                     </div>
                 </DialogFooter>
