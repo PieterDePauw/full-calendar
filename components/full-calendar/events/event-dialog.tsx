@@ -189,8 +189,11 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
 
     // > Define a function to handle the delete button click
     function handleDelete() {
-        // >> If the event doesn't exist or doesn't have an ID, return early
-        if (!event || !event.id) return
+        // >> If the event doesn't exist or doesn't have an ID, log an error and return early
+        if (!event || !event.id) {
+            console.error("Event ID is missing");
+            return
+        }
         // >> Call the onDelete function with the event ID
         onDelete(event.id)
     }
