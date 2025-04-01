@@ -228,7 +228,6 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         setError(null)
         // >> Close the end date popover
         setEndDateOpen(false)
-
     }
 
     // > Return the JSX for the event dialog component
@@ -344,13 +343,9 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
 
                     {/* > Color radio buttons */}
                     <fieldset className="space-y-4">
-                        <legend className="text-foreground text-sm leading-none font-medium">
-                            Etiquette
-                        </legend>
+                        <legend className="text-foreground text-sm leading-none font-medium">Etiquette</legend>
                         <RadioGroup className="flex gap-1.5" defaultValue={colorOptions[0].value} value={color} onValueChange={(value: EventColor) => setColor(value)}>
-                            {colorOptions.map((colorOption) => (
-                                <RadioGroupItem key={colorOption.value} id={`color-${colorOption.value}`} value={colorOption.value} aria-label={colorOption.label} className={cn("size-6 shadow-none", colorOption.bgClass, colorOption.borderClass)}/>
-                            ))}
+                            {colorOptions.map((colorOption) => <RadioGroupItem key={colorOption.value} id={`color-${colorOption.value}`} value={colorOption.value} aria-label={colorOption.label} className={cn("size-6 shadow-none", colorOption.bgClass, colorOption.borderClass)}/>)}
                         </RadioGroup>
                     </fieldset>
                 </div>
