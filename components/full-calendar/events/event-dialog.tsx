@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { formatTimeForInput, type CalendarEvent, type EventColor } from "@/components/full-calendar"
 
-// Define the color options for the event dialog@
+// Define the color options for the event dialog
 const colorOptions: { value: EventColor; label: string; bgClass: string; borderClass: string }[] = [
     {
         value: "sky",
