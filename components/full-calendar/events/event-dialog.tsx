@@ -57,15 +57,6 @@ const colorOptions: { value: EventColor; label: string; bgClass: string; borderC
     },
 ]
 
-// EventDialogProps interface
-// interface EventDialogProps {
-//     event: CalendarEvent | null
-//     isOpen: boolean
-//     onClose: () => void
-//     onSave: (event: CalendarEvent) => void
-//     onDelete: (eventId: string) => void
-// }
-
 // EventDialog component
 export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { event: CalendarEvent | null; isOpen: boolean; onClose: () => void; onSave: (event: CalendarEvent) => void; onDelete: (eventId: string) => void }) {
     // > Define the initial start and end dates as today
@@ -100,6 +91,24 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
 
     // > Use the useEffect hook to set the initial state of the dialog whenever the event prop changes
     useEffect(() => {
+        // > Define the initial start and end dates as today
+        const today = new Date()
+
+        // > Define a helper function to reset the form fields to their initial values
+        function resetForm() {
+            setTitle("")
+            setDescription("")
+            setStartDate(today)
+            setEndDate(today)
+            setStartTime(formatTimeForInput(today))
+            setEndTime(formatTimeForInput(today))
+            setAllDay(false)
+            setLocation("")
+            setColor(colorOptions[0].value)
+            setError(null)
+        }
+
+        // >> If there is an event, set the form fields to the event's values
         if (event) {
             setTitle(event.title || "")
             setDescription(event.description || "")
@@ -116,50 +125,45 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         }
     }, [event])
 
-    // > Define a helper function to reset the form fields to their initial values
-    function resetForm() {
-        setTitle("")
-        setDescription("")
-        setStartDate(today)
-        setEndDate(today)
-        setStartTime(formatTimeForInput(today))
-        setEndTime(formatTimeForInput(today))
-        setAllDay(false)
-        setLocation("")
-        setColor(colorOptions[0].value)
-        setError(null)
-    }
-
-    // > Memoize time options so they're only calculated once
+    // > Use the useMemo hook to create and memoize an array of time options (using an empty dependency array to ensure it is only created once)
     const timeOptions = useMemo(() => {
+        // >> Create an array to hold the time options
         const options = []
+        // >> Loop through each hour of the day (0-23)
         for (let hour = 0; hour < 24; hour++) {
+            // >> Loop through each 15-minute interval (0, 15, 30, 45)
             for (let minute = 0; minute < 60; minute += 15) {
+                // >> Format the hour and minute to be two digits
                 const formattedHour = hour.toString().padStart(2, "0")
+                // >> Format the minute to be two digits
                 const formattedMinute = minute.toString().padStart(2, "0")
+                // >> Create the value string in HH:MM format
                 const value = `${formattedHour}:${formattedMinute}`
                 // Use a fixed date to avoid unnecessary date object creations
                 const date = new Date(2000, 0, 1, hour, minute)
+                // >> Format the date to be in h:mm a format (e.g., 1:00 AM, 1:15 AM, etc.)
                 const label = format(date, "h:mm a")
+                // >> Push the value and label into the options array
                 options.push({ value, label })
             }
         }
         return options
-    }, []) // Empty dependency array ensures this only runs once
+    }, [])
 
     // > Define a function to handle the save button click
     function handleSave() {
-        // >> Define the start and end dates based on the state
+        // >> Define the start date and time based on the state
         const start = new Date(startDate)
+        // >> Define the end date and time based on the state
         const end = new Date(endDate)
         // >> If the event is not set to all-day, set the start and end times based on the selected time
         if (!allDay) {
             // >>> Parse the start time from the start time string
             const [startHours, startMinutes] = startTime.split(":").map(Number)
-            // >>> Parse the end time from the end time string
-            const [endHours, endMinutes] = endTime.split(":").map(Number)
             // >>> Set the hours, minutes, seconds to the start object
             start.setHours(startHours, startMinutes, 0)
+            // >>> Parse the end time from the end time string
+            const [endHours, endMinutes] = endTime.split(":").map(Number)
             // >>> Set the hours, minutes, seconds to the end object
             end.setHours(endHours, endMinutes, 0)
         }
@@ -176,8 +180,8 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
             return
         }
         // >> If the event doesn't have an ID, keep it empty
-        const eventId = event?.id || ""
-        // >> Use generic title if empty
+        const eventId = (event && event.id) || ""
+        // >> If the event doesn't have a title, set it to "(no title)"
         const eventTitle = title.trim() ? title : "(no title)"
         // >> Call the onSave function with the event data
         onSave({ id: eventId, title: eventTitle, description, start, end, allDay, location, color })
@@ -189,6 +193,58 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         if (!event || !event.id) return
         // >> Call the onDelete function with the event ID
         onDelete(event.id)
+    }
+
+    // > Define a function to handle the selecting of the start date
+    // const handleStartDateSelect = (date: Date | null) => {
+    //     // >> If the date is falsy, return early
+    //     if (date) {
+    //         // >> Set the start date to the selected date
+    //         setStartDate(date)
+    //         // >> If the end date falls does not fall before the new start date, return early
+    //         if (isBefore(endDate, date)) {
+    //             console.log("End date is before start date")
+    //             setEndDate(date)
+    //         }
+    //         // >> Reset the error message to null
+    //         setError(null)
+    //         // >> Close the start date popover
+    //         setStartDateOpen(false)
+    //     }
+    // }
+
+    // > Define a function to handle the selecting of the end date
+    // function handleEndDateSelect(date: Date | null) {
+    //     // >> If the date is falsy, return early
+    //     if (date) {
+    //         // >> Set the end date to the selected date
+    //         setEndDate(date)
+    //         // >> If the start date falls does not fall before the new end date, return early
+    //         if (isBefore(startDate, date)) {
+    //             console.log("Start date is before end date")
+    //             setStartDate(date)
+    //         }
+    //         // >> Reset the error message to null
+    //         setError(null)
+    //         // >> Close the end date popover
+    //         setEndDateOpen(false)
+    //     }
+    // }
+
+    const handleStartDateSelect = (date: Date | null) => {
+        if (date) {
+            setStartDate(date)
+            setError(null)
+            setStartDateOpen(false)
+        }
+    }
+
+    const handleEndDateSelect = (date: Date | null) => {
+        if (date) {
+            setEndDate(date)
+            setError(null)
+            setEndDateOpen(false)
+        }
     }
 
     // > Return the JSX for the event dialog component
@@ -233,18 +289,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
-                                    <Calendar mode="single" selected={startDate} defaultMonth={startDate} onSelect={(date) => {
-                                            if (date) {
-                                                setStartDate(date)
-                                                // If end date is before the new start date, update it to match the start date
-                                                if (isBefore(endDate, date)) {
-                                                    setEndDate(date)
-                                                }
-                                                setError(null)
-                                                setStartDateOpen(false)
-                                            }
-                                        }}
-                                    />
+                                    <Calendar mode="single" selected={startDate} defaultMonth={startDate} onSelect={() => handleStartDateSelect(startDate)} />
                                 </PopoverContent>
                             </Popover>
                         </div>
@@ -280,14 +325,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
-                                    <Calendar mode="single" selected={endDate} defaultMonth={endDate} disabled={{ before: startDate }} onSelect={(date) => {
-                                            if (date) {
-                                                setEndDate(date)
-                                                setError(null)
-                                                setEndDateOpen(false)
-                                            }
-                                        }}
-                                    />
+                                    <Calendar mode="single" selected={endDate} defaultMonth={endDate} onSelect={() => handleEndDateSelect(endDate)} />
                                 </PopoverContent>
                             </Popover>
                         </div>
