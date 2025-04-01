@@ -196,55 +196,32 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
     }
 
     // > Define a function to handle the selecting of the start date
-    // const handleStartDateSelect = (date: Date | null) => {
-    //     // >> If the date is falsy, return early
-    //     if (date) {
-    //         // >> Set the start date to the selected date
-    //         setStartDate(date)
-    //         // >> If the end date falls does not fall before the new start date, return early
-    //         if (isBefore(endDate, date)) {
-    //             console.log("End date is before start date")
-    //             setEndDate(date)
-    //         }
-    //         // >> Reset the error message to null
-    //         setError(null)
-    //         // >> Close the start date popover
-    //         setStartDateOpen(false)
-    //     }
-    // }
-
-    // > Define a function to handle the selecting of the end date
-    // function handleEndDateSelect(date: Date | null) {
-    //     // >> If the date is falsy, return early
-    //     if (date) {
-    //         // >> Set the end date to the selected date
-    //         setEndDate(date)
-    //         // >> If the start date falls does not fall before the new end date, return early
-    //         if (isBefore(startDate, date)) {
-    //             console.log("Start date is before end date")
-    //             setStartDate(date)
-    //         }
-    //         // >> Reset the error message to null
-    //         setError(null)
-    //         // >> Close the end date popover
-    //         setEndDateOpen(false)
-    //     }
-    // }
-
-    const handleStartDateSelect = (date: Date | null) => {
-        if (date) {
-            setStartDate(date)
-            setError(null)
-            setStartDateOpen(false)
-        }
+    const handleStartDateSelect = (date: Date | undefined) => {
+        // >> If the date is falsy, return early
+        if (!date) return
+        // >> Set the start date to the selected date
+        setStartDate(date)
+        // >> If the end date falls does not fall before the new start date, return early
+        if (isBefore(endDate, date)) { setEndDate(date) }
+        // >> Reset the error message to null
+        setError(null)
+        // >> Close the start date popover
+        setStartDateOpen(false)
     }
 
-    const handleEndDateSelect = (date: Date | null) => {
-        if (date) {
-            setEndDate(date)
-            setError(null)
-            setEndDateOpen(false)
-        }
+    // > Define a function to handle the selecting of the end date
+    function handleEndDateSelect(date: Date | undefined) {
+        // >> If the date is falsy, return early
+        if (!date) return
+        // >> Set the end date to the selected date
+        setEndDate(date)
+        // >> If the start date falls does not fall before the new end date, return early
+        if (isBefore(date, startDate)) { setStartDate(date) }
+        // >> Reset the error message to null
+        setError(null)
+        // >> Close the end date popover
+        setEndDateOpen(false)
+
     }
 
     // > Return the JSX for the event dialog component
@@ -289,7 +266,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
-                                    <Calendar mode="single" selected={startDate} defaultMonth={startDate} onSelect={() => handleStartDateSelect(startDate)} />
+                                    <Calendar mode="single" selected={startDate} defaultMonth={startDate} onSelect={(date) => handleStartDateSelect(date)} />
                                 </PopoverContent>
                             </Popover>
                         </div>
@@ -325,7 +302,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
-                                    <Calendar mode="single" selected={endDate} defaultMonth={endDate} onSelect={() => handleEndDateSelect(endDate)} />
+                                    <Calendar mode="single" selected={endDate} defaultMonth={endDate} onSelect={(date) => handleEndDateSelect(date)} />
                                 </PopoverContent>
                             </Popover>
                         </div>
