@@ -198,28 +198,32 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         onDelete(event.id)
     }
 
-    // > Define a function to handle the selecting of the start date
+    // > Define a function to handle selecting a new start date
     const handleStartDateSelect = (date: Date | undefined) => {
-        // >> If the date is falsy, return early
+        // >> If the newly selected start date is falsy, return early
         if (!date) return
-        // >> Set the start date to the selected date
+        // >> Set the start date to the newly selected start date
         setStartDate(date)
-        // >> If the end date falls does not fall before the new start date, return early
-        if (isBefore(endDate, date)) { setEndDate(date) }
+        // >> If the end date falls before the new start date, set the end date to the newly selected date
+        if (isBefore(endDate, date)) {
+            setEndDate(date)
+        }
         // >> Reset the error message to null
         setError(null)
         // >> Close the start date popover
         setStartDateOpen(false)
     }
 
-    // > Define a function to handle the selecting of the end date
+    // > Define a function to handle selecting a new end date
     function handleEndDateSelect(date: Date | undefined) {
-        // >> If the date is falsy, return early
+        // >> If the newly selected end date is falsy, return early
         if (!date) return
-        // >> Set the end date to the selected date
+        // >> Set the end date to the newly selected end date
         setEndDate(date)
-        // >> If the start date falls does not fall before the new end date, return early
-        if (isBefore(date, startDate)) { setStartDate(date) }
+        // >> If the newly selected end date falls before the start date, set the start date to the newly selected date
+        if (isBefore(date, startDate)) {
+            setStartDate(date)
+        }
         // >> Reset the error message to null
         setError(null)
         // >> Close the end date popover
