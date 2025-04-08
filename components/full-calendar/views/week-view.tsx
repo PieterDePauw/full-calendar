@@ -93,19 +93,15 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
 
             // Calculate positions for each event
             const positionedEvents: PositionedEvent[] = []
-            const dayStart = startOfDay(day)
 
             // Track columns for overlapping events
             const columns: { event: CalendarEvent; end: Date }[][] = []
 
             // Loop through sorted events to position them
             sortedEvents.forEach((event) => {
-                const eventStart = new Date(event.start)
-                const eventEnd = new Date(event.end)
-
                 // Adjust start and end times if they're outside this day
-                const adjustedStart = isSameDay(day, eventStart) ? eventStart : dayStart
-                const adjustedEnd = isSameDay(day, eventEnd) ? eventEnd : addHours(dayStart, 24)
+                const adjustedStart = isSameDay(day, new Date(event.start)) ? new Date(event.start) : startOfDay(day)
+                const adjustedEnd = isSameDay(day, new Date(event.end)) ? new Date(event.end) : addHours(startOfDay(day), 24)
 
                 // Calculate top position and height
                 const startHour = getHours(adjustedStart) + getMinutes(adjustedStart) / 60

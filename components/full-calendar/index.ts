@@ -13,6 +13,7 @@ export { EventItem } from "./events/event-item"
 export { EventsPopup } from "./events/events-popup"
 export { FullCalendar } from "./events/full-calendar"
 export { CalendarHeader } from "./events/calendar-header"
+export { CurrentTimeIndicator } from "./events/current-time-indicator"
 
 // Constants and utility exports
 export * from "@/lib/constants"
