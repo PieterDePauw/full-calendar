@@ -14,7 +14,7 @@ export { EventsPopup } from "./events/events-popup"
 export { FullCalendar } from "./events/full-calendar"
 
 // Constants and utility exports
-export * from "./constants"
+export * from "@/lib/constants"
 export * from "./utils"
 
 // Hook exports
