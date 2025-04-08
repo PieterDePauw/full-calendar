@@ -1,17 +1,16 @@
 "use client"
 
 // Import modules
-import { useMemo, useState, type CSSProperties } from "react"
+import { useState, type CSSProperties } from "react"
 import { RiCalendarCheckLine } from "@remixicon/react"
-import { addDays, endOfWeek, format, isSameMonth, startOfWeek } from "date-fns"
+import { format } from "date-fns"
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { addHoursToDate, AgendaDaysToShow, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarNavigation, type CalendarEvent, type CalendarView } from "@/components/full-calendar"
+import { addHoursToDate, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarNavigation, type CalendarEvent, type CalendarView } from "@/components/full-calendar"
 import { useCalendarViewTitle } from "@/hooks/use-calendar-view-title"
-import type { view } from "drizzle-orm/sqlite-core"
 
 // FullCalendarProps type
 export interface FullCalendarProps {
