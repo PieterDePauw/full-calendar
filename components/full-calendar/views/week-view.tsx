@@ -70,12 +70,8 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
             const dayEvents = events.filter((event) => {
                 // Skip all-day events and multi-day events
                 if (event.allDay || checkIfMultiDayEvent(event)) return false
-
-                const eventStart = new Date(event.start)
-                const eventEnd = new Date(event.end)
-
                 // Check if event is on this day
-                return (isSameDay(day, eventStart) || isSameDay(day, eventEnd) || (eventStart < day && eventEnd > day))
+                return (isSameDay(day, new Date(event.start)) || isSameDay(day, new Date(event.end)) || (new Date(event.start) < day && new Date(event.end) > day))
             })
 
             // Sort events by start time and duration
