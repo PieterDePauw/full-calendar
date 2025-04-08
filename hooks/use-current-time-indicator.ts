@@ -3,6 +3,7 @@
 // Import modules
 import { useEffect, useState } from "react"
 import { endOfWeek, isSameDay, isWithinInterval, startOfWeek } from "date-fns"
+import { WeekStartsOn } from "@/lib/constants"
 
 // useCurrentTimeIndicator hook: custom hook to calculate the current time position
 export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week") {
@@ -43,9 +44,7 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
 
             // >>> If the view is "week", check if the current time is within the week to determine visibility
             if (view === "week") {
-                const startOfWeekDate = startOfWeek(currentDate, { weekStartsOn: 0 })
-                const endOfWeekDate = endOfWeek(currentDate, { weekStartsOn: 0 })
-                isCurrentTimeVisible = isWithinInterval(now, { start: startOfWeekDate, end: endOfWeekDate })
+                isCurrentTimeVisible = isWithinInterval(now, { start: startOfWeek(currentDate, { weekStartsOn: WeekStartsOn }), end: endOfWeek(currentDate, { weekStartsOn: WeekStartsOn }) })
             }
 
             // >>> Update the current time position
@@ -58,11 +57,11 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
         // >> Calculate the initial time position when the component mounts
         calculateTimePosition()
 
-        // >> Update every minute (60000ms) to keep the current time indicator up to date
-        const interval = setInterval(calculateTimePosition, 60000)
+        // >> Update every minute (60000 ms) to keep the current time indicator up to date
+        const intervalId = setInterval(calculateTimePosition, 1 * 60 * 1000)
 
         // >> Return a cleanup function to clear the interval when the component unmounts
-        return () => clearInterval(interval)
+        return () => clearInterval(intervalId)
     }, [currentDate, view])
 
     // > Return the current time position and time visibility status

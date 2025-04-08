@@ -1,14 +1,20 @@
+// Import modules
+import { type Day } from "date-fns"
+
 // Height of calendar events in pixels - used in month, week and day views
-export const EventHeight = 24
+export const EventHeight: number = 24
 
 // Vertical gap between events in pixels - controls spacing in month view
-export const EventGap = 4
+export const EventGap: number = 4
 
 // Height of hour cells in week and day views - controls the scale of time display
-export const WeekCellsHeight = 64
+export const WeekCellsHeight: number = 64
 
 // Number of days to show in the agenda view
-export const AgendaDaysToShow = 30
+export const AgendaDaysToShow: number = 30
 
 // Number of days in a week
-export const DaysPerWeek = 7
+export const DaysPerWeek: number = 7
+
+// Starting day of the week (0 = Sunday, 1 = Monday, etc.)
+export const WeekStartsOn: Day = 1
