@@ -1,14 +1,14 @@
 export type CalendarView = "month" | "week" | "day" | "agenda"
 
 export interface CalendarEvent {
-  id: string
-  title: string
-  description?: string
-  start: Date
-  end: Date
-  allDay?: boolean
-  color?: EventColor
-  location?: string
+    id: string
+    title: string
+    description?: string
+    start: Date
+    end: Date
+    allDay?: boolean
+    color?: EventColor
+    location?: string
 }
 
 // PositionedEvent interface
@@ -21,19 +21,18 @@ export interface PositionedEvent {
     zIndex: number
 }
 
+// EventColor type
 export type EventColor =
-  | "sky"
-  | "amber"
-  | "violet"
-  | "rose"
-  | "emerald"
-  | "orange"
+    | "sky"
+    | "amber"
+    | "violet"
+    | "rose"
+    | "emerald"
+    | "orange"
 
+// DragHandlePositionType interface
 export interface DragHandlePositionType {
-  x?: number
-  y?: number
-  data?: {
-    isFirstDay?: boolean
-    isLastDay?: boolean
-  }
+    x?: number
+    y?: number
+    data?: { isFirstDay?: boolean; isLastDay?: boolean }
 }
