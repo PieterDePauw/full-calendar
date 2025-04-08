@@ -12,7 +12,7 @@ export function CalendarHeader({ className, onEventCreateClick }: { className: s
     const { currentView, setCurrentView } = useCalendarView()
 
     // > Use the useCalendarNavigation hook to manage the current date and navigation
-    const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation({ initialDate: new Date() })
+    const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation()
 
     // > Use the useCalendarViewTitle hook to manage the view title
     const viewTitle = useCalendarViewTitle({ currentDate })

@@ -1,11 +1,10 @@
 "use client"
 
 // Import modules
-import { useState, type CSSProperties } from "react"
+import React from "react"
 import { format } from "date-fns"
 import { toast } from "sonner"
-import { addHoursToDate, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarNavigation, useCalendarView, type CalendarEvent } from "@/components/full-calendar"
-import { CalendarHeader } from "./calendar-header"
+import { addHoursToDate, CalendarHeader, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarEventManagement, useCalendarView, type CalendarEvent, useCalendarDate } from "@/components/full-calendar"
 
 // FullCalendarProps type
 export interface FullCalendarProps {
@@ -18,20 +17,14 @@ export interface FullCalendarProps {
 
 // FullCalendar component
 export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDelete, className }: FullCalendarProps) {
-    // > Define the initial date as today
-    const initialDate = new Date()
-
-    // > We no longer keep current view in local state
+    // > Use the useCalendarView hook to manage the current view
     const { currentView } = useCalendarView()
 
-    // > Use the useState hook to manage the event dialog state
-    const [isEventDialogOpen, setIsEventDialogOpen] = useState<boolean>(false)
-
-    // > Use the useState hook to manage the selected event
-    const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+    // > Use the useCalendarEventManagement hook to manage the selected date and the state of the dialog
+    const { isEventDialogOpen, setIsEventDialogOpen, selectedEvent, setSelectedEvent, handleResetSelectedEvent, handleDialogClose, handleEventCreateClick } = useCalendarEventManagement()
 
     // > Use the useCalendarNavigation hook to manage the current date and navigation
-    const { currentDate } = useCalendarNavigation({ initialDate })
+    const { currentDate } = useCalendarDate()
 
     // > Use the useViewKeyboardShortcut hook to handle keyboard shortcuts for switching calendar views
     useViewKeyboardShortcut({ isEventDialogOpen })
@@ -78,27 +71,14 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Call the onEventUpdate callback with the updated event
         onEventUpdate?.(updatedEvent)
         // >> Show toast notification when an event is updated via drag and drop
-        toast(`Event "${updatedEvent.title}" moved`, {
-            description: format(new Date(updatedEvent.start), "MMM d, yyyy"),
-            position: "bottom-left"
-        })
+        toast(`Event "${updatedEvent.title}" moved`, { description: format(new Date(updatedEvent.start), "MMM d, yyyy"), position: "bottom-right" })
         // >> Reset the selected event to null
-        setSelectedEvent(null)
+        handleResetSelectedEvent();
         // >> Close the event dialog after updating the event
         setIsEventDialogOpen(false)
     }
 
-    // > Define a helper function to handle the event create button click
-    function handleEventCreateClick() {
-        setSelectedEvent(null)
-        setIsEventDialogOpen(true)
-    }
 
-    // > Define a helper function to handle the event dialog close
-    function handleDialogClose() {
-        setSelectedEvent(null);
-        setIsEventDialogOpen(false)
-    }
 
     // > Define a helper function to handle saving an event
     function handleEventSave(event: CalendarEvent) {
@@ -107,10 +87,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
             // >>> Call the onEventUpdate callback with the updated event
             onEventUpdate?.(event)
             // >>> Show toast notification when an event is updated
-            toast(`Event "${event.title}" updated`, {
-                description: format(new Date(event.start), "MMM d, yyyy"),
-                position: "bottom-left",
-            })
+            toast(`Event "${event.title}" updated`, { description: format(new Date(event.start), "MMM d, yyyy"), position: "bottom-right" })
         }
 
         // >> If the event doesn't have an ID, it's a new event that needs to be added
@@ -118,13 +95,10 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
             // >>> Call the onEventAdd callback with the new event
             onEventAdd?.({ ...event, id: Math.random().toString(36).substring(2, 11) })
             // >>> Show toast notification when an event is added
-            toast(`Event "${event.title}" added`, {
-                description: format(new Date(event.start), "MMM d, yyyy"),
-                position: "bottom-left",
-            })
+            toast(`Event "${event.title}" added`, { description: format(new Date(event.start), "MMM d, yyyy"), position: "bottom-right" })
         }
         // >> Reset the selected event to null
-        setSelectedEvent(null)
+        handleResetSelectedEvent()
         // >> Close the event dialog after saving the event
         setIsEventDialogOpen(false)
     }
@@ -138,18 +112,15 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Call the onEventDelete callback with the event
         onEventDelete?.(eventId)
         // >> Show toast notification when an event is deleted
-        toast(`Event "${deletedEvent.title}" deleted`, {
-            description: format(new Date(deletedEvent.start), "MMM d, yyyy"),
-            position: "bottom-left"
-        })
+        toast(`Event "${deletedEvent.title}" deleted`, { description: format(new Date(deletedEvent.start), "MMM d, yyyy"), position: "bottom-right" })
         // >> Reset the selected event to null
-        setSelectedEvent(null)
+        handleResetSelectedEvent()
         // >> Close the event dialog after deleting the event
         setIsEventDialogOpen(false)
     }
 
     // > Define the style object for the calendar component based on the event height, the event gap, and week cells height
-    const style = { "--event-height": `${EventHeight}px`, "--event-gap": `${EventGap}px`, "--week-cells-height": `${WeekCellsHeight}px` } as CSSProperties
+    const style = { "--event-height": `${EventHeight}px`, "--event-gap": `${EventGap}px`, "--week-cells-height": `${WeekCellsHeight}px` } as React.CSSProperties
 
     // > Return the FullCalendar component
     return (

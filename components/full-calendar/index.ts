@@ -12,6 +12,7 @@ export { EventDialog } from "./events/event-dialog"
 export { EventItem } from "./events/event-item"
 export { EventsPopup } from "./events/events-popup"
 export { FullCalendar } from "./events/full-calendar"
+export { CalendarHeader } from "./events/calendar-header"
 
 // Constants and utility exports
 export * from "@/lib/constants"
@@ -28,6 +29,8 @@ export * from "@/hooks/use-view-keyboard-shortcut"
 export * from "@/hooks/use-calendar-navigation"
 export * from "@/hooks/use-calendar-view-title"
 export * from "@/hooks/use-calendar-view"
+export * from "@/hooks/use-calendar-date"
+export * from "@/hooks/use-calendar-event-management"
 
 // Type exports
 export type { CalendarEvent, PositionedEvent, CalendarView, EventColor, DragHandlePositionType, JSONValue } from "@/lib/types"
