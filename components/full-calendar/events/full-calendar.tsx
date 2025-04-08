@@ -1,14 +1,15 @@
 "use client"
 
+// Import modules
 import { useMemo, useState, type CSSProperties } from "react"
 import { RiCalendarCheckLine } from "@remixicon/react"
-import { addDays, addMonths, addWeeks, endOfWeek, format, isSameMonth, startOfWeek, subMonths, subWeeks } from "date-fns"
+import { addDays, addMonths, addWeeks, endOfWeek, format, isSameMonth, startOfWeek, subDays, subMonths, subWeeks } from "date-fns"
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { addHoursToDate, AgendaDaysToShow, AgendaView, CalendarDndProvider, CalendarEvent, CalendarView, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut } from "@/components/full-calendar"
+import { addHoursToDate, AgendaDaysToShow, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarNavigation, type CalendarEvent, type CalendarView } from "@/components/full-calendar"
 
 // FullCalendarProps type
 export interface FullCalendarProps {
@@ -23,13 +24,13 @@ export interface FullCalendarProps {
 // FullCalendar component
 export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDelete, className, initialView = "month" }: FullCalendarProps) {
     // > Define the initial date as today
-    const today = new Date()
-
-    // > Use the useState hook to manage the current date
-    const [currentDate, setCurrentDate] = useState<Date>(today)
+    const initialDate = new Date()
 
     // > Use the useState hook to manage the current view
     const [view, setView] = useState<CalendarView>(initialView)
+
+    // > Use the useCalendarNavigation hook to manage the current date and navigation
+    const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation({ view, initialDate })
 
     // > Use the useState hook to manage the event dialog state
     const [isEventDialogOpen, setIsEventDialogOpen] = useState<boolean>(false)
@@ -39,70 +40,6 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
     // > Use the useViewKeyboardShortcut hook to handle keyboard shortcuts for switching calendar views
     useViewKeyboardShortcut({ isEventDialogOpen, setView })
-
-    // // > Use the useEffect hook to listen for keydown events to switch between calendar views
-    // useEffect(() => {
-    //     // >> Define the handleKeyDown function
-    //     function handleKeyDown(e: KeyboardEvent) {
-    //         // >>> If user is typing in an input, a textarea or a contentEditable element or if the event dialog is open, return early
-    //         if (isEventDialogOpen || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)) { return}
-    //         // >>> Get the key pressed
-    //         const keyPressed = e.key.toLowerCase()
-    //         // >>> Switch view based on key pressed
-    //         switch (keyPressed) {
-    //             case "m":
-    //                 setView("month")
-    //                 break
-    //             case "w":
-    //                 setView("week")
-    //                 break
-    //             case "d":
-    //                 setView("day")
-    //                 break
-    //             case "a":
-    //                 setView("agenda")
-    //                 break
-    //             default:
-    //                 break
-    //         }
-    //     }
-    //     // >> Add the handleKeyDown to the event listener for keydown
-    //     window.addEventListener("keydown", handleKeyDown)
-    //     // >> Return a function to clean up the event listener
-    //     return () => window.removeEventListener("keydown", handleKeyDown)
-    // }, [isEventDialogOpen])
-
-    // > Define a helper function to handle the previous button click
-    function handleGoToPrevious() {
-        if (view === "month") {
-            setCurrentDate(subMonths(currentDate, 1))
-        } else if (view === "week") {
-            setCurrentDate(subWeeks(currentDate, 1))
-        } else if (view === "day") {
-            setCurrentDate(addDays(currentDate, -1))
-        } else if (view === "agenda") {
-            setCurrentDate(addDays(currentDate, -AgendaDaysToShow))
-        }
-    }
-
-    // > Define a helper function to handle the next button click
-    function handleGoToNext() {
-        if (view === "month") {
-            setCurrentDate(addMonths(currentDate, 1))
-        } else if (view === "week") {
-            setCurrentDate(addWeeks(currentDate, 1))
-        } else if (view === "day") {
-            setCurrentDate(addDays(currentDate, 1))
-        } else if (view === "agenda") {
-            setCurrentDate(addDays(currentDate, AgendaDaysToShow))
-        }
-    }
-
-    // > Define a helper function to handle the today button click
-    function handleGoToToday() {
-        // >> Set the current date to the current date
-        setCurrentDate(today)
-    }
 
     // > Define a helper function to handle selecting an event
     function handleEventSelect(event: CalendarEvent) {
@@ -118,7 +55,6 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     function handleEventCreate(startTime: Date) {
         // >> Log the start time of the new event
         console.log("Creating new event at:", startTime) // Debug log
-
         // >> Snap to 15-minute intervals
         const minutes = startTime.getMinutes()
         const remainder = minutes % 15
@@ -133,7 +69,6 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
             startTime.setSeconds(0)
             startTime.setMilliseconds(0)
         }
-
         // >> Create a default new event with a default duration of 1 hour
         const newEvent: CalendarEvent = { id: "", title: "", start: startTime, end: addHoursToDate(startTime, 1), allDay: false }
         // >> Set the selected event to the default new event
@@ -144,7 +79,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
     // > Define a helper function to handle saving an event
     function handleEventSave(event: CalendarEvent) {
-        // >> IF the event has an ID, it's an existing event that needs to be updated
+        // >> If the event has an ID, it's an existing event that needs to be updated
         if (event.id) {
             // >>> Call the onEventUpdate callback with the updated event
             onEventUpdate?.(event)
@@ -165,29 +100,29 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
                 position: "bottom-left",
             })
         }
-
-        // >> Close the event dialog after saving the event and reset the selected event
-        setIsEventDialogOpen(false)
+        // >> Reset the selected event to null
         setSelectedEvent(null)
+        // >> Close the event dialog after saving the event
+        setIsEventDialogOpen(false)
     }
 
     // > Define a helper function to handle deleting an event
     function handleEventDelete(eventId: string) {
         // >> Find the event to be deleted
-        const deletedEvent = events.find((e) => e.id === eventId)
+        const deletedEvent = events.find((event) => event.id === eventId)
         // >> If the event is not found, return early
         if (!deletedEvent) return
         // >> Call the onEventDelete callback with the event
         onEventDelete?.(eventId)
-        // >> Close the event dialog
-        setIsEventDialogOpen(false)
-        // >> Reset the selected event
-        setSelectedEvent(null)
         // >> Show toast notification when an event is deleted
         toast(`Event "${deletedEvent.title}" deleted`, {
             description: format(new Date(deletedEvent.start), "MMM d, yyyy"),
             position: "bottom-left"
         })
+        // >> Reset the selected event to null
+        setSelectedEvent(null)
+        // >> Close the event dialog after deleting the event
+        setIsEventDialogOpen(false)
     }
 
     // > Define a helper function to handle updating an event
@@ -203,7 +138,14 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
     // > Use the useMemo hook to calculate the view title based on the current date and view
     const viewTitle = useMemo(() => {
-        if (view === "month") {
+        // >> If the current date is not available, return an empty string
+        if (!currentDate) { return "" }
+        // >> If the view is not available, return an empty string
+        else if (!view || !(["month", "week", "day", "agenda"].includes(view))) {
+            return ""
+        }
+        // > Format the view title based on the current date and the current view
+        else if (view === "month") {
             return format(currentDate, "MMMM yyyy")
         } else if (view === "week") {
             const start = startOfWeek(currentDate, { weekStartsOn: 0 })
@@ -242,13 +184,6 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         }
     }, [currentDate, view])
 
-    // > Define the style object for the calendar component based on the event height, the event gap, and week cells height
-    const style = {
-        "--event-height": `${EventHeight}px`,
-        "--event-gap": `${EventGap}px`,
-        "--week-cells-height": `${WeekCellsHeight}px`,
-    } as CSSProperties
-
     // > Define a helper function to handle the event create button click
     function handleEventCreateClick() {
         setSelectedEvent(null)
@@ -260,6 +195,9 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         setSelectedEvent(null);
         setIsEventDialogOpen(false)
     }
+
+    // > Define the style object for the calendar component based on the event height, the event gap, and week cells height
+    const style = { "--event-height": `${EventHeight}px`, "--event-gap": `${EventGap}px`, "--week-cells-height": `${WeekCellsHeight}px` } as CSSProperties
 
     // > Return the FullCalendar component
     return (
