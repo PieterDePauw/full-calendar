@@ -15,7 +15,10 @@ export { FullCalendar } from "./events/full-calendar"
 
 // Constants and utility exports
 export * from "@/lib/constants"
-export * from "./utils"
+export * from "@/lib/event-styling"
+export * from "@/lib/event-queries"
+export * from "@/lib/event-positioning"
+export * from "@/lib/time-helpers"
 
 // Hook exports
 export * from "@/hooks/use-current-time-indicator"
