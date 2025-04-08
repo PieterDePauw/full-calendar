@@ -1,20 +1,8 @@
 // Import modules
-import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme/theme-provider"
-import "./globals.css"
-
-// Define the font variable for Geist
-const fontSans = Geist({
-    variable: "--font-sans",
-    subsets: ["latin"],
-})
-
-// Define the font variable for Geist_Mono
-const fontMono = Geist_Mono({
-    variable: "--font-mono",
-    subsets: ["latin"],
-})
+import { fontMono, fontSans } from "@/styles/fonts"
+import "@/styles/globals.css"
 
 // RootLayout component
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
