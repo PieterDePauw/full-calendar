@@ -2,9 +2,8 @@
 
 // Import modules
 import React from "react"
-import { format } from "date-fns"
 import { toast } from "sonner"
-import { addHoursToDate, CalendarHeader, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarEventManagement, useCalendarView, type CalendarEvent, useCalendarDate } from "@/components/full-calendar"
+import { addHoursToDate, CalendarHeader, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarEventManagement, useCalendarView, type CalendarEvent, useCalendarDate, formatForNotification } from "@/components/full-calendar"
 
 // FullCalendarProps type
 export interface FullCalendarProps {
@@ -71,7 +70,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Call the onEventUpdate callback with the updated event
         onEventUpdate?.(updatedEvent)
         // >> Show toast notification when an event is updated via drag and drop
-        toast(`Event "${updatedEvent.title}" moved`, { description: format(new Date(updatedEvent.start), "MMM d, yyyy"), position: "bottom-right" })
+        toast(`Event "${updatedEvent.title}" moved`, { description: formatForNotification(updatedEvent.start), position: "bottom-right" })
         // >> Reset the selected event to null
         handleResetSelectedEvent();
         // >> Close the event dialog after updating the event
@@ -82,21 +81,14 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
     // > Define a helper function to handle saving an event
     function handleEventSave(event: CalendarEvent) {
+        // >> Check if the event has an ID
+        const alreadyExists = event.id && events.some((existingEvent) => existingEvent.id === event.id)
         // >> If the event has an ID, it's an existing event that needs to be updated
-        if (event.id) {
-            // >>> Call the onEventUpdate callback with the updated event
-            onEventUpdate?.(event)
-            // >>> Show toast notification when an event is updated
-            toast(`Event "${event.title}" updated`, { description: format(new Date(event.start), "MMM d, yyyy"), position: "bottom-right" })
-        }
-
+        if (alreadyExists) { onEventUpdate?.(event) }
         // >> If the event doesn't have an ID, it's a new event that needs to be added
-        if (!event.id) {
-            // >>> Call the onEventAdd callback with the new event
-            onEventAdd?.({ ...event, id: Math.random().toString(36).substring(2, 11) })
-            // >>> Show toast notification when an event is added
-            toast(`Event "${event.title}" added`, { description: format(new Date(event.start), "MMM d, yyyy"), position: "bottom-right" })
-        }
+        if (!alreadyExists) { onEventAdd?.({ ...event, id: Math.random().toString(36).substring(2, 11) }) }
+        // >> Show toast notification when an event is added or updated
+        toast(`Event "${event.title}" ${event.id ? "updated" : "added"}`, { description: formatForNotification(event.start), position: "bottom-right" })
         // >> Reset the selected event to null
         handleResetSelectedEvent()
         // >> Close the event dialog after saving the event
@@ -110,9 +102,9 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> If the event is not found, return early
         if (!deletedEvent) return
         // >> Call the onEventDelete callback with the event
-        onEventDelete?.(eventId)
+        if (deletedEvent) { onEventDelete?.(eventId) }
         // >> Show toast notification when an event is deleted
-        toast(`Event "${deletedEvent.title}" deleted`, { description: format(new Date(deletedEvent.start), "MMM d, yyyy"), position: "bottom-right" })
+        toast(`Event "${deletedEvent.title}" deleted`, { description: formatForNotification(deletedEvent.start), position: "bottom-right" })
         // >> Reset the selected event to null
         handleResetSelectedEvent()
         // >> Close the event dialog after deleting the event

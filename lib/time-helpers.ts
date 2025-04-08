@@ -19,6 +19,11 @@ export function formatTimeWithOptionalMinutes(date: Date) {
   return format(date, getMinutes(date) === 0 ? "ha" : "h:mma").toLowerCase()
 }
 
+// Define a helper function to format the date for the toast notification
+export function formatForNotification(date: Date) {
+  return format(new Date(date), "MMM d, yyyy")
+}
+
 // Define a helper function to add hours to a specified date
 export function addHoursToDate(date: Date, hours: number): Date {
   // > If the hours value is not an integer, throw an error
