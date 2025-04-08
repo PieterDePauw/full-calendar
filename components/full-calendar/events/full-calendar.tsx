@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react"
+import { useMemo, useState, type CSSProperties } from "react"
 import { RiCalendarCheckLine } from "@remixicon/react"
 import { addDays, addMonths, addWeeks, endOfWeek, format, isSameMonth, startOfWeek, subMonths, subWeeks } from "date-fns"
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react"
@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { addHoursToDate, AgendaDaysToShow, AgendaView, CalendarDndProvider, CalendarEvent, CalendarView, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView } from "@/components/full-calendar"
+import { addHoursToDate, AgendaDaysToShow, AgendaView, CalendarDndProvider, CalendarEvent, CalendarView, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut } from "@/components/full-calendar"
 
 // FullCalendarProps type
 export interface FullCalendarProps {
@@ -37,37 +37,40 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     // > Use the useState hook to manage the selected event
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
 
-    // > Use the useEffect hook to listen for keydown events to switch between calendar views
-    useEffect(() => {
-        // >> Define the handleKeyDown function
-        const handleKeyDown = (e: KeyboardEvent) => {
-            // >>> If user is typing in an input, a textarea or a contentEditable element or if the event dialog is open, return early
-            if (isEventDialogOpen || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)) { return }
-            // >>> Get the key pressed
-            const keyPressed = e.key.toLowerCase();
-            // >>> Switch view based on key pressed
-            switch (keyPressed) {
-                case "m":
-                    setView("month")
-                    break
-                case "w":
-                    setView("week")
-                    break
-                case "d":
-                    setView("day")
-                    break
-                case "a":
-                    setView("agenda")
-                    break
-                default:
-                    break
-            }
-        }
-        // >> Add the handleKeyDown to the event listener for keydown
-        window.addEventListener("keydown", handleKeyDown)
-        // >> Return a function to clean up the event listener
-        return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [isEventDialogOpen])
+    // > Use the useViewKeyboardShortcut hook to handle keyboard shortcuts for switching calendar views
+    useViewKeyboardShortcut({ isEventDialogOpen, setView })
+
+    // // > Use the useEffect hook to listen for keydown events to switch between calendar views
+    // useEffect(() => {
+    //     // >> Define the handleKeyDown function
+    //     function handleKeyDown(e: KeyboardEvent) {
+    //         // >>> If user is typing in an input, a textarea or a contentEditable element or if the event dialog is open, return early
+    //         if (isEventDialogOpen || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)) { return}
+    //         // >>> Get the key pressed
+    //         const keyPressed = e.key.toLowerCase()
+    //         // >>> Switch view based on key pressed
+    //         switch (keyPressed) {
+    //             case "m":
+    //                 setView("month")
+    //                 break
+    //             case "w":
+    //                 setView("week")
+    //                 break
+    //             case "d":
+    //                 setView("day")
+    //                 break
+    //             case "a":
+    //                 setView("agenda")
+    //                 break
+    //             default:
+    //                 break
+    //         }
+    //     }
+    //     // >> Add the handleKeyDown to the event listener for keydown
+    //     window.addEventListener("keydown", handleKeyDown)
+    //     // >> Return a function to clean up the event listener
+    //     return () => window.removeEventListener("keydown", handleKeyDown)
+    // }, [isEventDialogOpen])
 
     // > Define a helper function to handle the previous button click
     function handleGoToPrevious() {
@@ -116,7 +119,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Log the start time of the new event
         console.log("Creating new event at:", startTime) // Debug log
 
-        // Snap to 15-minute intervals
+        // >> Snap to 15-minute intervals
         const minutes = startTime.getMinutes()
         const remainder = minutes % 15
         if (remainder !== 0) {
@@ -141,24 +144,29 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
     // > Define a helper function to handle saving an event
     function handleEventSave(event: CalendarEvent) {
+        // >> IF the event has an ID, it's an existing event that needs to be updated
         if (event.id) {
+            // >>> Call the onEventUpdate callback with the updated event
             onEventUpdate?.(event)
-            // Show toast notification when an event is updated
+            // >>> Show toast notification when an event is updated
             toast(`Event "${event.title}" updated`, {
                 description: format(new Date(event.start), "MMM d, yyyy"),
                 position: "bottom-left",
             })
-        } else {
-            onEventAdd?.({
-                ...event,
-                id: Math.random().toString(36).substring(2, 11),
-            })
-            // Show toast notification when an event is added
+        }
+
+        // >> If the event doesn't have an ID, it's a new event that needs to be added
+        if (!event.id) {
+            // >>> Call the onEventAdd callback with the new event
+            onEventAdd?.({ ...event, id: Math.random().toString(36).substring(2, 11) })
+            // >>> Show toast notification when an event is added
             toast(`Event "${event.title}" added`, {
                 description: format(new Date(event.start), "MMM d, yyyy"),
                 position: "bottom-left",
             })
         }
+
+        // >> Close the event dialog after saving the event and reset the selected event
         setIsEventDialogOpen(false)
         setSelectedEvent(null)
     }
@@ -176,7 +184,10 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Reset the selected event
         setSelectedEvent(null)
         // >> Show toast notification when an event is deleted
-        toast(`Event "${deletedEvent.title}" deleted`, { description: format(new Date(deletedEvent.start), "MMM d, yyyy"), position: "bottom-left" })
+        toast(`Event "${deletedEvent.title}" deleted`, {
+            description: format(new Date(deletedEvent.start), "MMM d, yyyy"),
+            position: "bottom-left"
+        })
     }
 
     // > Define a helper function to handle updating an event
@@ -184,7 +195,10 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Call the onEventUpdate callback with the updated event
         onEventUpdate?.(updatedEvent)
         // >> Show toast notification when an event is updated via drag and drop
-        toast(`Event "${updatedEvent.title}" moved`, { description: format(new Date(updatedEvent.start), "MMM d, yyyy"), position: "bottom-left" })
+        toast(`Event "${updatedEvent.title}" moved`, {
+            description: format(new Date(updatedEvent.start), "MMM d, yyyy"),
+            position: "bottom-left"
+        })
     }
 
     // > Use the useMemo hook to calculate the view title based on the current date and view

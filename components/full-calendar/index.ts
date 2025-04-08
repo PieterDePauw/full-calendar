@@ -23,6 +23,7 @@ export * from "@/lib/time-helpers"
 // Hook exports
 export * from "@/hooks/use-current-time-indicator"
 export * from "@/hooks/use-event-visibility"
+export * from "@/hooks/use-view-keyboard-shortcut"
 
 // Type exports
 export type { CalendarEvent, PositionedEvent, CalendarView, EventColor, DragHandlePositionType } from "@/lib/types"
