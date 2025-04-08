@@ -23,7 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true} disableTransitionOnChange={true}>
                     {children}
-                    <Toaster />
+                    <Toaster closeButton={true} richColors={true} position="bottom-right" />
                 </ThemeProvider>
             </body>
         </html>
