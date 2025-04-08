@@ -1,6 +1,6 @@
 // Import modules
 import { type ClassValue } from "clsx"
-import { addHours, areIntervalsOverlapping, differenceInDays, differenceInMinutes, getHours, getMinutes, isSameDay, startOfDay } from "date-fns"
+import { addHours, areIntervalsOverlapping, differenceInDays, differenceInMinutes, getHours, getMinutes, isSameDay, startOfDay, format } from "date-fns"
 import { WeekCellsHeight, type CalendarEvent, type PositionedEvent, type EventColor, type CalendarView } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
@@ -12,6 +12,14 @@ export function formatTimeForInput(date: Date): string {
     const minutes = (Math.floor(date.getMinutes() / 15) * 15).toString().padStart(2, "0")
     // > Return the formatted time string
     return `${hours}:${minutes}`
+}
+
+// Define a helper function to format the time with optional minutes using custom formatting
+// 'h' - hours (1-12)
+// 'a' - am/pm
+// ':mm' - minutes with leading zero (only if the token 'mm' is present)
+export function formatTimeWithOptionalMinutes(date: Date) {
+    return format(date, getMinutes(date) === 0 ? "ha" : "h:mma").toLowerCase()
 }
 
 // Define a helper function to generate CSS classes for event colors

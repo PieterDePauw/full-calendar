@@ -1,19 +1,12 @@
 "use client"
 
+// Import modules
 import { useMemo, type ReactNode, type MouseEvent, type TouchEvent } from "react"
 import { type DraggableAttributes } from "@dnd-kit/core"
 import { type SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities"
-import { differenceInMinutes, format, getMinutes, isPast } from "date-fns"
+import { differenceInMinutes, isPast } from "date-fns"
 import { cn } from "@/lib/utils"
-import { getEventWrapperClasses, getDayWeekEventClasses, getMonthEventClasses, getAgendaEventClasses, type CalendarEvent, type CalendarView } from "@/components/full-calendar"
-
-// Using date-fns format with custom formatting:
-// 'h' - hours (1-12)
-// 'a' - am/pm
-// ':mm' - minutes with leading zero (only if the token 'mm' is present)
-const formatTimeWithOptionalMinutes = (date: Date) => {
-    return format(date, getMinutes(date) === 0 ? "ha" : "h:mma").toLowerCase()
-}
+import { formatTimeWithOptionalMinutes, getEventWrapperClasses, getDayWeekEventClasses, getMonthEventClasses, getAgendaEventClasses, type CalendarEvent, type CalendarView } from "@/components/full-calendar"
 
 // EventWrapperProps interface
 interface EventWrapperProps {
