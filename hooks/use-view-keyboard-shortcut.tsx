@@ -1,11 +1,15 @@
 // Import modules
 import { useEffect } from "react"
 import { useCalendarView } from "@/hooks/use-calendar-view"
+import { useCalendarEventManagement } from "@/hooks/use-calendar-event-management"
 
 // Define a custom hook to handle keyboard shortcuts for switching calendar views
-export function useViewKeyboardShortcut({ isEventDialogOpen }: { isEventDialogOpen: boolean }) {
+export function useViewKeyboardShortcut() {
     // > Use the useCalendarView hook to get the current view and set the current view
     const { setCurrentView } = useCalendarView()
+
+    // > Use the useCalendarEventManagement hook to manage the state of the event dialog
+    const { isEventDialogOpen } = useCalendarEventManagement()
 
     // > Use the useEffect hook to listen for keydown events to switch between calendar views
     useEffect(() => {

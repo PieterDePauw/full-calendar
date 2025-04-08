@@ -27,7 +27,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     const { currentDate } = useCalendarDate()
 
     // > Use the useViewKeyboardShortcut hook to handle keyboard shortcuts for switching calendar views
-    useViewKeyboardShortcut({ isEventDialogOpen })
+    useViewKeyboardShortcut()
 
     // > Define a helper function to handle selecting an event
     function handleEventSelect(event: CalendarEvent) {
