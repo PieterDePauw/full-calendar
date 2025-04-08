@@ -19,10 +19,11 @@ export * from "@/lib/event-styling"
 export * from "@/lib/event-queries"
 export * from "@/lib/event-positioning"
 export * from "@/lib/time-helpers"
+// export * from "./utils"
 
 // Hook exports
 export * from "@/hooks/use-current-time-indicator"
 export * from "@/hooks/use-event-visibility"
 
 // Type exports
-export type { CalendarEvent, PositionedEvent, CalendarView, EventColor, DragHandlePositionType } from "@//lib/types"
+export type { CalendarEvent, PositionedEvent, CalendarView, EventColor, DragHandlePositionType } from "@/lib/types"
