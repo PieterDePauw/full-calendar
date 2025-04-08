@@ -30,17 +30,17 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     // > Use the useState hook to manage the current view
     const [currentView, setCurrentView] = useState<CalendarView>(initialView)
 
-    // > Use the useCalendarNavigation hook to manage the current date and navigation
-    const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation({ currentView, initialDate })
-
-    // > Use the useCalendarViewTitle hook to manage the view title
-    const viewTitle = useCalendarViewTitle({ currentDate, currentView })
-
     // > Use the useState hook to manage the event dialog state
     const [isEventDialogOpen, setIsEventDialogOpen] = useState<boolean>(false)
 
     // > Use the useState hook to manage the selected event
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+
+    // > Use the useCalendarNavigation hook to manage the current date and navigation
+    const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation({ currentView, initialDate })
+
+    // > Use the useCalendarViewTitle hook to manage the view title
+    const viewTitle = useCalendarViewTitle({ currentDate, currentView })
 
     // > Use the useViewKeyboardShortcut hook to handle keyboard shortcuts for switching calendar views
     useViewKeyboardShortcut({ isEventDialogOpen, setCurrentView })
@@ -143,54 +143,6 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Close the event dialog after updating the event
         setIsEventDialogOpen(false)
     }
-
-    // > Use the useMemo hook to calculate the view title based on the current date and view
-    // const viewTitle = useMemo(() => {
-    //     // >> If the current date is not available, return an empty string
-    //     if (!currentDate) { return "" }
-    //     // >> If the view is not available, return an empty string
-    //     else if (!view || !(["month", "week", "day", "agenda"].includes(view))) {
-    //         return ""
-    //     }
-    //     // > Format the view title based on the current date and the current view
-    //     else if (view === "month") {
-    //         return format(currentDate, "MMMM yyyy")
-    //     } else if (view === "week") {
-    //         const start = startOfWeek(currentDate, { weekStartsOn: 0 })
-    //         const end = endOfWeek(currentDate, { weekStartsOn: 0 })
-    //         if (isSameMonth(start, end)) {
-    //             return format(start, "MMMM yyyy")
-    //         } else {
-    //             return `${format(start, "MMM")} - ${format(end, "MMM yyyy")}`
-    //         }
-    //     } else if (view === "day") {
-    //         return (
-    //             <>
-    //                 <span className="min-[480px]:hidden" aria-hidden="true">
-    //                     {format(currentDate, "MMM d, yyyy")}
-    //                 </span>
-    //                 <span className="max-[479px]:hidden min-md:hidden" aria-hidden="true">
-    //                     {format(currentDate, "MMMM d, yyyy")}
-    //                 </span>
-    //                 <span className="max-md:hidden">
-    //                     {format(currentDate, "EEE MMMM d, yyyy")}
-    //                 </span>
-    //             </>
-    //         )
-    //     } else if (view === "agenda") {
-    //         // Show the month range for agenda view
-    //         const start = currentDate
-    //         const end = addDays(currentDate, AgendaDaysToShow - 1)
-
-    //         if (isSameMonth(start, end)) {
-    //             return format(start, "MMMM yyyy")
-    //         } else {
-    //             return `${format(start, "MMM")} - ${format(end, "MMM yyyy")}`
-    //         }
-    //     } else {
-    //         return format(currentDate, "MMMM yyyy")
-    //     }
-    // }, [currentDate, view])
 
     // > Define a helper function to handle the event create button click
     function handleEventCreateClick() {
