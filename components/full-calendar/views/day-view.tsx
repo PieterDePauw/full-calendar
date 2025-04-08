@@ -3,7 +3,7 @@
 // Import modules
 import { Fragment, useMemo, type MouseEvent } from "react"
 import { addHours, eachHourOfInterval, format, getHours, isSameDay, startOfDay } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, getDroppableCellClasses, positionEvents, getAllEventsForDay } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, EventItem, CurrentTimeIndicator, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, getDroppableCellClasses, positionEvents, getAllEventsForDay } from "@/components/full-calendar"
 
 // DayViewProps interface
 interface DayViewProps {
@@ -109,18 +109,6 @@ export function HourLabels({ hours }: { hours: Date[] }) {
                     {idx > 0 && <span className="bg-background text-muted-foreground/70 absolute -top-3 left-0 flex h-6 w-16 max-w-full items-center justify-end pe-2 text-[10px] sm:pe-4 sm:text-xs">{format(hour, "h a")}</span>}
                 </div>
             ))}
-        </div>
-    )
-}
-
-// CurrentTimeIndicator component
-export function CurrentTimeIndicator({ currentTimePosition }: { currentTimePosition: number }) {
-    return (
-        <div className="pointer-events-none absolute right-0 left-0 z-20" style={{ top: `${currentTimePosition}%` }}>
-            <div className="relative flex items-center">
-                <div className="bg-primary absolute -left-1 h-2 w-2 rounded-full"></div>
-                <div className="bg-primary h-[2px] w-full"></div>
-            </div>
         </div>
     )
 }

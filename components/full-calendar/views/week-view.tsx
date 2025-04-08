@@ -23,27 +23,19 @@ import {
     DroppableCell,
     EventItem,
     checkIfMultiDayEvent,
-    useCurrentTimeIndicator,
+    CurrentTimeIndicator,
     WeekCellsHeight,
     getDroppableCellClasses,
     type CalendarEvent,
+    type PositionedEvent,
+    useCurrentTimeIndicator,
 } from "@/components/full-calendar"
-import { CurrentTimeIndicator } from "./day-view"
 
 interface WeekViewProps {
     currentDate: Date
     events: CalendarEvent[]
     onEventSelect: (event: CalendarEvent) => void
     onEventCreate: (startTime: Date) => void
-}
-
-interface PositionedEvent {
-    event: CalendarEvent
-    top: number
-    height: number
-    left: number
-    width: number
-    zIndex: number
 }
 
 export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: WeekViewProps) {
