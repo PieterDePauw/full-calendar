@@ -1,5 +1,10 @@
+// CalendarView type
 export type CalendarView = "month" | "week" | "day" | "agenda"
 
+// EventColor type
+export type EventColor = "sky" | "amber" | "violet" | "rose" | "emerald" | "orange" | "red" | "green" | "blue" | "purple" | "pink" | "yellow" | "gray" | "slate" | "zinc" | "neutral" | "stone"
+
+// CalendarEvent interface
 export interface CalendarEvent {
     id: string
     title: string
@@ -20,15 +25,6 @@ export interface PositionedEvent {
     width: number
     zIndex: number
 }
-
-// EventColor type
-export type EventColor =
-    | "sky"
-    | "amber"
-    | "violet"
-    | "rose"
-    | "emerald"
-    | "orange"
 
 // DragHandlePositionType interface
 export interface DragHandlePositionType {
