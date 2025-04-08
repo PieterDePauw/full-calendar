@@ -1,5 +1,25 @@
 {
     "editor.defaultFormatter": null,
     "editor.foldingImportsByDefault": true,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.history": true,
+        "**/.next": true,
+        "**/.trunk/*actions/": true,
+        "**/.trunk/*logs/": true,
+        "**/.trunk/*notifications/": true,
+        "**/.trunk/*out/": true,
+        "**/.trunk/*plugins/": true,
+        "**/node_modules": true,
+        ".vercel": true,
+        ".turbo": true,
+        ".vscode": true,
+        ".gitignore": true
+    },
+    "explorerExclude.backup": {}
 }
