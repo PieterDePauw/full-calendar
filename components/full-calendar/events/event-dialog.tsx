@@ -15,7 +15,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import { formatTimeForInput, type CalendarEvent, type EventColor } from "@/components/full-calendar"
+import { formatTimeForInput, type CalendarEvent, type EventColor, type JSONValue } from "@/components/full-calendar"
+import { useLogDebug } from "@/hooks/use-log-error"
 
 // Define the color options for the event dialog
 const colorOptions: { value: EventColor; label: string; bgClass: string; borderClass: string }[] = [
@@ -86,8 +87,11 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
     // > Use the useState hook to manage the state of the end date date input dialog
     const [endDateOpen, setEndDateOpen] = useState<boolean>(false)
 
-    // > Use the useEffect hook to log the event, whenever it changes, for debugging purposes
-    useEffect(() => console.log("EventDialog received event:", event), [event])
+    // // > Use the useEffect hook to log the event, whenever it changes, for debugging purposes
+    // useEffect(() => console.log("EventDialog received event:", event), [event])
+
+    // > Use the useLogError hook to log the event, whenever it changes for debugging purposes
+    useLogDebug(event as JSONValue)
 
     // > Use the useEffect hook to set the initial state of the dialog whenever the event prop changes
     useEffect(() => {

@@ -30,4 +30,4 @@ export * from "@/hooks/use-calendar-view-title"
 export * from "@/hooks/use-calendar-view"
 
 // Type exports
-export type { CalendarEvent, PositionedEvent, CalendarView, EventColor, DragHandlePositionType } from "@/lib/types"
+export type { CalendarEvent, PositionedEvent, CalendarView, EventColor, DragHandlePositionType, JSONValue } from "@/lib/types"

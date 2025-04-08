@@ -79,6 +79,34 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         setIsEventDialogOpen(true)
     }
 
+
+    // > Define a helper function to handle updating an event
+    function handleEventUpdate(updatedEvent: CalendarEvent) {
+        // >> Call the onEventUpdate callback with the updated event
+        onEventUpdate?.(updatedEvent)
+        // >> Show toast notification when an event is updated via drag and drop
+        toast(`Event "${updatedEvent.title}" moved`, {
+            description: format(new Date(updatedEvent.start), "MMM d, yyyy"),
+            position: "bottom-left"
+        })
+        // >> Reset the selected event to null
+        setSelectedEvent(null)
+        // >> Close the event dialog after updating the event
+        setIsEventDialogOpen(false)
+    }
+
+    // > Define a helper function to handle the event create button click
+    function handleEventCreateClick() {
+        setSelectedEvent(null)
+        setIsEventDialogOpen(true)
+    }
+
+    // > Define a helper function to handle the event dialog close
+    function handleDialogClose() {
+        setSelectedEvent(null);
+        setIsEventDialogOpen(false)
+    }
+
     // > Define a helper function to handle saving an event
     function handleEventSave(event: CalendarEvent) {
         // >> If the event has an ID, it's an existing event that needs to be updated
@@ -124,33 +152,6 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
         // >> Reset the selected event to null
         setSelectedEvent(null)
         // >> Close the event dialog after deleting the event
-        setIsEventDialogOpen(false)
-    }
-
-    // > Define a helper function to handle updating an event
-    function handleEventUpdate(updatedEvent: CalendarEvent) {
-        // >> Call the onEventUpdate callback with the updated event
-        onEventUpdate?.(updatedEvent)
-        // >> Show toast notification when an event is updated via drag and drop
-        toast(`Event "${updatedEvent.title}" moved`, {
-            description: format(new Date(updatedEvent.start), "MMM d, yyyy"),
-            position: "bottom-left"
-        })
-        // >> Reset the selected event to null
-        setSelectedEvent(null)
-        // >> Close the event dialog after updating the event
-        setIsEventDialogOpen(false)
-    }
-
-    // > Define a helper function to handle the event create button click
-    function handleEventCreateClick() {
-        setSelectedEvent(null)
-        setIsEventDialogOpen(true)
-    }
-
-    // > Define a helper function to handle the event dialog close
-    function handleDialogClose() {
-        setSelectedEvent(null);
         setIsEventDialogOpen(false)
     }
 

@@ -1,3 +1,6 @@
+// Define the JSONValue type
+export type JSONValue = string | number | boolean | null | { [key: string]: JSONValue } | JSONValue[]
+
 // CalendarView type
 export type CalendarView = "month" | "week" | "day" | "agenda"
 
