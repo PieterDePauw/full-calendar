@@ -9,8 +9,9 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { addHoursToDate, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarNavigation, type CalendarEvent, type CalendarView } from "@/components/full-calendar"
+import { addHoursToDate, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarNavigation, type CalendarEvent } from "@/components/full-calendar"
 import { useCalendarViewTitle } from "@/hooks/use-calendar-view-title"
+import { useCalendarView } from "@/hooks/use-calendar-view"
 
 // FullCalendarProps type
 export interface FullCalendarProps {
@@ -19,16 +20,15 @@ export interface FullCalendarProps {
     onEventUpdate?: (event: CalendarEvent) => void
     onEventDelete?: (eventId: string) => void
     className?: string
-    initialView?: CalendarView
 }
 
 // FullCalendar component
-export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDelete, className, initialView = "month" }: FullCalendarProps) {
+export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDelete, className }: FullCalendarProps) {
     // > Define the initial date as today
     const initialDate = new Date()
 
-    // > Use the useState hook to manage the current view
-    const [currentView, setCurrentView] = useState<CalendarView>(initialView)
+    // > We no longer keep current view in local state
+    const { currentView, setCurrentView } = useCalendarView()
 
     // > Use the useState hook to manage the event dialog state
     const [isEventDialogOpen, setIsEventDialogOpen] = useState<boolean>(false)
@@ -37,13 +37,13 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
 
     // > Use the useCalendarNavigation hook to manage the current date and navigation
-    const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation({ currentView, initialDate })
+    const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation({ initialDate })
 
     // > Use the useCalendarViewTitle hook to manage the view title
     const viewTitle = useCalendarViewTitle({ currentDate, currentView })
 
     // > Use the useViewKeyboardShortcut hook to handle keyboard shortcuts for switching calendar views
-    useViewKeyboardShortcut({ isEventDialogOpen, setCurrentView })
+    useViewKeyboardShortcut({ isEventDialogOpen })
 
     // > Define a helper function to handle selecting an event
     function handleEventSelect(event: CalendarEvent) {

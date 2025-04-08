@@ -1,17 +1,20 @@
 // Import modules
 import { useEffect } from "react"
-import { type CalendarView } from "@/lib/types"
+import { useCalendarView } from "@/hooks/use-calendar-view"
 
 // Define a custom hook to handle keyboard shortcuts for switching calendar views
-export function useViewKeyboardShortcut({ isEventDialogOpen, setCurrentView }: { isEventDialogOpen: boolean, setCurrentView: React.Dispatch<React.SetStateAction<CalendarView>> }) {
+export function useViewKeyboardShortcut({ isEventDialogOpen }: { isEventDialogOpen: boolean }) {
+    // > Use the useCalendarView hook to get the current view and set the current view
+    const { setCurrentView } = useCalendarView()
+
     // > Use the useEffect hook to listen for keydown events to switch between calendar views
     useEffect(() => {
         // >> Define the handleKeyDown function
-        function handleKeyDown(e: KeyboardEvent) {
+        function handleKeyDown(event: KeyboardEvent) {
             // >>> If user is typing in an input, a textarea or a contentEditable element or if the event dialog is open, return early
-            if (isEventDialogOpen || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)) { return }
+            if (isEventDialogOpen || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || (event.target instanceof HTMLElement && event.target.isContentEditable)) { return }
             // >>> Get the key pressed
-            const keyPressed = e.key.toLowerCase()
+            const keyPressed = event.key.toLowerCase()
             // >>> Switch view based on key pressed
             switch (keyPressed) {
                 case "m":

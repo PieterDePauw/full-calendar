@@ -1,10 +1,14 @@
 // Import modules
 import { useState } from "react"
-import { AgendaDaysToShow, type CalendarView } from "@/components/full-calendar"
 import { subMonths, subWeeks, subDays, addMonths, addWeeks, addDays } from "date-fns"
+import { AgendaDaysToShow, type CalendarView } from "@/components/full-calendar"
+import { useCalendarView } from "@/hooks/use-calendar-view"
 
 // Define a custom hook to handle calendar navigation
-export function useCalendarNavigation({ currentView, initialDate }: { currentView: CalendarView, initialDate: Date }) {
+export function useCalendarNavigation({ initialDate }: { initialDate: Date }) {
+    // > Use the useCalendarView hook to get the current view
+    const { currentView } = useCalendarView()
+
     // > Use the useState hook to manage the current date
     const [currentDate, setCurrentDate] = useState<Date>(initialDate)
 

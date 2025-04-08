@@ -1,5 +1,6 @@
 // Import modules
 import { type Day } from "date-fns"
+import { type CalendarView } from "@/lib/types"
 
 // Height of calendar events in pixels - used in month, week and day views
 export const EventHeight: number = 24
@@ -18,3 +19,6 @@ export const DaysPerWeek: number = 7
 
 // Starting day of the week (0 = Sunday, 1 = Monday, etc.)
 export const WeekStartsOn: Day = 1
+
+// Default view for the calendar
+export const DEFAULT_VIEW: CalendarView = "month"
