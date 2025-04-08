@@ -4,18 +4,13 @@
 import { createContext, useContext, useId, useRef, useState, type ReactNode } from "react"
 import { DndContext, DragOverlay, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragOverEvent, type DragStartEvent, type UniqueIdentifier } from "@dnd-kit/core"
 import { addMinutes, differenceInMinutes } from "date-fns"
-import { type CalendarEvent, compareDateTime, type DragHandlePositionType, EventItem } from "@/components/full-calendar"
-
-// Define the type for event dimensions
-type EventDimensions = {
-    height: number
-}
+import { EventItem, compareDateTime, type CalendarEvent, type CalendarView, type DragHandlePositionType } from "@/components/full-calendar"
 
 // Define the type for drag-and-drop context
 type CalendarDndContextType = {
     activeEvent: CalendarEvent | null
     activeId: UniqueIdentifier | null
-    activeView: "month" | "week" | "day" | null
+    activeView: CalendarView | null
     currentTime: Date | null
     eventHeight: number | null
     isMultiDay: boolean
@@ -24,19 +19,12 @@ type CalendarDndContextType = {
 }
 
 // Create the context for the calendar drag-and-drop functionality
-const CalendarDndContext = createContext<CalendarDndContextType>({
-    activeEvent: null,
-    activeId: null,
-    activeView: null,
-    currentTime: null,
-    eventHeight: null,
-    isMultiDay: false,
-    multiDayWidth: null,
-    dragHandlePosition: null,
-})
+const CalendarDndContext = createContext<CalendarDndContextType>({ activeEvent: null, activeId: null, activeView: null, currentTime: null, eventHeight: null, isMultiDay: false, multiDayWidth: null, dragHandlePosition: null })
 
 // Create a custom hook to use the calendar drag-and-drop context
-export const useCalendarDnd = () => useContext(CalendarDndContext)
+export function useCalendarDnd() {
+    return useContext(CalendarDndContext)
+}
 
 // CalendarDndProvider component
 // This component provides the drag-and-drop context for the calendar
@@ -52,7 +40,7 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
     const [dragHandlePosition, setDragHandlePosition] = useState<DragHandlePositionType | null>(null)
 
     // > Use the useRef hook to store the original height of the event to maintain the drag overlay size
-    const eventDimensions = useRef<EventDimensions>({ height: 0 })
+    const eventDimensions = useRef<{ height: number }>({ height: 0 })
 
     // > Use the useSensors hook to define the sensors for drag-and-drop interactions
     const sensors = useSensors(
@@ -105,6 +93,7 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
             return
         }
 
+        // Safely access data with checks
         const { date, time } = dragOverEvent.over.data.current as { date: Date; time?: number }
 
         // Update time for week/day views
@@ -157,22 +146,22 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
     }
 
     // > Define a helper function to handle the drag end event
-    const handleDragEnd = (dragEndEvent: DragEndEvent) => {
-        // Add robust error checking
-        if (!dragEndEvent.over || !activeEvent || !currentTime) {
-            // Reset state and exit early
-            setActiveEvent(null)
-            setActiveId(null)
-            setActiveView(null)
-            setCurrentTime(null)
-            setEventHeight(null)
-            setIsMultiDay(false)
-            setMultiDayWidth(null)
-            setDragHandlePosition(null)
-            return
-        }
-
+    function handleDragEnd(dragEndEvent: DragEndEvent) {
         try {
+            // Add robust error checking
+            if (!dragEndEvent.over || !activeEvent || !currentTime) {
+                // Reset state and exit early
+                setActiveEvent(null)
+                setActiveId(null)
+                setActiveView(null)
+                setCurrentTime(null)
+                setEventHeight(null)
+                setIsMultiDay(false)
+                setMultiDayWidth(null)
+                setDragHandlePosition(null)
+                return
+            }
+
             // Safely access data with checks
             if (!dragEndEvent.active.data.current || !dragEndEvent.over.data.current) {
                 throw new Error("Missing data in drag dragEndEvent")
@@ -245,29 +234,16 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
     // > Return the JSX for the calendar drag-and-drop context provider and the drag overlay component
     return (
         <DndContext id={dndContextId} sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
-
             <CalendarDndContext.Provider value={{ activeEvent, activeId, activeView, currentTime, eventHeight, isMultiDay, multiDayWidth, dragHandlePosition }} >
-
                 {children}
-
                 <DragOverlay adjustScale={false} dropAnimation={null}>
                     {activeEvent && activeView && (
                         <div style={{ height: eventHeight ? `${eventHeight}px` : "auto", width: isMultiDay && multiDayWidth ? `${multiDayWidth}%` : "100%" }}>
-                            <EventItem
-                                event={activeEvent}
-                                view={activeView}
-                                isDragging={true}
-                                showTime={activeView !== "month"}
-                                currentTime={currentTime || undefined}
-                                isFirstDay={dragHandlePosition?.data?.isFirstDay !== false}
-                                isLastDay={dragHandlePosition?.data?.isLastDay !== false}
-                            />
+                            <EventItem event={activeEvent} view={activeView} isDragging={true} showTime={activeView !== "month"} currentTime={currentTime || undefined} isFirstDay={dragHandlePosition?.data?.isFirstDay !== false} isLastDay={dragHandlePosition?.data?.isLastDay !== false} />
                         </div>
                     )}
                 </DragOverlay>
-
             </CalendarDndContext.Provider>
-
         </DndContext>
     )
 }

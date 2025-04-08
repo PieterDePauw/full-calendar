@@ -4,7 +4,7 @@
 import { Fragment, useMemo, type CSSProperties, type MouseEvent } from "react"
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { DaysPerWeek, DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
+import { DaysPerWeek, DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, formatTimeWithOptionalMinutes, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
 import { useMounted } from "@/hooks/use-mounted"
 
 // MonthView component
@@ -75,7 +75,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                                         <div key={`spanning-${event.id}-${day.toISOString().slice(0, 10)}`} className="aria-hidden:hidden" aria-hidden={isHidden ? "true" : undefined}>
                                                             <EventItem onClick={(e) => handleEventClick(event, e)} event={event} view="month" isFirstDay={isFirstDay} isLastDay={isLastDay}>
                                                                 <div className="invisible" aria-hidden={true}>
-                                                                    {!event.allDay && <span>{format(new Date(event.start), "h:mm")}</span>}
+                                                                    {!event.allDay && <span>{formatTimeWithOptionalMinutes(event.start)}</span>}
                                                                     {event.title && <span className="truncate">{event.title}</span>}
                                                                 </div>
                                                             </EventItem>

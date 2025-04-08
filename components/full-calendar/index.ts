@@ -19,7 +19,6 @@ export * from "@/lib/event-styling"
 export * from "@/lib/event-queries"
 export * from "@/lib/event-positioning"
 export * from "@/lib/time-helpers"
-// export * from "./utils"
 
 // Hook exports
 export * from "@/hooks/use-current-time-indicator"
