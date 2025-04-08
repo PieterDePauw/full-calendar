@@ -9,9 +9,7 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { addHoursToDate, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarNavigation, type CalendarEvent } from "@/components/full-calendar"
-import { useCalendarViewTitle } from "@/hooks/use-calendar-view-title"
-import { useCalendarView } from "@/hooks/use-calendar-view"
+import { addHoursToDate, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, capitalize, getFirstLetter, useViewKeyboardShortcut, useCalendarNavigation, useCalendarViewTitle, useCalendarView, type CalendarEvent } from "@/components/full-calendar"
 
 // FullCalendarProps type
 export interface FullCalendarProps {
@@ -40,7 +38,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     const { currentDate, handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation({ initialDate })
 
     // > Use the useCalendarViewTitle hook to manage the view title
-    const viewTitle = useCalendarViewTitle({ currentDate, currentView })
+    const viewTitle = useCalendarViewTitle({ currentDate })
 
     // > Use the useViewKeyboardShortcut hook to handle keyboard shortcuts for switching calendar views
     useViewKeyboardShortcut({ isEventDialogOpen })
@@ -192,10 +190,10 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
                                 <Button variant="outline" className="gap-1.5 max-[479px]:h-8">
                                     <span>
                                         <span className="min-[480px]:hidden" aria-hidden="true">
-                                            {currentView.charAt(0).toUpperCase()}
+                                            {getFirstLetter(currentView)}
                                         </span>
                                         <span className="max-[479px]:sr-only">
-                                            {currentView.charAt(0).toUpperCase() + currentView.slice(1)}
+                                            {capitalize(currentView)}
                                         </span>
                                     </span>
                                     <ChevronDownIcon className="-me-1 opacity-60" size={16} aria-hidden="true"/>
