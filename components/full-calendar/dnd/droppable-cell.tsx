@@ -10,7 +10,7 @@ export function DroppableCell({ id, date, time, children, className, onClick }: 
     // > Get the active event from the useCalendarDnd hook
     const { activeEvent } = useCalendarDnd()
     // > Use the useDroppable hook to get the setNodeRef and isOver functions
-    const { setNodeRef, isOver } = useDroppable({ id, data: { date, time } })
+    const { setNodeRef, isOver } = useDroppable({ id: id, data: { date, time } })
     // > Format time for display in tooltip (only for debugging)
     const formattedTime = time !== undefined ? `${Math.floor(time)}:${Math.round((time - Math.floor(time)) * 60).toString().padStart(2, "0")}` : null
     // > Return the droppable cell component

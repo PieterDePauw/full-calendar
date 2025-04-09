@@ -6,6 +6,7 @@ import { format, isSameDay } from "date-fns"
 import { XIcon } from "lucide-react"
 import { EventItem, type CalendarEvent } from "@/components/full-calendar"
 
+// EventsPopupProps interface
 interface EventsPopupProps {
     date: Date
     events: CalendarEvent[]
@@ -37,7 +38,7 @@ export function EventsPopup({ date, events, position, onClose, onEventSelect }: 
     useEffect(() => {
         // >> Define the handleEscKey function
         const handleEscKey = (event: KeyboardEvent) => {
-            if (event.key === "Escape") onClose()
+            if (event.key === "Escape") { onClose() }
         }
         // >> Add the handleEscKey function to the event listener for keydown
         document.addEventListener("keydown", handleEscKey)
