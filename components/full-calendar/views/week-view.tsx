@@ -87,17 +87,14 @@ export function WeekView({ events, onEventSelect, onEventCreate }: { events: Cal
 
                 while (!placed) {
                     if (!columns[columnIndex]) {
+                        // If this column doesn't exist, create it
                         columns[columnIndex] = []
+                        // Place the event here
                         placed = true
                     } else {
                         // Check if this event overlaps with any event in this column
-                        const overlaps = columns[columnIndex].some((col) =>
-                            areIntervalsOverlapping(
-                                { start: adjustedStart, end: adjustedEnd },
-                                { start: new Date(col.event.start), end: new Date(col.event.end) }
-                            )
-                        )
-
+                        const overlaps = columns[columnIndex].some((col) => areIntervalsOverlapping({ start: adjustedStart, end: adjustedEnd }, { start: new Date(col.event.start), end: new Date(col.event.end) }))
+                        // If it doesn't overlap, place it here, otherwise move to the next column
                         if (!overlaps) {
                             placed = true
                         } else {
@@ -110,7 +107,7 @@ export function WeekView({ events, onEventSelect, onEventCreate }: { events: Cal
                 columns[columnIndex].push({ event, end: adjustedEnd })
 
                 // Calculate width and left position based on number of columns
-                const width = columnIndex === 0 ? 1 : 1 - (columnIndex * 0.9)
+                const width = columnIndex === 0 ? 1 : 1 - (columnIndex * 0.1)
                 const left = columnIndex === 0 ? 0 : columnIndex * 0.1
 
                 // Higher columns get higher z-index
