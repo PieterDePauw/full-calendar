@@ -107,7 +107,7 @@ export function WeekView({ events, onEventSelect, onEventCreate }: { events: Cal
                 columns[columnIndex].push({ event, end: adjustedEnd })
 
                 // Calculate width and left position based on number of columns
-                const width = columnIndex === 0 ? 1 : 1 - (columnIndex * 0.1)
+                const width = columnIndex === 0 ? 1 : Math.max(1 - (columnIndex * 0.1), 0.4)
                 const left = columnIndex === 0 ? 0 : columnIndex * 0.1
 
                 // Higher columns get higher z-index
