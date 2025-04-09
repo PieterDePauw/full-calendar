@@ -1,15 +1,10 @@
+// Import modules
 import { useMemo } from "react"
 import { format, startOfWeek, endOfWeek, isSameMonth, addDays } from "date-fns"
-import { AgendaDaysToShow, WEEK_STARTS_WITH } from "@/components/full-calendar"
+import { NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA, WEEK_STARTS_ON } from "@/components/full-calendar"
 import { useCalendarView } from "@/hooks/use-calendar-view"
 
-/**
- * Returns the title for the calendar view based on the current date and view type.
- * @param {Object} params - The parameters object.
- * @param {Date} params.currentDate - The current date to display in the title.
- * @param {CalendarView} params.currentView - The current view type (month, week, day, agenda).
- * @returns {string} The formatted title for the calendar view.
- */
+// Use the useCalendarViewTitle hook to get the title of the calendar view
 export function useCalendarViewTitle({ currentDate }: { currentDate: Date }) {
     // > Get the current view from the global calendar view store
     const { currentView } = useCalendarView()
@@ -19,20 +14,24 @@ export function useCalendarViewTitle({ currentDate }: { currentDate: Date }) {
         // > Check if the current view is valid
         if (currentView !== "month" && currentView !== "week" && currentView !== "day" && currentView !== "agenda") {
             return ""
-        } else if (currentView === "day") {
+        }
+        if (currentView === "day") {
             return format(currentDate, "EEEE, MMMM d, yyyy")
-        } else if (currentView === "week") {
-            if (isSameMonth(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }))) {
-                return format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), "MMMM yyyy")
+        }
+        if (currentView === "week") {
+            if (isSameMonth(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }))) {
+                return format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), "MMMM yyyy")
             }
-            return `${format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), "MMM")} - ${format(endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), "MMM yyyy")}`
-        } else if (currentView === "month") {
+            return `${format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), "MMM")} - ${format(endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), "MMM yyyy")}`
+        }
+        if (currentView === "month") {
             return format(currentDate, "MMMM yyyy")
-        } else if (currentView === "agenda") {
-            if (isSameMonth(currentDate, addDays(currentDate, AgendaDaysToShow - 1))) {
+        }
+        if (currentView === "agenda") {
+            if (isSameMonth(currentDate, addDays(currentDate, NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA - 1))) {
                 return format(currentDate, "MMMM yyyy")
             }
-            return `${format(currentDate, "MMM")} - ${format(addDays(currentDate, AgendaDaysToShow - 1), "MMM yyyy")}`
+            return `${format(currentDate, "MMM")} - ${format(addDays(currentDate, NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA - 1), "MMM yyyy")}`
         }
         // Fallback
         return format(currentDate, "MMMM yyyy")

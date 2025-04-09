@@ -3,7 +3,7 @@
 // Import modules
 import { useEffect, useState } from "react"
 import { endOfWeek, isSameDay, isWithinInterval, startOfWeek } from "date-fns"
-import { WEEK_STARTS_WITH } from "@/lib/constants"
+import { WEEK_STARTS_ON } from "@/lib/constants"
 
 // useCurrentTimeIndicator hook: custom hook to calculate the current time position
 export function useCurrentTimeIndicator(currentDate: Date, currentView: "day" | "week") {
@@ -44,7 +44,7 @@ export function useCurrentTimeIndicator(currentDate: Date, currentView: "day" | 
 
             // >>> If the view is "week", check if the current time is within the week to determine visibility
             if (currentView === "week") {
-                isCurrentTimeVisible = isWithinInterval(now, { start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }) })
+                isCurrentTimeVisible = isWithinInterval(now, { start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }) })
             }
 
             // >>> Update the current time position

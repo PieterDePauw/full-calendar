@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import { addHours, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, eachHourOfInterval, endOfWeek, format, getHours, getMinutes, isBefore, isSameDay, isToday, startOfDay, startOfWeek } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, CurrentTimeIndicator, WeekCellsHeight, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_WITH } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, CurrentTimeIndicator, WeekCellsHeight, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_ON, formatTimeLabel } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
 interface WeekViewProps {
@@ -15,11 +15,11 @@ interface WeekViewProps {
 export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: WeekViewProps) {
     // Get the days of the week based on the current date
     // prettier-ignore // biome-ignore
-    const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }) }), [currentDate])
+    const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }) }), [currentDate])
 
     // Get the start of the week for the current date
     // prettier-ignore // biome-ignore
-    const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), [currentDate])
+    const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), [currentDate])
 
     // Get the hours for each day of the week based on the current date
     // prettier-ignore // biome-ignore
@@ -146,7 +146,7 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
                 <div className="border-border/70 border-r">
                     {hours.map((hour, index) => (
                         <div key={hour.toString()} className="border-border/70 relative h-[var(--week-cells-height)] border-b last:border-b-0">
-                            {index > 0 && <span className="bg-background text-muted-foreground/70 absolute -top-3 left-0 flex h-6 w-16 max-w-full items-center justify-end pe-2 text-[10px] sm:pe-4 sm:text-xs">{format(hour, "h a")}</span>}
+                            {index > 0 && <span className="bg-background text-muted-foreground/70 absolute -top-3 left-0 flex h-6 w-16 max-w-full items-center justify-end pe-2 text-[10px] sm:pe-4 sm:text-xs">{formatTimeLabel(hour)}</span>}
                         </div>
                     ))}
                 </div>

@@ -1,12 +1,13 @@
 // Import modules
 import { format, getHours, getMinutes } from "date-fns";
+import { USE_12_HOUR_CLOCK_NOTATION } from "@/lib/constants"
 
 // Define a helper function to format the time for the input field
 export function formatTimeForInput(date: Date): string {
   // > Get the hours from the date object and format them to 2 digits
-  const hours = (date.getHours()).toString().padStart(2, "0")
+  const hours = String(date.getHours()).padStart(2, "0")
   // > Get the minutes from the date object, round them to the nearest 15 minutes, and format them to 2 digits
-  const minutes = (Math.floor(date.getMinutes() / 15) * 15).toString().padStart(2, "0")
+  const minutes = String(Math.floor(date.getMinutes() / 15) * 15).padStart(2, "0")
   // > Return the formatted time string
   return `${hours}:${minutes}`
 }
@@ -16,12 +17,17 @@ export function formatTimeForInput(date: Date): string {
 // 'a' - am/pm
 // ':mm' - minutes with leading zero (only if the token 'mm' is present)
 export function formatTimeWithOptionalMinutes(date: Date) {
-  return format(date, getMinutes(date) === 0 ? "ha" : "h:mma").toLowerCase()
+  return format(date, getMinutes(date) === 0 ? (USE_12_HOUR_CLOCK_NOTATION ? "ha" : "H:mm") : (USE_12_HOUR_CLOCK_NOTATION ? "h:mma" : "H:mm")).toLowerCase()
 }
 
 // Define a helper function to format the date for the toast notification
 export function formatForNotification(date: Date) {
   return format(new Date(date), "MMM d, yyyy")
+}
+
+// Define a helper function to format the time for the time labels
+export function formatTimeLabel(hour: Date) {
+  return format(hour, USE_12_HOUR_CLOCK_NOTATION ? "h a" : "HH:mm")
 }
 
 // Define a helper function to add hours to a specified date

@@ -15,7 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import { formatTimeForInput, type CalendarEvent, type EventColor, type JSONValue } from "@/components/full-calendar"
+import { formatTimeForInput, USE_12_HOUR_CLOCK_NOTATION, type CalendarEvent, type EventColor, type JSONValue } from "@/components/full-calendar"
 import { useLogDebug } from "@/hooks/use-log-error"
 
 // Define the color options for the event dialog
@@ -146,7 +146,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                 // Use a fixed date to avoid unnecessary date object creations
                 const date = new Date(2000, 0, 1, hour, minute)
                 // >> Format the date to be in h:mm a format (e.g., 1:00 AM, 1:15 AM, etc.)
-                const label = format(date, "h:mm a")
+                const label = USE_12_HOUR_CLOCK_NOTATION ? format(date, "h:mm a") : format(date, "HH:mm")
                 // >> Push the value and label into the options array
                 options.push({ value, label })
             }

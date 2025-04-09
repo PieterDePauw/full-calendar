@@ -4,14 +4,14 @@
 import { useMemo } from "react"
 import { RiCalendarEventLine } from "@remixicon/react"
 import { addDays, format, isToday } from "date-fns"
-import { AgendaDaysToShow, CalendarEvent, EventItem, getAgendaEventsForDay } from "@/components/full-calendar"
+import { NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA, CalendarEvent, EventItem, getAgendaEventsForDay } from "@/components/full-calendar"
 
 // Agenda view component
 export function AgendaView({ currentDate, events, onEventSelect }: { currentDate: Date; events: CalendarEvent[]; onEventSelect: (event: CalendarEvent) => void }) {
     // > Show events for the next days based on constant
     const days = useMemo(() => {
         console.log("Agenda view updating with date:", currentDate.toISOString())
-        return Array.from({ length: AgendaDaysToShow }, (_, i) => addDays(new Date(currentDate), i))
+        return Array.from({ length: NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA }, (_, i) => addDays(new Date(currentDate), i))
     }, [currentDate])
 
     // > Helper function to handle the event click to select an event

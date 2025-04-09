@@ -1,19 +1,19 @@
 // Calendar view exports
-export { AgendaView } from "./views/agenda-view"
-export { DayView } from "./views/day-view"
-export { MonthView } from "./views/month-view"
-export { WeekView } from "./views/week-view"
+export { AgendaView } from "@/components/full-calendar/views/agenda-view"
+export { DayView } from "@/components/full-calendar/views/day-view"
+export { MonthView } from "@/components/full-calendar/views/month-view"
+export { WeekView } from "@/components/full-calendar/views/week-view"
 
 // Sub-component exports@
-export { CalendarDndProvider, useCalendarDnd } from "./dnd/calendar-dnd-context"
-export { DraggableEvent } from "./dnd/draggable-event"
-export { DroppableCell } from "./dnd/droppable-cell"
-export { EventDialog } from "./events/event-dialog"
-export { EventItem } from "./events/event-item"
-export { EventsPopup } from "./events/events-popup"
-export { FullCalendar } from "./events/full-calendar"
-export { CalendarHeader } from "./events/calendar-header"
-export { CurrentTimeIndicator } from "./events/current-time-indicator"
+export { CalendarDndProvider, useCalendarDnd } from "@/components/full-calendar/dnd/calendar-dnd-context"
+export { DraggableEvent } from "@/components/full-calendar/dnd/draggable-event"
+export { DroppableCell } from "@/components/full-calendar/dnd/droppable-cell"
+export { EventDialog } from "@/components/full-calendar/events/event-dialog"
+export { EventItem } from "@/components/full-calendar/events/event-item"
+export { EventsPopup } from "@/components/full-calendar/events/events-popup"
+export { FullCalendar } from "@/components/full-calendar/events/full-calendar"
+export { CalendarHeader } from "@/components/full-calendar/events/calendar-header"
+export { CurrentTimeIndicator } from "@/components/full-calendar/events/current-time-indicator"
 
 // Constants and utility exports
 export * from "@/lib/constants"

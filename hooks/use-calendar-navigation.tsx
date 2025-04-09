@@ -1,6 +1,6 @@
 // Import modules
 import { subMonths, subWeeks, subDays, addMonths, addWeeks, addDays } from "date-fns"
-import { AgendaDaysToShow, type CalendarView } from "@/components/full-calendar"
+import { NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA, type CalendarView } from "@/components/full-calendar"
 import { useCalendarView } from "@/hooks/use-calendar-view"
 import { useCalendarDate } from "@/hooks/use-calendar-date"
 
@@ -31,7 +31,7 @@ export function useCalendarNavigation(initialDate: Date = new Date() ) {
         } else if (currentView === "day") {
             setCurrentDate(subDays(currentDate, 1))
         } else if (currentView === "agenda") {
-            setCurrentDate(subDays(currentDate, AgendaDaysToShow))
+            setCurrentDate(subDays(currentDate, NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA))
         }
     }
 
@@ -46,7 +46,7 @@ export function useCalendarNavigation(initialDate: Date = new Date() ) {
         } else if (currentView === "day") {
             setCurrentDate(addDays(currentDate, 1))
         } else if (currentView === "agenda") {
-            setCurrentDate(addDays(currentDate, AgendaDaysToShow))
+            setCurrentDate(addDays(currentDate, NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA))
         }
     }
 

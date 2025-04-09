@@ -12,13 +12,16 @@ export const EventGap: number = 4
 export const WeekCellsHeight: number = 64
 
 // Number of days to show in the agenda view
-export const AgendaDaysToShow: number = 30
+export const NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA: number = 30
 
 // Number of days in a week
-export const DaysPerWeek: number = 7
+export const NUMBER_OF_DAYS_PER_WEEK: number = 7
 
 // Starting day of the week (0 = Sunday, 1 = Monday, etc.)
-export const WEEK_STARTS_WITH: Day = 1
+export const WEEK_STARTS_ON: Day = 1
 
 // Default view for the calendar
 export const DEFAULT_VIEW: CalendarView = "month"
+
+// Date/time notation format
+export const USE_12_HOUR_CLOCK_NOTATION: boolean = false
