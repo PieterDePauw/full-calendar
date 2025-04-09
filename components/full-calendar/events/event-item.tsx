@@ -47,7 +47,7 @@ function EventWrapper({ event, isFirstDay = true, isLastDay = true, isDragging, 
 
 interface EventItemProps {
     event: CalendarEvent
-    view: CalendarView
+    currentView: CalendarView
     isDragging?: boolean
     onClick?: (e: MouseEvent) => void
     showTime?: boolean
@@ -62,7 +62,7 @@ interface EventItemProps {
     onTouchStart?: (e: TouchEvent) => void
 }
 
-export function EventItem({ event, view, isDragging, onClick, showTime, currentTime, isFirstDay = true, isLastDay = true, children, className, dndListeners, dndAttributes, onMouseDown, onTouchStart }: EventItemProps) {
+export function EventItem({ event, currentView, isDragging, onClick, showTime, currentTime, isFirstDay = true, isLastDay = true, children, className, dndListeners, dndAttributes, onMouseDown, onTouchStart }: EventItemProps) {
     // > Get the event color from the event object
     const eventColor = event.color
 
@@ -85,7 +85,7 @@ export function EventItem({ event, view, isDragging, onClick, showTime, currentT
         return `${formatTimeWithOptionalMinutes(displayStart)} - ${formatTimeWithOptionalMinutes(displayEnd)}`
     }
 
-    if (view === "month") {
+    if (currentView === "month") {
         return (
             <EventWrapper event={event} isFirstDay={isFirstDay} isLastDay={isLastDay} isDragging={isDragging} onClick={onClick} className={getMonthEventClasses({ className })} currentTime={currentTime} dndListeners={dndListeners} dndAttributes={dndAttributes} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
                 {children || (
@@ -102,9 +102,9 @@ export function EventItem({ event, view, isDragging, onClick, showTime, currentT
         )
     }
 
-    if (view === "week" || view === "day") {
+    if (currentView === "week" || currentView === "day") {
         return (
-            <EventWrapper event={event} isFirstDay={isFirstDay} isLastDay={isLastDay} isDragging={isDragging} onClick={onClick} className={getDayWeekEventClasses({ durationInMinutes, view, className })} currentTime={currentTime} dndListeners={dndListeners} dndAttributes={dndAttributes} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
+            <EventWrapper event={event} isFirstDay={isFirstDay} isLastDay={isLastDay} isDragging={isDragging} onClick={onClick} className={getDayWeekEventClasses({ durationInMinutes, currentView, className })} currentTime={currentTime} dndListeners={dndListeners} dndAttributes={dndAttributes} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
                 {durationInMinutes < 45 ? (
                     <div className="truncate font-normal opacity-70 sm:text-[11px]">
                         {event.title}{" "}
