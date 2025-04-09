@@ -19,7 +19,8 @@
         ".vercel": true,
         ".turbo": true,
         ".vscode": true,
-        ".gitignore": true
+        ".gitignore": true,
+        ".deprecated": true
     },
     "explorerExclude.backup": {}
 }
