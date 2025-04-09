@@ -15,7 +15,7 @@ export function DroppableCell({ id, date, time, children, className, onClick }: 
     const formattedTime = time !== undefined ? `${Math.floor(time)}:${Math.round((time - Math.floor(time)) * 60).toString().padStart(2, "0")}` : null
     // > Return the droppable cell component
     return (
-        <div ref={setNodeRef} onClick={onClick} className={cn("data-dragging:bg-accent flex h-full flex-col overflow-hidden px-0.5 py-1 sm:px-1", className)} title={formattedTime ? `${formattedTime}` : undefined} data-dragging={(isOver && activeEvent) || undefined}>
+        <div ref={setNodeRef} onClick={onClick} className={cn("data-dragging:bg-accent flex h-full flex-col overflow-hidden px-0.5 py-1 sm:px-1", className)} title={formattedTime ? `${formattedTime}` : undefined} data-dragging={(isOver && activeEvent) ? true : undefined}>
             {children}
         </div>
     )

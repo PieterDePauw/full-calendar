@@ -8,7 +8,7 @@ import "@/styles/globals.css"
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en" suppressHydrationWarning={true}>
-            <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}>
+            <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`} suppressHydrationWarning={true}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true} disableTransitionOnChange={true}>
                     {children}
                     <Toaster closeButton={true} richColors={true} position="bottom-right" />

@@ -106,10 +106,10 @@ export function EventItem({ event, view, isDragging, onClick, showTime, currentT
         return (
             <EventWrapper event={event} isFirstDay={isFirstDay} isLastDay={isLastDay} isDragging={isDragging} onClick={onClick} className={getDayWeekEventClasses({ durationInMinutes, view, className })} currentTime={currentTime} dndListeners={dndListeners} dndAttributes={dndAttributes} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
                 {durationInMinutes < 45 ? (
-                    <div className="truncate">
+                    <div className="truncate font-normal opacity-70 sm:text-[11px]">
                         {event.title}{" "}
                         {showTime && (
-                            <span className={cn("opacity-70", view === "week" ? "sm:text-[11px]" : "text-[11px]")}>
+                            <span className={cn("opacity-70")}>
                                 {formatTimeWithOptionalMinutes(displayStart)}
                             </span>
                         )}
@@ -118,7 +118,7 @@ export function EventItem({ event, view, isDragging, onClick, showTime, currentT
                     <>
                         <div className="truncate font-medium">{event.title}</div>
                         {showTime && (
-                            <div className="truncate text-[11px] font-normal opacity-70">
+                            <div className="truncate font-normal opacity-70 sm:text-[11px]">
                                 {getEventTime()}
                             </div>
                         )}

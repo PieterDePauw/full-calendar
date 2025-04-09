@@ -109,7 +109,7 @@ function HasMoreEventsPopover({ EventHeight, allEvents, day, remainingCount, han
         <Popover modal={true}>
             {/* Trigger to open the popover */}
             <PopoverTrigger asChild={true}>
-                <button onClick={(e) => e.stopPropagation()} className="focus-visible:border-ring focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground hover:bg-muted/50 mt-[var(--event-gap)] flex h-[var(--event-height)] w-full items-center overflow-hidden px-1 text-left text-[10px] backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2 sm:text-xs">
+                <button onClick={(e) => e.stopPropagation()} className="focus-visible:border-ring focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground hover:bg-muted/50 mt-[var(--event-gap)] flex h-[var(--event-height)] w-full items-center overflow-hidden px-1 text-left text-[10px] backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] sm:px-2 sm:text-xs">
                     <span>+ {remainingCount}{" "}
                         <span className="max-sm:sr-only">more</span>
                     </span>
