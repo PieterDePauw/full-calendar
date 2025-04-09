@@ -133,11 +133,11 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
             // >>> Parse the start time from the start time string
             const [startHours, startMinutes] = startTime.split(":").map(Number)
             // >>> Set the hours, minutes, seconds to the start object
-            start.setHours(startHours, startMinutes, 0)
+            start.setHours(startHours, startMinutes, 0, 0)
             // >>> Parse the end time from the end time string
             const [endHours, endMinutes] = endTime.split(":").map(Number)
             // >>> Set the hours, minutes, seconds to the end object
-            end.setHours(endHours, endMinutes, 0)
+            end.setHours(endHours, endMinutes, 0, 0)
         }
         // >> If the event is all-day, set the start and end objects to the beginning and end of the day
         if (allDay) {
@@ -162,10 +162,8 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
     // > Define a function to handle the delete button click
     function handleDelete() {
         // >> If the event doesn't exist or doesn't have an ID, log an error and return early
-        if (!event || !event.id) {
-            console.error("Event ID is missing");
-            return
-        }
+        if (!event || !event.id) console.error("Event ID is missing");
+        if (!event || !event.id) return
         // >> Call the onDelete function with the event ID
         onDelete(event.id)
     }

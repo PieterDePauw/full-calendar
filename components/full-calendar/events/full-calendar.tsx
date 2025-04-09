@@ -29,30 +29,46 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
     }
 
     // > Define a helper function to handle creating a new event
+    // function handleEventCreate(startTime: Date) {
+    //     // >> Log the start time of the new event
+    //     console.log("Creating new event at:", startTime) // Debug log
+    //     // >> Snap to 15-minute intervals
+    //     const minutes = startTime.getMinutes()
+    //     const remainder = minutes % 15
+    //     if (remainder !== 0) {
+    //         if (remainder < 7.5) {
+    //             // Round down to nearest 15 min
+    //             startTime.setMinutes(minutes - remainder)
+    //         } else {
+    //             // Round up to nearest 15 min
+    //             startTime.setMinutes(minutes + (15 - remainder))
+    //         }
+    //         startTime.setSeconds(0)
+    //         startTime.setMilliseconds(0)
+    //     }
+    //     // >> Create a default new event with a default duration of 1 hour
+    //     const newEvent: CalendarEvent = { id: "", title: "", start: startTime, end: addHours(startTime, 1), allDay: false }
+    //     // >> Set the selected event to the default new event
+    //     setSelectedEvent(newEvent)
+    //     // >> Open the event dialog
+    //     setIsEventDialogOpen(true)
+    // }
+
+    // > Define a helper function to handle the event creation click
     function handleEventCreate(startTime: Date) {
         // >> Log the start time of the new event
-        console.log("Creating new event at:", startTime) // Debug log
-        // >> Snap to 15-minute intervals
-        const minutes = startTime.getMinutes()
-        const remainder = minutes % 15
-        if (remainder !== 0) {
-            if (remainder < 7.5) {
-                // Round down to nearest 15 min
-                startTime.setMinutes(minutes - remainder)
-            } else {
-                // Round up to nearest 15 min
-                startTime.setMinutes(minutes + (15 - remainder))
-            }
-            startTime.setSeconds(0)
-            startTime.setMilliseconds(0)
-        }
-        // >> Create a default new event with a default duration of 1 hour
-        const newEvent: CalendarEvent = { id: "", title: "", start: startTime, end: addHours(startTime, 1), allDay: false }
-        // >> Set the selected event to the default new event
+        console.debug("Creating new event at:", startTime)
+        // >> Snap to 15-minute intervals by rounding the minutes to the nearest 15
+        startTime.setMinutes(Math.round(startTime.getMinutes() / 15) * 15, 0, 0)
+        // >> Calculate the end time by adding 1 hour to the start time
+        const endTime = addHours(startTime, 1)
+        // Create a default new event with a duration of 1 hour
+        const newEvent: CalendarEvent = { id: crypto.randomUUID(), title: "", start: startTime, end: endTime, allDay: false }
+        // >> Set the selected event to the new event
         setSelectedEvent(newEvent)
         // >> Open the event dialog
         setIsEventDialogOpen(true)
-    }
+      }
 
     // > Define a helper function to handle updating an event
     function handleEventUpdate(updatedEvent: CalendarEvent) {
