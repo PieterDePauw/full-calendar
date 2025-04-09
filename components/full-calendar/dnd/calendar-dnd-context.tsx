@@ -126,12 +126,7 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
             // For month view, just update the date but preserve time
             const newTime = new Date(date)
             if (currentTime) {
-                newTime.setHours(
-                    currentTime.getHours(),
-                    currentTime.getMinutes(),
-                    currentTime.getSeconds(),
-                    currentTime.getMilliseconds()
-                )
+                newTime.setHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds(), currentTime.getMilliseconds())
             }
 
             // Only update if date has changed
