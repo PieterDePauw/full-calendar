@@ -7,17 +7,20 @@ import { NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA, WEEK_STARTS_ON, useCalendarView, u
 export function useCalendarViewTitle() {
     // > Get the current view from the global calendar view store
     const { currentView } = useCalendarView()
+
     // > Get the current date from the global calendar date store
     const { currentDate } = useCalendarDate()
+
     // > Return a title based on the current view and the current date
     return useMemo(() => {
         // >> Use a switch statement to determine the title based on the current view
         switch (currentView) {
-            case "day":
+            case "day": {
                 // Format: "Friday, April 5, 2025"
                 return format(currentDate, "EEEE, MMMM d, yyyy")
+            }
 
-            case "week":
+            case "week": {
                 // >> Define a helper variable for the start date of the week
                 const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON })
                 // >> Define a helper variable for the end date of the week
@@ -28,12 +31,14 @@ export function useCalendarViewTitle() {
                 if (fullWeekWithinSameMonth) return format(weekStart, "MMMM yyyy")
                 // Otherwise, use an abbreviated version of both month names, e.g. "Mar - Apr 2025"
                 return `${format(weekStart, "MMM")} - ${format(weekEnd, "MMM yyyy")}`
+            }
 
-            case "month":
+            case "month": {
                 // Format: "April 2025"
                 return format(currentDate, "MMMM yyyy")
+            }
 
-            case "agenda":
+            case "agenda": {
                 // >> Define a helper variable for the end date of the agenda
                 const agendaEndDate = addDays(currentDate, NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA - 1)
                 // Check if the agenda start and end dates are in the same month
@@ -42,6 +47,7 @@ export function useCalendarViewTitle() {
                 if (fullAgendaWithinSameMonth) return format(currentDate, "MMMM yyyy")
                 // Otherwise, use an abbreviated version of both month names, e.g. "Apr - May 2025"
                 return `${format(currentDate, "MMM")} - ${format(agendaEndDate, "MMM yyyy")}`
+            }
 
             default: {
                 // Fallback (should be unreachable if validViews is correct)
