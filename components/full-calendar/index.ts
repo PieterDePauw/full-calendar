@@ -27,10 +27,9 @@ export * from "@/lib/capitalization"
 export * from "@/hooks/use-current-time-indicator"
 export * from "@/hooks/use-event-visibility"
 export * from "@/hooks/use-view-keyboard-shortcut"
+export * from "@/hooks/use-calendar"
 export * from "@/hooks/use-calendar-navigation"
 export * from "@/hooks/use-calendar-view-title"
-export * from "@/hooks/use-calendar-view"
-export * from "@/hooks/use-calendar-date"
 export * from "@/hooks/use-calendar-event-management"
 
 // Type exports

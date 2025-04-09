@@ -1,8 +1,7 @@
 // Import modules
 import { subMonths, subWeeks, subDays, addMonths, addWeeks, addDays } from "date-fns"
 import { NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA, type CalendarView } from "@/components/full-calendar"
-import { useCalendarView } from "@/hooks/use-calendar-view"
-import { useCalendarDate } from "@/hooks/use-calendar-date"
+import { useCalendarView, useCalendarDate } from "@/hooks/use-calendar"
 
 // Define a custom hook to handle calendar navigation
 export function useCalendarNavigation(initialDate: Date = new Date() ) {
@@ -11,9 +10,6 @@ export function useCalendarNavigation(initialDate: Date = new Date() ) {
 
     // > Use the useCalendarDate hook to get the current date
     const { currentDate, setCurrentDate } = useCalendarDate()
-
-    // // > Use the useState hook to manage the current date
-    // const [currentDate, setCurrentDate] = useState<Date>(initialDate)
 
     // > Define a function to handle date change
     function handleGoToSpecificDate(newDate: Date) {
@@ -52,8 +48,10 @@ export function useCalendarNavigation(initialDate: Date = new Date() ) {
 
     // > Define a helper function to handle the today button click
     function handleGoToToday() {
+        // >> Get the current date
+        const today = new Date()
         // >> Set the current date to the current date
-        setCurrentDate(new Date())
+        setCurrentDate(today)
     }
 
 

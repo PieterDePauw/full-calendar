@@ -1,6 +1,6 @@
 // Import modules
 import { useEffect } from "react"
-import { useCalendarView } from "@/hooks/use-calendar-view"
+import { useCalendarView } from "@/hooks/use-calendar"
 import { useCalendarEventManagement } from "@/hooks/use-calendar-event-management"
 
 // Define a custom hook to handle keyboard shortcuts for switching calendar views
