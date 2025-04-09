@@ -6,7 +6,7 @@ import { endOfWeek, isSameDay, isWithinInterval, startOfWeek } from "date-fns"
 import { WEEK_STARTS_WITH } from "@/lib/constants"
 
 // useCurrentTimeIndicator hook: custom hook to calculate the current time position
-export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week") {
+export function useCurrentTimeIndicator(currentDate: Date, currentView: "day" | "week") {
     // > Use the useState hook to keep track of the current time position
     const [currentTimePosition, setCurrentTimePosition] = useState<number>(0)
 
@@ -38,12 +38,12 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
             let isCurrentTimeVisible = false
 
             // >>> If the view is "day", check if the current time is on the same day to determine visibility
-            if (view === "day") {
+            if (currentView === "day") {
                 isCurrentTimeVisible = isSameDay(now, currentDate)
             }
 
             // >>> If the view is "week", check if the current time is within the week to determine visibility
-            if (view === "week") {
+            if (currentView === "week") {
                 isCurrentTimeVisible = isWithinInterval(now, { start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }) })
             }
 
@@ -62,7 +62,7 @@ export function useCurrentTimeIndicator(currentDate: Date, view: "day" | "week")
 
         // >> Return a cleanup function to clear the interval when the component unmounts
         return () => clearInterval(intervalId)
-    }, [currentDate, view])
+    }, [currentDate, currentView])
 
     // > Return the current time position and time visibility status
     return { currentTimePosition, currentTimeVisible }

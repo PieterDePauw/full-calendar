@@ -11,5 +11,5 @@ export const useCalendarView = create<{ currentView: CalendarView; setCurrentVie
     // Define the initial state of the calendar view
     currentView: DEFAULT_VIEW,
     // Define a function to set the current view
-    setCurrentView: (view) => set({ currentView: view })
+    setCurrentView: (currentView) => set({ currentView })
 }))

@@ -107,7 +107,7 @@ export function EventsPopup({ date, events, position, onClose, onEventSelect }: 
                             >
                                 <EventItem
                                     event={event}
-                                    view="agenda"
+                                    currentView="agenda"
                                     isFirstDay={isFirstDay}
                                     isLastDay={isLastDay}
                                 />

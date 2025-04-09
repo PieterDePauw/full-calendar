@@ -66,7 +66,7 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
         // >> Store the active event and its properties
         setActiveEvent(dragStartEvent.active.data.current.event)
         setActiveId(dragStartEvent.active.id)
-        setActiveView(dragStartEvent.active.data.current.view)
+        setActiveView(dragStartEvent.active.data.current.currentView)
         setCurrentTime(new Date(dragStartEvent.active.data.current.event.start))
         setIsMultiDay(dragStartEvent.active.data.current.isMultiDay || false)
         setMultiDayWidth(dragStartEvent.active.data.current.multiDayWidth || null)
@@ -167,7 +167,7 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
                 throw new Error("Missing data in drag dragEndEvent")
             }
 
-            const activeData = dragEndEvent.active.data.current as { event?: CalendarEvent; view?: string }
+            const activeData = dragEndEvent.active.data.current as { event?: CalendarEvent; currentView?: string }
             const overData = dragEndEvent.over.data.current as { date?: Date; time?: number }
 
             // Verify we have all required data
@@ -239,7 +239,7 @@ export function CalendarDndProvider({ children, onEventUpdate }: { children: Rea
                 <DragOverlay adjustScale={false} dropAnimation={null}>
                     {activeEvent && activeView && (
                         <div style={{ height: eventHeight ? `${eventHeight}px` : "auto", width: isMultiDay && multiDayWidth ? `${multiDayWidth}%` : "100%" }}>
-                            <EventItem event={activeEvent} view={activeView} isDragging={true} showTime={activeView !== "month"} currentTime={currentTime || undefined} isFirstDay={dragHandlePosition?.data?.isFirstDay !== false} isLastDay={dragHandlePosition?.data?.isLastDay !== false} />
+                            <EventItem event={activeEvent} currentView={activeView} isDragging={true} showTime={activeView !== "month"} currentTime={currentTime || undefined} isFirstDay={dragHandlePosition?.data?.isFirstDay !== false} isLastDay={dragHandlePosition?.data?.isLastDay !== false} />
                         </div>
                     )}
                 </DragOverlay>

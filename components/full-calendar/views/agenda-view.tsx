@@ -51,7 +51,7 @@ export function AgendaView({ currentDate, events, onEventSelect }: { currentDate
                             {format(day, "d MMM, EEEE")}
                         </span>
                         <div className="mt-6 space-y-2">
-                            {dayEvents.map((event) => <EventItem key={event.id} event={event} view="agenda" onClick={(e) => handleEventClick(event, e)} />)}
+                            {dayEvents.map((event) => <EventItem key={event.id} event={event} currentView="agenda" onClick={(e) => handleEventClick(event, e)} />)}
                         </div>
                     </div>
                 )

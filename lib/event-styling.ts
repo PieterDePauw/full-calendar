@@ -45,11 +45,11 @@ export function getEventWrapperClasses({ isFirstDay, isLastDay, eventColor, clas
 /**
  * Returns classes for Day/Week events, adjusting layout for short events.
  */
-export function getDayWeekEventClasses({ durationInMinutes, view, className }: { durationInMinutes: number; view: CalendarView; className: ClassValue }): string {
-  return cn("py-1", durationInMinutes < 45 ? "items-center" : "flex-col", view === "week" ? "text-[10px] sm:text-xs" : "text-xs", className);
+export function getDayWeekEventClasses({ durationInMinutes, currentView, className }: { durationInMinutes: number; currentView: CalendarView; className: ClassValue }): string {
+  return cn("py-1", durationInMinutes < 45 ? "items-center" : "flex-col", currentView === "week" ? "text-[10px] sm:text-xs" : "text-xs", className);
 }
 
-/**
+/**currentView
  * Returns classes for Month-view events.
  */
 export function getMonthEventClasses({ className }: { className: ClassValue }): string {

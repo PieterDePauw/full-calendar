@@ -65,7 +65,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                                 if (isFirstDay) {
                                                     return (
                                                         <div key={event.id} className="aria-hidden:hidden" aria-hidden={isHidden ? "true" : undefined}>
-                                                            <DraggableEvent event={event} view="month" onClick={(e) => handleEventClick(event, e)} isFirstDay={isFirstDay} isLastDay={isLastDay} />
+                                                            <DraggableEvent event={event} currentView="month" onClick={(e) => handleEventClick(event, e)} isFirstDay={isFirstDay} isLastDay={isLastDay} />
                                                         </div>
                                                     )
                                                 }
@@ -73,7 +73,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                                 if (!isFirstDay) {
                                                     return (
                                                         <div key={`spanning-${event.id}-${day.toISOString().slice(0, 10)}`} className="aria-hidden:hidden" aria-hidden={isHidden ? "true" : undefined}>
-                                                            <EventItem onClick={(e) => handleEventClick(event, e)} event={event} view="month" isFirstDay={isFirstDay} isLastDay={isLastDay}>
+                                                            <EventItem onClick={(e) => handleEventClick(event, e)} event={event} currentView="month" isFirstDay={isFirstDay} isLastDay={isLastDay}>
                                                                 <div className="invisible" aria-hidden={true}>
                                                                     {!event.allDay && <span>{formatTimeWithOptionalMinutes(event.start)}</span>}
                                                                     {event.title && <span className="truncate">{event.title}</span>}
@@ -124,7 +124,7 @@ function HasMoreEventsPopover({ EventHeight, allEvents, day, remainingCount, han
                     </div>
                     <div className="space-y-1">
                         {sortEvents(allEvents).map((event) => {
-                            return <EventItem key={event.id} view="month" onClick={(e) => handleEventClick(event, e)} event={event} isFirstDay={isSameDay(day, new Date(event.start))} isLastDay={isSameDay(day, new Date(event.end))} />
+                            return <EventItem key={event.id} currentView="month" onClick={(e) => handleEventClick(event, e)} event={event} isFirstDay={isSameDay(day, new Date(event.start))} isLastDay={isSameDay(day, new Date(event.end))} />
                         })}
                     </div>
                 </div>

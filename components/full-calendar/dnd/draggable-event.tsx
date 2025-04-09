@@ -4,12 +4,13 @@
 import { useMemo, useRef, useState } from "react"
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
-import { CalendarEvent, checkIfMultiDayEvent, EventItem, useCalendarDnd, type DragHandlePositionType } from "@/components/full-calendar"
+import { CalendarEvent, checkIfMultiDayEvent, EventItem, useCalendarDnd, useCalendarView, type CalendarView, type DragHandlePositionType } from "@/components/full-calendar"
 
 // DraggableEventProps interface
 interface DraggableEventProps {
     event: CalendarEvent
-    view: "month" | "week" | "day"
+    currentView: CalendarView,
+    // currentView: "month" | "week" | "day"
     showTime?: boolean
     onClick?: (e: React.MouseEvent) => void
     height?: number
@@ -20,9 +21,12 @@ interface DraggableEventProps {
 }
 
 // DraggableEvent component
-export function DraggableEvent({ event, view, showTime, onClick, height, multiDayWidth, isFirstDay = true, isLastDay = true, ariaHidden: ariaHidden }: DraggableEventProps) {
+export function DraggableEvent({ event, showTime, onClick, height, multiDayWidth, isFirstDay = true, isLastDay = true, ariaHidden: ariaHidden }: DraggableEventProps) {
     // > Get the activeId from the useCalendarDnd hook
     const { activeId } = useCalendarDnd()
+
+    // > Get the view from the useCalendarView hook
+    const { currentView } = useCalendarView()
 
     // > Use the useRef hook to create a ref for the element to be dragged
     const elementRef = useRef<HTMLDivElement>(null)
@@ -34,19 +38,19 @@ export function DraggableEvent({ event, view, showTime, onClick, height, multiDa
     const isMultiDayEvent = checkIfMultiDayEvent(event)
 
     // > Use the useMemo hook to keep a memoized value of the draggable event's id
-    const id = useMemo(() => `${event.id}-${view}`, [event.id, view])
+    const id = useMemo(() => `${event.id}-${currentView}`, [event.id, currentView])
 
     // > Use the useDraggable hook to make the event draggable
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: id,
-        data: { event: event, view: view, isFirstDay: isFirstDay, isLastDay: isLastDay, isMultiDay: isMultiDayEvent, multiDayWidth: multiDayWidth, height: height || elementRef.current?.offsetHeight || null, dragHandlePosition: dragHandlePosition },
+        data: { event: event, currentView: currentView, isFirstDay: isFirstDay, isLastDay: isLastDay, isMultiDay: isMultiDayEvent, multiDayWidth: multiDayWidth, height: height || elementRef.current?.offsetHeight || null, dragHandlePosition: dragHandlePosition },
     })
 
     // > Define a helper function to handle the mouse down event to track where on the event the user clicked
-    function handleMouseDown(e: React.MouseEvent) {
+    function handleMouseDown(event: React.MouseEvent) {
         if (elementRef.current) {
             const rect = elementRef.current.getBoundingClientRect()
-            setDragHandlePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+            setDragHandlePosition({ x: event.clientX - rect.left, y: event.clientY - rect.top })
         }
     }
 
@@ -54,9 +58,13 @@ export function DraggableEvent({ event, view, showTime, onClick, height, multiDa
     function handleTouchStart(event: React.TouchEvent) {
         if (elementRef.current) {
             const rect = elementRef.current.getBoundingClientRect()
-            setDragHandlePosition({ x: event.touches[0].clientX - rect.left, y: event.touches[0].clientY - rect.top })
+            const touch = event.touches[0]
+            if (touch) {
+                setDragHandlePosition({ x: touch.clientX - rect.left, y: touch.clientY - rect.top })
+            }
         }
     }
+
 
     // > Don't render if this event is being dragged
     if (isDragging || activeId === id) {
@@ -71,7 +79,7 @@ export function DraggableEvent({ event, view, showTime, onClick, height, multiDa
     // > Return the JSX for the draggable event
     return (
         <div ref={(node) => {setNodeRef(node); if (elementRef) elementRef.current = node}} style={style} className="touch-none">
-            <EventItem event={event} view={view} showTime={showTime} isFirstDay={isFirstDay} isLastDay={isLastDay} isDragging={isDragging} onClick={onClick} onMouseDown={handleMouseDown} onTouchStart={handleTouchStart} dndListeners={listeners} dndAttributes={attributes} aria-hidden={ariaHidden} />
+            <EventItem event={event} currentView={currentView} showTime={showTime} isFirstDay={isFirstDay} isLastDay={isLastDay} isDragging={isDragging} onClick={onClick} onMouseDown={handleMouseDown} onTouchStart={handleTouchStart} dndListeners={listeners} dndAttributes={attributes} aria-hidden={ariaHidden} />
         </div>
     )
 }

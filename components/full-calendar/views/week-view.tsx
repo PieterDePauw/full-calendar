@@ -221,7 +221,7 @@ export function AllDayEventsSection({ days, allDayEvents, onEventClick, weekStar
                                 const shouldShowTitle = isSameDay(day, eventStart) || isFirstVisibleDay
 
                                 return (
-                                    <EventItem key={`spanning-${event.id}`} onClick={(e) => onEventClick(event, e)} event={event} view="month" isFirstDay={isSameDay(day, eventStart)} isLastDay={isSameDay(day, eventEnd)}>
+                                    <EventItem key={`spanning-${event.id}`} onClick={(e) => onEventClick(event, e)} event={event} currentView="month" isFirstDay={isSameDay(day, eventStart)} isLastDay={isSameDay(day, eventEnd)}>
                                         {/* Show title if it's the first day of the event or the first visible day in the week */}
                                         <div className={cn("truncate", !shouldShowTitle && "invisible")} aria-hidden={!shouldShowTitle}>
                                             {event.title}
@@ -259,7 +259,7 @@ export function PositionedEvent({ positionedEvent, handleEventClick }: { positio
     return (
         <div key={positionedEvent.event.id} className="absolute z-10 px-0.5" style={{ top: `${positionedEvent.top}px`, height: `${positionedEvent.height}px`, left: `${positionedEvent.left * 100}%`, width: `${positionedEvent.width * 100}%`, zIndex: positionedEvent.zIndex }} onClick={(e) => e.stopPropagation()}>
             <div className="h-full w-full">
-                <DraggableEvent event={positionedEvent.event} view="week" onClick={(e) => handleEventClick(positionedEvent.event, e)} showTime={true} height={positionedEvent.height} />
+                <DraggableEvent event={positionedEvent.event} currentView="week" onClick={(e) => handleEventClick(positionedEvent.event, e)} showTime={true} height={positionedEvent.height} />
             </div>
         </div>
     )

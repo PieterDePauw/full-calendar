@@ -90,7 +90,7 @@ export function AllDayEventsSection({ allDayEvents, onEventClick, currentDate }:
                 </div>
                 <div className="border-border/70 relative border-r p-1 last:border-r-0">
                     {allDayEvents.map((event) =>
-                        <EventItem key={`spanning-${event.id}`} onClick={(e) => onEventClick(event, e)} event={event} view="month" isFirstDay={isSameDay(currentDate, new Date(event.start))} isLastDay={isSameDay(currentDate, new Date(event.end))}>
+                        <EventItem key={`spanning-${event.id}`} onClick={(e) => onEventClick(event, e)} event={event} currentView="month" isFirstDay={isSameDay(currentDate, new Date(event.start))} isLastDay={isSameDay(currentDate, new Date(event.end))}>
                             <div>{event.title}</div>
                         </EventItem>
                     )}
@@ -148,7 +148,7 @@ export function EventsGrid({ positionedEvents, onEventClick }: { positionedEvent
     return positionedEvents.map((positionedEvent) => (
         <div key={positionedEvent.event.id} className="absolute z-10 px-0.5" style={{ top: `${positionedEvent.top}px`, height: `${positionedEvent.height}px`, left: `${positionedEvent.left * 100}%`, width: `${positionedEvent.width * 100}%`, zIndex: positionedEvent.zIndex }}>
             <div className="h-full w-full">
-                <DraggableEvent event={positionedEvent.event} view="day" onClick={(e) => onEventClick(positionedEvent.event, e)} showTime={true} height={positionedEvent.height} />
+                <DraggableEvent event={positionedEvent.event} currentView="day" onClick={(e) => onEventClick(positionedEvent.event, e)} showTime={true} height={positionedEvent.height} />
             </div>
         </div>
     ))
