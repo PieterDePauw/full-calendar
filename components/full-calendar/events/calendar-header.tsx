@@ -7,7 +7,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortc
 import { capitalize, getFirstLetter, useCalendarNavigation, useCalendarView, useCalendarViewTitle } from "@/components/full-calendar"
 
 export function CalendarHeader({ className, onEventCreateClick }: { className: string | undefined, onEventCreateClick: () => void }) {
-
     // > Use the useCalendarView hook to manage the current view
     const { currentView, setCurrentView } = useCalendarView()
 
@@ -57,16 +56,20 @@ export function CalendarHeader({ className, onEventCreateClick }: { className: s
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="min-w-32">
                         <DropdownMenuItem onClick={() => setCurrentView("month")}>
-                            Month <DropdownMenuShortcut>M</DropdownMenuShortcut>
+                            <span>Month</span>
+                            <DropdownMenuShortcut>M</DropdownMenuShortcut>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setCurrentView("week")}>
-                            Week <DropdownMenuShortcut>W</DropdownMenuShortcut>
+                            <span>Week</span>
+                            <DropdownMenuShortcut>W</DropdownMenuShortcut>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setCurrentView("day")}>
-                            Day <DropdownMenuShortcut>D</DropdownMenuShortcut>
+                            <span>Day</span>
+                            <DropdownMenuShortcut>D</DropdownMenuShortcut>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setCurrentView("agenda")}>
-                            Agenda <DropdownMenuShortcut>A</DropdownMenuShortcut>
+                            <span>Agenda</span>
+                            <DropdownMenuShortcut>A</DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -1,35 +1,9 @@
 "use client"
 
 import React, { useMemo } from "react"
-import {
-    addHours,
-    areIntervalsOverlapping,
-    differenceInMinutes,
-    eachDayOfInterval,
-    eachHourOfInterval,
-    endOfWeek,
-    format,
-    getHours,
-    getMinutes,
-    isBefore,
-    isSameDay,
-    isToday,
-    startOfDay,
-    startOfWeek,
-} from "date-fns"
+import { addHours, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, eachHourOfInterval, endOfWeek, format, getHours, getMinutes, isBefore, isSameDay, isToday, startOfDay, startOfWeek } from "date-fns"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, CurrentTimeIndicator, WeekCellsHeight, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_WITH } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
-import {
-    DraggableEvent,
-    DroppableCell,
-    EventItem,
-    checkIfMultiDayEvent,
-    CurrentTimeIndicator,
-    WeekCellsHeight,
-    getDroppableCellClasses,
-    type CalendarEvent,
-    type PositionedEvent,
-    useCurrentTimeIndicator,
-} from "@/components/full-calendar"
 
 interface WeekViewProps {
     currentDate: Date
@@ -41,11 +15,11 @@ interface WeekViewProps {
 export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: WeekViewProps) {
     // Get the days of the week based on the current date
     // prettier-ignore // biome-ignore
-    const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 0 }), end: endOfWeek(currentDate, { weekStartsOn: 0 }) }), [currentDate])
+    const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }) }), [currentDate])
 
     // Get the start of the week for the current date
     // prettier-ignore // biome-ignore
-    const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 0 }), [currentDate])
+    const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), [currentDate])
 
     // Get the hours for each day of the week based on the current date
     // prettier-ignore // biome-ignore

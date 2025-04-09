@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { format, startOfWeek, endOfWeek, isSameMonth, addDays } from "date-fns"
-import { AgendaDaysToShow, WeekStartsOn } from "@/components/full-calendar"
+import { AgendaDaysToShow, WEEK_STARTS_WITH } from "@/components/full-calendar"
 import { useCalendarView } from "@/hooks/use-calendar-view"
 
 /**
@@ -22,10 +22,10 @@ export function useCalendarViewTitle({ currentDate }: { currentDate: Date }) {
         } else if (currentView === "day") {
             return format(currentDate, "EEEE, MMMM d, yyyy")
         } else if (currentView === "week") {
-            if (isSameMonth(startOfWeek(currentDate, { weekStartsOn: WeekStartsOn }), endOfWeek(currentDate, { weekStartsOn: WeekStartsOn }))) {
-                return format(startOfWeek(currentDate, { weekStartsOn: WeekStartsOn }), "MMMM yyyy")
+            if (isSameMonth(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }))) {
+                return format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), "MMMM yyyy")
             }
-            return `${format(startOfWeek(currentDate, { weekStartsOn: WeekStartsOn }), "MMM")} - ${format(endOfWeek(currentDate, { weekStartsOn: WeekStartsOn }), "MMM yyyy")}`
+            return `${format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), "MMM")} - ${format(endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_WITH }), "MMM yyyy")}`
         } else if (currentView === "month") {
             return format(currentDate, "MMMM yyyy")
         } else if (currentView === "agenda") {

@@ -18,7 +18,7 @@ export const AgendaDaysToShow: number = 30
 export const DaysPerWeek: number = 7
 
 // Starting day of the week (0 = Sunday, 1 = Monday, etc.)
-export const WeekStartsOn: Day = 1
+export const WEEK_STARTS_WITH: Day = 1
 
 // Default view for the calendar
 export const DEFAULT_VIEW: CalendarView = "month"

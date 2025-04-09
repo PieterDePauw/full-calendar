@@ -4,13 +4,13 @@
 import { Fragment, useMemo, type CSSProperties, type MouseEvent } from "react"
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { DaysPerWeek, DraggableEvent, DroppableCell, EventGap, EventHeight, EventItem, formatTimeWithOptionalMinutes, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
+import { DaysPerWeek, DraggableEvent, DroppableCell, EventGap, WEEK_STARTS_WITH, EventHeight, EventItem, formatTimeWithOptionalMinutes, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
 import { useMounted } from "@/hooks/use-mounted"
 
 // MonthView component
 export function MonthView({ currentDate, events, onEventSelect, onEventCreate }: { currentDate: Date; events: CalendarEvent[]; onEventSelect: (event: CalendarEvent) => void; onEventCreate: (startTime: Date) => void }) {
     // > Get all the days of the month, beginning from the start of the week in which the month starts and ending at the end of the week in which the month ends
-    const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(startOfMonth(currentDate), { weekStartsOn: 0 }), end: endOfWeek(endOfMonth(startOfMonth(currentDate)), { weekStartsOn: 0 }) }), [currentDate])
+    const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(startOfMonth(currentDate), { weekStartsOn: WEEK_STARTS_WITH }), end: endOfWeek(endOfMonth(startOfMonth(currentDate)), { weekStartsOn: WEEK_STARTS_WITH }) }), [currentDate])
 
     // > Get all the days of the week, based on the current date
     const weekdays = useMemo(() => Array.from({ length: DaysPerWeek }).map((_, i) => format(addDays(startOfWeek(new Date()), i), "EEE")), [])
