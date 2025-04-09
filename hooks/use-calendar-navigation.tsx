@@ -6,7 +6,7 @@ import { useCalendarView, useCalendarDate } from "@/hooks/use-calendar"
 // Define a custom hook to handle calendar navigation
 export function useCalendarNavigation(initialDate: Date = new Date() ) {
     // > Use the useCalendarView hook to get the current view
-    const { currentView } = useCalendarView()
+    const { currentView, setCurrentView } = useCalendarView()
 
     // > Use the useCalendarDate hook to get the current date
     const { currentDate, setCurrentDate } = useCalendarDate()
@@ -54,12 +54,47 @@ export function useCalendarNavigation(initialDate: Date = new Date() ) {
         setCurrentDate(today)
     }
 
+    // > Define a helper function to handle the view change
+    function handleSwitchToSpecificView(view: CalendarView) {
+        // >> Set the current view to the specified view
+        setCurrentView(view)
+    }
 
+    // > Define a helper function to handle the view change to "day"
+    function handleSwitchToDayView() {
+        // >> Set the current view to "day"
+        setCurrentView("day")
+    }
+
+    // > Define a helper function to handle the view change to "week"
+    function handleSwitchToWeekView() {
+        // >> Set the current view to "week"
+        setCurrentView("week")
+    }
+
+    // > Define a helper function to handle the view change to "month"
+    function handleSwitchToMonthView() {
+        // >> Set the current view to "month"
+        setCurrentView("month")
+    }
+
+    // > Define a helper function to handle the view change to "agenda"
+    function handleSwitchToAgendaView() {
+        // >> Set the current view to "agenda"
+        setCurrentView("agenda")
+    }
+
+    // > Return the current date and helper functions
     return {
         currentDate,
         handleGoToSpecificDate,
         handleGoToNext,
         handleGoToPrevious,
         handleGoToToday,
+        handleSwitchToSpecificView,
+        handleSwitchToDayView,
+        handleSwitchToWeekView,
+        handleSwitchToMonthView,
+        handleSwitchToAgendaView,
     }
 }

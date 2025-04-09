@@ -1,27 +1,26 @@
 // Import modules
-import { RiCalendarCheckLine } from "@remixicon/react"
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon, CalendarCheckIcon } from "lucide-react"
 import { capitalize, getFirstLetter, useCalendarNavigation, useCalendarView, useCalendarViewTitle } from "@/components/full-calendar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export function CalendarHeader({ className, onEventCreateClick }: { className: string | undefined, onEventCreateClick: () => void }) {
     // > Use the useCalendarView hook to manage the current view
-    const { currentView, setCurrentView } = useCalendarView()
+    const { currentView } = useCalendarView()
 
     // > Use the useCalendarNavigation hook to manage the current date and navigation
-    const { handleGoToNext, handleGoToPrevious, handleGoToToday } = useCalendarNavigation()
+    const { handleGoToNext, handleGoToPrevious, handleGoToToday, handleSwitchToDayView, handleSwitchToWeekView, handleSwitchToMonthView, handleSwitchToAgendaView } = useCalendarNavigation()
 
     // > Use the useCalendarViewTitle hook to manage the view title
-    const viewTitle = useCalendarViewTitle()
+    const { viewTitle } = useCalendarViewTitle()
 
     return (
         <div className={cn("flex items-center justify-between p-2 sm:p-4", className)}>
             {/* Calendar header with buttons and view selector */}
             <div className="flex items-center gap-1 sm:gap-4">
                 <Button variant="outline" className="aspect-square max-[479px]:p-0!" onClick={handleGoToToday}>
-                    <RiCalendarCheckLine className="min-[480px]:hidden" size={16} aria-hidden="true" />
+                    <CalendarCheckIcon className="min-[480px]:hidden" size={16} aria-hidden="true" />
                     <span className="max-[479px]:sr-only">Today</span>
                 </Button>
                 <div className="flex items-center sm:gap-2">
@@ -55,19 +54,19 @@ export function CalendarHeader({ className, onEventCreateClick }: { className: s
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="min-w-32">
-                        <DropdownMenuItem onClick={() => setCurrentView("month")}>
-                            <span>Month</span>
-                            <DropdownMenuShortcut>M</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setCurrentView("week")}>
-                            <span>Week</span>
-                            <DropdownMenuShortcut>W</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setCurrentView("day")}>
+                        <DropdownMenuItem onClick={handleSwitchToDayView}>
                             <span>Day</span>
                             <DropdownMenuShortcut>D</DropdownMenuShortcut>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setCurrentView("agenda")}>
+                        <DropdownMenuItem onClick={handleSwitchToWeekView}>
+                            <span>Week</span>
+                            <DropdownMenuShortcut>W</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleSwitchToMonthView}>
+                            <span>Month</span>
+                            <DropdownMenuShortcut>M</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleSwitchToAgendaView}>
                             <span>Agenda</span>
                             <DropdownMenuShortcut>A</DropdownMenuShortcut>
                         </DropdownMenuItem>

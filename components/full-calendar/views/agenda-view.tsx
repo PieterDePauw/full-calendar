@@ -2,7 +2,7 @@
 
 // Import modules
 import { useMemo } from "react"
-import { RiCalendarEventLine } from "@remixicon/react"
+import { CalendarSearchIcon } from "lucide-react"
 import { addDays, format, isToday } from "date-fns"
 import { NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA, CalendarEvent, EventItem, getAgendaEventsForDay } from "@/components/full-calendar"
 
@@ -41,9 +41,6 @@ export function AgendaView({ currentDate, events, onEventSelect }: { currentDate
                 // >>> If there are no events for the day, return null (no need to render anything)
                 if (dayEvents.length === 0) return null
 
-                // >>> Sort the events for the day
-                // const sortedEvents = dayEvents.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
-
                 // >>> Render the events for the day
                 return (
                     <div key={day.toString()} className="border-border/70 relative my-12 border-t">
@@ -64,7 +61,7 @@ export function AgendaView({ currentDate, events, onEventSelect }: { currentDate
 export function EmptyAgendaView() {
     return (
         <div className="flex min-h-[70svh] flex-col items-center justify-center py-16 text-center">
-            <RiCalendarEventLine size={32} className="text-muted-foreground/50 mb-2"/>
+            <CalendarSearchIcon size={32} className="text-muted-foreground/50 mb-2"/>
             <h3 className="text-lg font-medium">No events found</h3>
             <p className="text-muted-foreground">There are no events scheduled for this time period.</p>
         </div>

@@ -4,15 +4,15 @@ import { format, startOfWeek, endOfWeek, isSameMonth, addDays } from "date-fns"
 import { NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA, WEEK_STARTS_ON, useCalendarView, useCalendarDate } from "@/components/full-calendar"
 
 // Define a custom hook to get the title of the calendar view
-export function useCalendarViewTitle() {
+export function useCalendarViewTitle(): { viewTitle: string } {
     // > Get the current view from the global calendar view store
     const { currentView } = useCalendarView()
 
     // > Get the current date from the global calendar date store
     const { currentDate } = useCalendarDate()
 
-    // > Return a title based on the current view and the current date
-    return useMemo(() => {
+    // > Use the useMemo hook to memoize the title based on the current view and the current date
+    const viewTitle = useMemo(() => {
         // >> Use a switch statement to determine the title based on the current view
         switch (currentView) {
             // >>> If the current view is "day", ...
@@ -60,4 +60,7 @@ export function useCalendarViewTitle() {
             }
         }
     }, [currentDate, currentView, WEEK_STARTS_ON, NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA])
+
+    // > Return the memoized title
+    return { viewTitle }
 }
