@@ -2,7 +2,7 @@
 
 // Import modules
 import { useState, useEffect, useMemo } from "react"
-import { RiCalendarLine, RiDeleteBinLine } from "@remixicon/react"
+import { Trash2Icon, CalendarPlusIcon } from "lucide-react"
 import { format, isBefore } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -15,53 +15,24 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import { formatTimeForInput, USE_12_HOUR_CLOCK_NOTATION, type CalendarEvent, type EventColor, type JSONValue } from "@/components/full-calendar"
-import { useLogDebug } from "@/hooks/use-log-error"
+import { formatTimeForInput, USE_12_HOUR_CLOCK_NOTATION, type CalendarEvent, type EventColor } from "@/components/full-calendar"
 
 // Define the color options for the event dialog
 const colorOptions: { value: EventColor; label: string; bgClass: string; borderClass: string }[] = [
-    {
-        value: "sky",
-        label: "Sky",
-        bgClass: "bg-sky-400 data-[state=checked]:bg-sky-400",
-        borderClass: "border-sky-400 data-[state=checked]:border-sky-400",
-    },
-    {
-        value: "amber",
-        label: "Amber",
-        bgClass: "bg-amber-400 data-[state=checked]:bg-amber-400",
-        borderClass: "border-amber-400 data-[state=checked]:border-amber-400",
-    },
-    {
-        value: "violet",
-        label: "Violet",
-        bgClass: "bg-violet-400 data-[state=checked]:bg-violet-400",
-        borderClass: "border-violet-400 data-[state=checked]:border-violet-400",
-    },
-    {
-        value: "rose",
-        label: "Rose",
-        bgClass: "bg-rose-400 data-[state=checked]:bg-rose-400",
-        borderClass: "border-rose-400 data-[state=checked]:border-rose-400",
-    },
-    {
-        value: "emerald",
-        label: "Emerald",
-        bgClass: "bg-emerald-400 data-[state=checked]:bg-emerald-400",
-        borderClass: "border-emerald-400 data-[state=checked]:border-emerald-400",
-    },
-    {
-        value: "orange",
-        label: "Orange",
-        bgClass: "bg-orange-400 data-[state=checked]:bg-orange-400",
-        borderClass: "border-orange-400 data-[state=checked]:border-orange-400",
-    },
+    { value: "sky", label: "Sky", bgClass: "bg-sky-400 data-[state=checked]:bg-sky-400", borderClass: "border-sky-400 data-[state=checked]:border-sky-400" },
+    { value: "amber", label: "Amber", bgClass: "bg-amber-400 data-[state=checked]:bg-amber-400", borderClass: "border-amber-400 data-[state=checked]:border-amber-400" },
+    { value: "violet", label: "Violet", bgClass: "bg-violet-400 data-[state=checked]:bg-violet-400", borderClass: "border-violet-400 data-[state=checked]:border-violet-400" },
+    { value: "rose", label: "Rose", bgClass: "bg-rose-400 data-[state=checked]:bg-rose-400", borderClass: "border-rose-400 data-[state=checked]:border-rose-400" },
+    { value: "emerald", label: "Emerald", bgClass: "bg-emerald-400 data-[state=checked]:bg-emerald-400", borderClass: "border-emerald-400 data-[state=checked]:border-emerald-400" },
+    { value: "orange", label: "Orange", bgClass: "bg-orange-400 data-[state=checked]:bg-orange-400", borderClass: "border-orange-400 data-[state=checked]:border-orange-400" },
 ]
 
 // EventDialog component
 export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { event: CalendarEvent | null; isOpen: boolean; onClose: () => void; onSave: (event: CalendarEvent) => void; onDelete: (eventId: string) => void }) {
     // > Define the initial start and end dates as today
     const today = new Date()
+    // > Define the initial color as the first color option
+    const initialColor = colorOptions[0].value
     // > Use the useState hook to manage the state of the title input field
     const [title, setTitle] = useState<string>("")
     // > Use the useState hook to manage the state of the description input field
@@ -79,7 +50,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
     // > Use the useState hook to manage the state of the location input field
     const [location, setLocation] = useState<string>("")
     // > Use the useState hook to manage the state of the color radio button
-    const [color, setColor] = useState<EventColor>(colorOptions[0].value)
+    const [color, setColor] = useState<EventColor>(initialColor)
     // > Use the useState hook to manage the state of the error message
     const [error, setError] = useState<string | null>(null)
     // > Use the useState hook to manage the state of the start date date input dialog
@@ -87,11 +58,8 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
     // > Use the useState hook to manage the state of the end date date input dialog
     const [endDateOpen, setEndDateOpen] = useState<boolean>(false)
 
-    // // > Use the useEffect hook to log the event, whenever it changes, for debugging purposes
-    // useEffect(() => console.log("EventDialog received event:", event), [event])
-
-    // > Use the useLogError hook to log the event, whenever it changes for debugging purposes
-    useLogDebug(event as JSONValue)
+    // > Use the useEffect hook to log the event, whenever it changes, for debugging purposes
+    useEffect(() => console.log("EventDialog received event:", event), [event])
 
     // > Use the useEffect hook to set the initial state of the dialog whenever the event prop changes
     useEffect(() => {
@@ -184,7 +152,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
             return
         }
         // >> If the event doesn't have an ID, keep it empty
-        const eventId = (event && event.id) || ""
+        const eventId = (event && event.id) ? event.id : ""
         // >> If the event doesn't have a title, set it to "(no title)"
         const eventTitle = title.trim() ? title : "(no title)"
         // >> Call the onSave function with the event data
@@ -209,9 +177,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         // >> Set the start date to the newly selected start date
         setStartDate(date)
         // >> If the end date falls before the new start date, set the end date to the newly selected date
-        if (isBefore(endDate, date)) {
-            setEndDate(date)
-        }
+        if (isBefore(endDate, date)) { setEndDate(date) }
         // >> Reset the error message to null
         setError(null)
         // >> Close the start date popover
@@ -225,9 +191,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
         // >> Set the end date to the newly selected end date
         setEndDate(date)
         // >> If the newly selected end date falls before the start date, set the start date to the newly selected date
-        if (isBefore(date, startDate)) {
-            setStartDate(date)
-        }
+        if (isBefore(date, startDate)) { setStartDate(date) }
         // >> Reset the error message to null
         setError(null)
         // >> Close the end date popover
@@ -272,7 +236,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                         <span className={cn("truncate", !startDate && "text-muted-foreground")}>
                                             {startDate ? format(startDate, "PPP") : "Pick a date"}
                                         </span>
-                                        <RiCalendarLine size={16} className="text-muted-foreground/80 shrink-0" aria-hidden="true"/>
+                                        <CalendarPlusIcon size={16} className="text-muted-foreground/80 shrink-0" aria-hidden="true"/>
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
@@ -308,7 +272,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                                         <span className={cn("truncate", !endDate && "text-muted-foreground")}>
                                             {endDate ? format(endDate, "PPP") : "Pick a date"}
                                         </span>
-                                        <RiCalendarLine size={16} className="text-muted-foreground/80 shrink-0" aria-hidden="true" />
+                                        <CalendarPlusIcon size={16} className="text-muted-foreground/80 shrink-0" aria-hidden="true" />
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-2" align="start">
@@ -357,8 +321,8 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: { even
                 {/* Dialog footer with cancel and save buttons */}
                 <DialogFooter className="flex-row sm:justify-between">
                     {(event && event.id) && (
-                        <Button variant="outline" size="icon" onClick={handleDelete} aria-label="Delete event">
-                            <RiDeleteBinLine size={16} aria-hidden="true" />
+                        <Button variant="destructive" size="icon" onClick={handleDelete} aria-label="Delete event">
+                            <Trash2Icon size={16} aria-hidden="true" />
                         </Button>
                     )}
                     <div className="flex flex-1 justify-end gap-2">
