@@ -1,7 +1,7 @@
 "use client"
 
 // Import modules
-import { useMemo, useRef, useState } from "react"
+import { useState, useRef /* useMemo */ } from "react"
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 import { CalendarEvent, checkIfMultiDayEvent, EventItem, useCalendarDnd, useCalendarView, type CalendarView, type DragHandlePositionType } from "@/components/full-calendar"
@@ -38,11 +38,11 @@ export function DraggableEvent({ event, showTime, onClick, height, multiDayWidth
     const isMultiDayEvent = checkIfMultiDayEvent(event)
 
     // > Use the useMemo hook to keep a memoized value of the draggable event's id
-    const id = useMemo(() => `${event.id}-${currentView}`, [event.id, currentView])
+    // const id = useMemo(() => `${event.id}-${currentView}`, [event.id, currentView])
 
     // > Use the useDraggable hook to make the event draggable
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: id,
+        id: `${event.id}-${currentView}`,
         data: { event: event, currentView: currentView, isFirstDay: isFirstDay, isLastDay: isLastDay, isMultiDay: isMultiDayEvent, multiDayWidth: multiDayWidth, height: height || elementRef.current?.offsetHeight || null, dragHandlePosition: dragHandlePosition },
     })
 
@@ -67,7 +67,7 @@ export function DraggableEvent({ event, showTime, onClick, height, multiDayWidth
 
 
     // > Don't render if this event is being dragged
-    if (isDragging || activeId === id) {
+    if (isDragging || activeId === `${event.id}-${currentView}`) {
         return <div ref={setNodeRef} className="opacity-0" style={{ height: height || "auto" }} />
     }
 
