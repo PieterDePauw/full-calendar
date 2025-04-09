@@ -2,17 +2,12 @@
 
 import React, { useMemo } from "react"
 import { addHours, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, eachHourOfInterval, endOfWeek, format, getHours, getMinutes, isBefore, isSameDay, isToday, startOfDay, startOfWeek } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, CurrentTimeIndicator, WeekCellsHeight, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_ON, formatTimeLabel } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, formatTimeLabel, CurrentTimeIndicator, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_ON, WEEK_CELLS_HEIGHT } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
-interface WeekViewProps {
-    currentDate: Date
-    events: CalendarEvent[]
-    onEventSelect: (event: CalendarEvent) => void
-    onEventCreate: (startTime: Date) => void
-}
-
-export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: WeekViewProps) {
+// WeekView component
+// biome-ignore format: keep all properties on the same line
+export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: { currentDate: Date, events: CalendarEvent[], onEventSelect: (event: CalendarEvent) => void, onEventCreate: (startTime: Date) => void }) {
     // Get the days of the week based on the current date
     // prettier-ignore // biome-ignore
     const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }) }), [currentDate])
@@ -72,8 +67,8 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
                 // Calculate top position and height
                 const startHour = getHours(adjustedStart) + getMinutes(adjustedStart) / 60
                 const endHour = getHours(adjustedEnd) + getMinutes(adjustedEnd) / 60
-                const top = startHour * WeekCellsHeight
-                const height = (endHour - startHour) * WeekCellsHeight
+                const top = startHour * WEEK_CELLS_HEIGHT
+                const height = (endHour - startHour) * WEEK_CELLS_HEIGHT
 
                 // Find a column for this event
                 let columnIndex = 0
@@ -85,12 +80,7 @@ export function WeekView({ currentDate, events, onEventSelect, onEventCreate }: 
                         placed = true
                     } else {
                         // Check if this event overlaps with any event in this column
-                        const overlaps = columns[columnIndex].some((col) =>
-                            areIntervalsOverlapping(
-                                { start: adjustedStart, end: adjustedEnd },
-                                { start: new Date(col.event.start), end: new Date(col.event.end) }
-                            )
-                        )
+                        const overlaps = columns[columnIndex].some((col) => areIntervalsOverlapping({ start: adjustedStart, end: adjustedEnd }, { start: new Date(col.event.start), end: new Date(col.event.end) }))
 
                         if (!overlaps) {
                             placed = true

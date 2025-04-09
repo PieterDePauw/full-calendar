@@ -1,9 +1,6 @@
-// event-positioning.ts
-
+// Import modules
 import { areIntervalsOverlapping, addHours, isSameDay, startOfDay } from "date-fns";
-import { type CalendarEvent, type PositionedEvent, WeekCellsHeight } from "@/components/full-calendar";
-import { sortEventsByStartTimeAndDuration } from "./event-queries";
-import { getDecimalHour } from "./time-helpers";
+import { type CalendarEvent, type PositionedEvent, WEEK_CELLS_HEIGHT, getDecimalHour, sortEventsByStartTimeAndDuration } from "@/components/full-calendar";
 
 // Define a helper function to adjust event start/end times to the current day boundaries
 function adjustEventTimes(event: CalendarEvent, currentDate: Date): { adjustedStart: Date; adjustedEnd: Date }  {
@@ -79,8 +76,8 @@ export function positionEvents(events: CalendarEvent[], currentDate: Date): Posi
         columns[columnIndex].push({ event, end: adjustedEnd });
 
         // >> Calculate vertical position and height.
-        const top = startHour * WeekCellsHeight;
-        const height = (endHour - startHour) * WeekCellsHeight;
+        const top = startHour * WEEK_CELLS_HEIGHT;
+        const height = (endHour - startHour) * WEEK_CELLS_HEIGHT;
 
         // >> Calculate horizontal position & layering.
         const isFirstColumn = columnIndex === 0;

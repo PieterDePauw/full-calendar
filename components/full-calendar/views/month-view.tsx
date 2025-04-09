@@ -4,7 +4,7 @@
 import { Fragment, useMemo, type CSSProperties, type MouseEvent } from "react"
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { NUMBER_OF_DAYS_PER_WEEK, DraggableEvent, DroppableCell, EventGap, WEEK_STARTS_ON, EventHeight, EventItem, formatTimeWithOptionalMinutes, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, NUMBER_OF_DAYS_PER_WEEK, EVENT_GAP, EVENT_HEIGHT, WEEK_STARTS_ON, EventItem, formatTimeWithOptionalMinutes, getAllEventsForDay, getEventsForDay, getSpanningEventsForDay, sortEvents, useEventVisibility, type CalendarEvent } from "@/components/full-calendar"
 import { useMounted } from "@/hooks/use-mounted"
 
 // MonthView component
@@ -28,7 +28,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
     const isMounted = useMounted()
 
     // > Use the useEventVisibility hook to get the contentRef and getVisibleEventCount
-    const { contentRef, getVisibleEventCount } = useEventVisibility({ eventHeight: EventHeight, eventGap: EventGap })
+    const { contentRef, getVisibleEventCount } = useEventVisibility({ eventHeight: EVENT_HEIGHT, eventGap: EVENT_GAP })
 
     return (
         <Fragment>
@@ -85,7 +85,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
                                             })}
 
                                             {/* Additional events in a popover */}
-                                            {hasMore && <HasMoreEventsPopover EventHeight={EventHeight} allEvents={allEvents} day={day} remainingCount={remainingCount} handleEventClick={handleEventClick} />}
+                                            {hasMore && <HasMoreEventsPopover EventHeight={EVENT_HEIGHT} allEvents={allEvents} day={day} remainingCount={remainingCount} handleEventClick={handleEventClick} />}
                                         </div>
                                     </DroppableCell>
                                 </div>

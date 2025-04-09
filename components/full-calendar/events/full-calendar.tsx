@@ -4,7 +4,7 @@
 import React from "react"
 import { toast } from "sonner"
 import { addHours } from "date-fns"
-import { CalendarHeader, AgendaView, CalendarDndProvider, DayView, EventDialog, EventGap, EventHeight, MonthView, WeekCellsHeight, WeekView, useViewKeyboardShortcut, useCalendarEventManagement, useCalendarView, type CalendarEvent, useCalendarDate, formatForNotification } from "@/components/full-calendar"
+import { AgendaView, DayView, WeekView, MonthView, CalendarDndProvider, CalendarHeader, EventDialog, EVENT_GAP, EVENT_HEIGHT, WEEK_CELLS_HEIGHT, useViewKeyboardShortcut, useCalendarEventManagement, useCalendarView, type CalendarEvent, useCalendarDate, formatForNotification } from "@/components/full-calendar"
 
 // FullCalendar component
 // biome-ignore format: keep all properties on the same line
@@ -106,7 +106,7 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
     // > Return the FullCalendar component
     return (
-        <div className="flex flex-1 flex-col rounded-lg border" style={{ "--event-height": `${EventHeight}px`, "--event-gap": `${EventGap}px`, "--week-cells-height": `${WeekCellsHeight}px` } as React.CSSProperties}>
+        <div className="flex flex-1 flex-col rounded-lg border" style={{ "--event-height": `${EVENT_HEIGHT}px`, "--event-gap": `${EVENT_GAP}px`, "--week-cells-height": `${WEEK_CELLS_HEIGHT}px` } as React.CSSProperties}>
             <CalendarDndProvider onEventUpdate={handleEventUpdate}>
                 {/* Calendar header */}
                 <CalendarHeader className={className} onEventCreateClick={handleEventCreateClick} />
