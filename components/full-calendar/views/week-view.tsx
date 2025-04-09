@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import { addHours, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, eachHourOfInterval, endOfWeek, format, getHours, getMinutes, isBefore, isSameDay, isToday, startOfDay, startOfWeek } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, formatTimeLabel, positionEvents, CurrentTimeIndicator, useCalendarDate, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_ON, WEEK_CELLS_HEIGHT } from "@/components/full-calendar"
+import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, formatTimeLabel, CurrentTimeIndicator, useCalendarDate, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_ON, WEEK_CELLS_HEIGHT } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
 // WeekView component
@@ -28,7 +28,102 @@ export function WeekView({ events, onEventSelect, onEventCreate }: { events: Cal
     const allDayEvents = useMemo(() => events.filter((event) => checkIfMultiDayEvent(event)).filter((event) => days.some((day) => isSameDay(day, new Date(event.start)) || isSameDay(day, new Date(event.end)) || (day > new Date(event.start) && day < new Date(event.end)))), [events, days])
 
     // Process events for each day to calculate positions
-    const processedDayEvents = useMemo(() => positionEvents(days), [days, events])
+    const processedDayEvents = useMemo(() => {
+        const result = days.map((day) => {
+            // Get events for this day that are not all-day events or multi-day events
+            const dayEvents = events.filter((event) => {
+                // Skip all-day events and multi-day events
+                if (event.allDay || checkIfMultiDayEvent(event)) return false
+
+                const eventStart = new Date(event.start)
+                const eventEnd = new Date(event.end)
+
+                // Check if event is on this day
+                return (isSameDay(day, eventStart) || isSameDay(day, eventEnd) || (eventStart < day && eventEnd > day))
+            })
+
+            // Sort events by start time and duration
+            const sortedEvents = [...dayEvents].sort((a, b) => {
+                const aStart = new Date(a.start)
+                const bStart = new Date(b.start)
+                const aEnd = new Date(a.end)
+                const bEnd = new Date(b.end)
+
+                // First sort by start time
+                if (aStart < bStart) return -1
+                if (aStart > bStart) return 1
+
+                // If start times are equal, sort by duration (longer events first)
+                const aDuration = differenceInMinutes(aEnd, aStart)
+                const bDuration = differenceInMinutes(bEnd, bStart)
+                return bDuration - aDuration
+            })
+
+            // Calculate positions for each event
+            const positionedEvents: PositionedEvent[] = []
+            const dayStart = startOfDay(day)
+
+            // Track columns for overlapping events
+            const columns: { event: CalendarEvent; end: Date }[][] = []
+
+            // Loop through sorted events to position them
+            sortedEvents.forEach((event) => {
+                const eventStart = new Date(event.start)
+                const eventEnd = new Date(event.end)
+
+                // Adjust start and end times if they're outside this day
+                const adjustedStart = isSameDay(day, eventStart) ? eventStart : dayStart
+                const adjustedEnd = isSameDay(day, eventEnd) ? eventEnd : addHours(dayStart, 24)
+
+                // Calculate top position and height
+                const startHour = getHours(adjustedStart) + getMinutes(adjustedStart) / 60
+                const endHour = getHours(adjustedEnd) + getMinutes(adjustedEnd) / 60
+                const top = startHour * WEEK_CELLS_HEIGHT
+                const height = (endHour - startHour) * WEEK_CELLS_HEIGHT
+
+                // Find a column for this event
+                let columnIndex = 0
+                let placed = false
+
+                while (!placed) {
+                    if (!columns[columnIndex]) {
+                        columns[columnIndex] = []
+                        placed = true
+                    } else {
+                        // Check if this event overlaps with any event in this column
+                        const overlaps = columns[columnIndex].some((col) =>
+                            areIntervalsOverlapping(
+                                { start: adjustedStart, end: adjustedEnd },
+                                { start: new Date(col.event.start), end: new Date(col.event.end) }
+                            )
+                        )
+
+                        if (!overlaps) {
+                            placed = true
+                        } else {
+                            columnIndex++
+                        }
+                    }
+                }
+
+                // Add event to its column
+                columns[columnIndex].push({ event, end: adjustedEnd })
+
+                // Calculate width and left position based on number of columns
+                const width = columnIndex === 0 ? 1 : 1 - (columnIndex * 0.9)
+                const left = columnIndex === 0 ? 0 : columnIndex * 0.1
+
+                // Higher columns get higher z-index
+                positionedEvents.push({ event: event, top: top, height: height, left: left, width: width, zIndex: 10 + columnIndex })
+            })
+
+            // Return the positioned events for this day
+            return positionedEvents
+        })
+
+        // Return the resulting array of positioned events for each day
+        return result
+    }, [days, events])
 
     // > Define a helper function to handle event clicks
     function handleEventClick(event: CalendarEvent, e: React.MouseEvent) {
@@ -81,7 +176,7 @@ export function WeekView({ events, onEventSelect, onEventCreate }: { events: Cal
 }
 
 // TimeGrid component
-export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[]; currentDate: Date; onEventCreate: (date: Date) => void  }) {
+export function TimeGrid({ hours, currentDate, onEventCreate }: { hours: Date[]; currentDate: Date; onEventCreate: (date: Date) => void }) {
     // > Define a helper function to handle droppable cell clicks
     const handleDroppableCellClick = (day: Date, hourValue: number, quarter: number) => {
         const startTime = new Date(day)

@@ -84,7 +84,7 @@ export function EventItem({ event, currentView, isDragging, onClick, showTime, c
     // > Define a function to get the event time string based on its duration
     function getEventTime() {
         // >> If the event is all day, display "All day"
-        if (event.allDay) return "All day"
+        if (isAllDayEvent) return "All day"
         // >> If the event is short (i.e., less than 45 minutes), display only the start time
         if (durationInMinutes < 45) return formatTimeWithOptionalMinutes(displayStart)
         // >> If the event is longer (i.e., 45 minutes or more), display the start and end times
