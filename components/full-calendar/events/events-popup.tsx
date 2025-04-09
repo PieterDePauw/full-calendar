@@ -23,10 +23,8 @@ export function EventsPopup({ date, events, position, onClose, onEventSelect }: 
     // > Use the useEffect hook to handle clicks outside the popup
     useEffect(() => {
         // >> Define the handleClickOutside function
-        const handleClickOutside = (event: MouseEvent) => {
-            if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-                onClose()
-            }
+        function handleClickOutside(event: MouseEvent) {
+            if (popupRef.current && !popupRef.current.contains(event.target as Node)) { onClose() }
         }
         // >> Add the handleClickOutside function to the event listener for mousedown
         document.addEventListener("mousedown", handleClickOutside)
@@ -37,7 +35,7 @@ export function EventsPopup({ date, events, position, onClose, onEventSelect }: 
     // > Use the useEffect hook to handle the escape key
     useEffect(() => {
         // >> Define the handleEscKey function
-        const handleEscKey = (event: KeyboardEvent) => {
+        function handleEscKey(event: KeyboardEvent) {
             if (event.key === "Escape") { onClose() }
         }
         // >> Add the handleEscKey function to the event listener for keydown
@@ -91,31 +89,8 @@ export function EventsPopup({ date, events, position, onClose, onEventSelect }: 
             </div>
 
             <div className="space-y-2 p-3">
-                {events.length === 0 ? (
-                    <div className="text-muted-foreground py-2 text-sm">No events</div>
-                ) : (
-                    events.map((event) => {
-                        const eventStart = new Date(event.start)
-                        const eventEnd = new Date(event.end)
-                        const isFirstDay = isSameDay(date, eventStart)
-                        const isLastDay = isSameDay(date, eventEnd)
-
-                        return (
-                            <div
-                                key={event.id}
-                                className="cursor-pointer"
-                                onClick={() => handleEventClick(event)}
-                            >
-                                <EventItem
-                                    event={event}
-                                    currentView="agenda"
-                                    isFirstDay={isFirstDay}
-                                    isLastDay={isLastDay}
-                                />
-                            </div>
-                        )
-                    })
-                )}
+                {events.length === 0 && <div className="text-muted-foreground py-2 text-sm">No events</div>}
+                {events.length > 0 && events.map((event) => <div key={event.id} className="cursor-pointer" onClick={() => handleEventClick(event)}><EventItem event={event} currentView="agenda" isFirstDay={isSameDay(date, new Date(event.start))} isLastDay={isSameDay(date, new Date(event.end))} /></div>)}
             </div>
         </div>
     )
