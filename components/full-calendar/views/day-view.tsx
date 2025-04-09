@@ -3,18 +3,13 @@
 // Import modules
 import { Fragment, useMemo, type MouseEvent } from "react"
 import { addHours, eachHourOfInterval, getHours, isSameDay, startOfDay } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, CurrentTimeIndicator, checkIfMultiDayEvent, useCurrentTimeIndicator, type CalendarEvent, type PositionedEvent, getDroppableCellClasses, positionEvents, getAllEventsForDay, formatTimeLabel } from "@/components/full-calendar"
-
-// DayViewProps interface
-interface DayViewProps {
-    currentDate: Date
-    events: CalendarEvent[]
-    onEventSelect: (event: CalendarEvent) => void
-    onEventCreate: (startTime: Date) => void
-}
+import { DraggableEvent, DroppableCell, EventItem, CurrentTimeIndicator, checkIfMultiDayEvent, useCurrentTimeIndicator, useCalendarDate, type CalendarEvent, type PositionedEvent, getDroppableCellClasses, positionEvents, getAllEventsForDay, formatTimeLabel } from "@/components/full-calendar"
 
 // DayView component
-export function DayView({ currentDate, events, onEventSelect, onEventCreate, }: DayViewProps) {
+export function DayView({ events, onEventSelect, onEventCreate, }: { events: CalendarEvent[]; onEventSelect: (event: CalendarEvent) => void; onEventCreate: (startTime: Date) => void }) {
+    // > Get the current date
+    const { currentDate } = useCalendarDate()
+
     // > Get all of the hours in the current date
     // biome-ignore
     const hours = useMemo(() => eachHourOfInterval({ start: startOfDay(currentDate), end: addHours(startOfDay(currentDate), 23) }), [currentDate])

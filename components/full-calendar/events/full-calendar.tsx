@@ -4,16 +4,13 @@
 import React from "react"
 import { toast } from "sonner"
 import { addHours } from "date-fns"
-import { AgendaView, DayView, WeekView, MonthView, CalendarDndProvider, CalendarHeader, EventDialog, EVENT_GAP, EVENT_HEIGHT, WEEK_CELLS_HEIGHT, useViewKeyboardShortcut, useCalendarEventManagement, useCalendarView, type CalendarEvent, useCalendarDate, formatForNotification } from "@/components/full-calendar"
+import { AgendaView, DayView, WeekView, MonthView, CalendarDndProvider, CalendarHeader, EventDialog, EVENT_GAP, EVENT_HEIGHT, WEEK_CELLS_HEIGHT, useViewKeyboardShortcut, useCalendarEventManagement, useCalendarView, type CalendarEvent, formatForNotification } from "@/components/full-calendar"
 
 // FullCalendar component
 // biome-ignore format: keep all properties on the same line
 export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDelete, className }: { events?: CalendarEvent[], onEventAdd?: (event: CalendarEvent) => void, onEventUpdate?: (event: CalendarEvent) => void, onEventDelete?: (eventId: string) => void, className?: string }) {
     // > Use the useCalendarView hook to manage the current view
     const { currentView } = useCalendarView()
-
-    // > Use the useCalendarNavigation hook to manage the current date and navigation
-    const { currentDate } = useCalendarDate()
 
     // > Use the useCalendarEventManagement hook to manage the selected date and the state of the dialog
     const { isEventDialogOpen, setIsEventDialogOpen, selectedEvent, setSelectedEvent, handleResetSelectedEvent, handleDialogClose, handleEventCreateClick } = useCalendarEventManagement()
@@ -113,10 +110,10 @@ export function FullCalendar({ events = [], onEventAdd, onEventUpdate, onEventDe
 
                 {/* Calendar main content */}
                 <div className="flex flex-1 flex-col">
-                    {currentView === "month" && <MonthView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />}
-                    {currentView === "week" && <WeekView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />}
-                    {currentView === "day" && <DayView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />}
-                    {currentView === "agenda" && <AgendaView currentDate={currentDate} events={events} onEventSelect={handleEventSelect} />}
+                    {currentView === "month" && <MonthView events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />}
+                    {currentView === "week" && <WeekView events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />}
+                    {currentView === "day" && <DayView events={events} onEventSelect={handleEventSelect} onEventCreate={handleEventCreate} />}
+                    {currentView === "agenda" && <AgendaView events={events} onEventSelect={handleEventSelect} />}
                 </div>
 
                 {/* Event dialog for creating or editing events */}
