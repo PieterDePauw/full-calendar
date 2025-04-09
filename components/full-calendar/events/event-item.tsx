@@ -35,11 +35,11 @@ function EventWrapper({ event, isFirstDay = true, isLastDay = true, isDragging, 
         : new Date(event.end)
 
     // > Check if the event is in the past based on the displayEnd time
-    const isEventInPast = useMemo(() => isPast(displayEnd), [displayEnd])
+    const isEventInPast = isPast(displayEnd)
 
     // > Return a button element with the appropriate classes and attributes
     return (
-        <button className={getEventWrapperClasses({ isFirstDay, isLastDay, eventColor, className })} data-dragging={isDragging} data-past-event={isEventInPast} onClick={onClick} onMouseDown={onMouseDown} onTouchStart={onTouchStart} {...dndListeners} {...dndAttributes}>
+        <button className={getEventWrapperClasses({ isFirstDay, isLastDay, eventColor, className })} data-dragging={isDragging || undefined} data-past-event={isEventInPast || undefined} onClick={onClick} onMouseDown={onMouseDown} onTouchStart={onTouchStart} {...dndListeners} {...dndAttributes}>
             {children}
         </button>
     )
@@ -72,19 +72,19 @@ export function EventItem({ event, currentView, isDragging, onClick, showTime, c
     // > If currentTime is available, calculate the updated end time based on the event's duration
     const displayEnd = useMemo(() => currentTime ? new Date(new Date(currentTime).getTime() + (new Date(event.end).getTime() - new Date(event.start).getTime())) : new Date(event.end), [currentTime, event.start, event.end])
 
-    // > Calculate event duration in minutes
-    const durationInMinutes = useMemo(() => differenceInMinutes(displayEnd, displayStart), [displayStart, displayEnd])
-
     // > Use the useMemo hook to memoize whether the event is in the past
     const isEventInPast = useMemo(() => isPast(new Date(event.end)), [event.end])
 
     // > Use the useMemo hook to memoize whether the event is an all-day event
-    const isAllDayEvent = useMemo(() => event.allDay === true, [event.allDay])
+    const isAllDayEvent = useMemo(() => event.allDay, [event.allDay])
+
+    // > Calculate event duration in minutes
+    const durationInMinutes = useMemo(() => differenceInMinutes(displayEnd, displayStart), [displayStart, displayEnd])
 
     // > Define a function to get the event time string based on its duration
     function getEventTime() {
         // >> If the event is all day, display "All day"
-        if (isAllDayEvent) return "All day"
+        if (event.allDay) return "All day"
         // >> If the event is short (i.e., less than 45 minutes), display only the start time
         if (durationInMinutes < 45) return formatTimeWithOptionalMinutes(displayStart)
         // >> If the event is longer (i.e., 45 minutes or more), display the start and end times
