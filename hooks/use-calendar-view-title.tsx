@@ -15,42 +15,47 @@ export function useCalendarViewTitle() {
     return useMemo(() => {
         // >> Use a switch statement to determine the title based on the current view
         switch (currentView) {
+            // >>> If the current view is "day", ...
             case "day": {
-                // Format: "Friday, April 5, 2025"
+                // >>>> Use the full date format, e.g., "Monday, April 1, 2025"
                 return format(currentDate, "EEEE, MMMM d, yyyy")
             }
 
+            // >>> If the current view is "week", ...
             case "week": {
-                // >> Define a helper variable for the start date of the week
+                // >>>> Define a helper variable for the start date of the week
                 const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON })
-                // >> Define a helper variable for the end date of the week
+                // >>>> Define a helper variable for the end date of the week
                 const weekEnd = endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON })
-                // Check if the start and end dates of the week are in the same month
+                // >>>> Check if the start and end dates of the week are in the same month
                 const fullWeekWithinSameMonth = isSameMonth(weekStart, weekEnd)
-                // If the start and end dates of the week are in the same month, use the full month name, e.g., "April 2025"
+                // >>>> If the start and end dates of the week are in the same month, use the full month name, e.g., "April 2025"
                 if (fullWeekWithinSameMonth) return format(weekStart, "MMMM yyyy")
-                // Otherwise, use an abbreviated version of both month names, e.g. "Mar - Apr 2025"
+                // >>>> Otherwise, use an abbreviated version of both month names, e.g. "Mar - Apr 2025"
                 return `${format(weekStart, "MMM")} - ${format(weekEnd, "MMM yyyy")}`
             }
 
+            // >>> If the current view is "month", ...
             case "month": {
-                // Format: "April 2025"
+                // >>>> Use the full month name, e.g. "April 2025"
                 return format(currentDate, "MMMM yyyy")
             }
 
+            // >>> If the current view is "agenda", ...
             case "agenda": {
-                // >> Define a helper variable for the end date of the agenda
+                // >>>> Define a helper variable for the end date of the agenda
                 const agendaEndDate = addDays(currentDate, NUMBER_OF_DAYS_TO_DISPLAY_IN_AGENDA - 1)
-                // Check if the agenda start and end dates are in the same month
+                // >>>> Check if the agenda start and end dates are in the same month
                 const fullAgendaWithinSameMonth = isSameMonth(currentDate, agendaEndDate)
-                // If all start and end dates of the agenda are in the same month, use the full month name, e.g., "April 2025"
+                // >>>> If all start and end dates of the agenda are in the same month, use the full month name, e.g., "April 2025"
                 if (fullAgendaWithinSameMonth) return format(currentDate, "MMMM yyyy")
-                // Otherwise, use an abbreviated version of both month names, e.g. "Apr - May 2025"
+                // >>>> Otherwise, use an abbreviated version of both month names, e.g. "Apr - May 2025"
                 return `${format(currentDate, "MMM")} - ${format(agendaEndDate, "MMM yyyy")}`
             }
 
+            // >>> If the current view is any other view, (which should not happen)
             default: {
-                // Fallback (should be unreachable if validViews is correct)
+                // >>>> Throw an error indicating that the view is not valid
                 throw new Error(`Could not determine title for view "${currentView}", because it is not a valid view`)
             }
         }
