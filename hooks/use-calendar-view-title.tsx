@@ -17,8 +17,8 @@ export function useCalendarViewTitle(): { viewTitle: string } {
         switch (currentView) {
             // >>> If the current view is "day", ...
             case "day": {
-                // >>>> Use the full date format, e.g., "Monday, April 1, 2025"
-                return format(currentDate, "EEEE, MMMM d, yyyy")
+                // >>>> Use the full date format, e.g., "Wednesday 5th April 2025"
+                return format(currentDate, "EEEE dd MMMM yyyy")
             }
 
             // >>> If the current view is "week", ...
