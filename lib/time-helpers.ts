@@ -30,18 +30,6 @@ export function formatTimeLabel(hour: Date) {
   return format(hour, USE_12_HOUR_CLOCK_NOTATION ? "h a" : "HH:mm")
 }
 
-// Define a helper function to add hours to a specified date
-export function addHoursToDate(date: Date, hours: number): Date {
-  // > If the hours value is not an integer, throw an error
-  if (!Number.isInteger(hours)) { throw new Error("To add hours to the date, the value for hours must be an integer"); }
-  // > If the hours value is an integer, create a new date object
-  const result = new Date(date)
-  // > Add the specified number of hours to the date
-  result.setHours(result.getHours() + hours)
-  // > Return the new date object
-  return result
-}
-
 // Define a helper function to compare two dates and check if they are the same
 export function compareDateTime(dateA: Date, dateB: Date): boolean {
   // > Check if the year of both dates is the same
