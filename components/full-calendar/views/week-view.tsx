@@ -2,15 +2,14 @@
 
 // Import modules
 import React, { useMemo } from "react"
-import { addHours, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, eachHourOfInterval, endOfWeek, format, getHours, getMinutes, isBefore, isSameDay, isToday, startOfDay, startOfWeek } from "date-fns"
-import { DraggableEvent, DroppableCell, EventItem, checkIfMultiDayEvent, formatTimeLabel, CurrentTimeIndicator, useCalendarDate, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_ON, WEEK_CELLS_HEIGHT } from "@/components/full-calendar"
+import { addHours, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, eachHourOfInterval, endOfWeek, format, getHours, getMinutes, isSameDay, isToday, startOfDay, startOfWeek } from "date-fns"
+import { DraggableEvent, DroppableCell, checkIfMultiDayEvent, formatTimeLabel, CurrentTimeIndicator, useCalendarDate, getDroppableCellClasses, type CalendarEvent, type PositionedEvent, useCurrentTimeIndicator, WEEK_STARTS_ON, WEEK_CELLS_HEIGHT } from "@/components/full-calendar"
 import { cn } from "@/lib/utils"
 
 // WeekView component
 export function WeekView({ events, onEventSelect, onEventCreate }: { events: CalendarEvent[]; onEventSelect: (event: CalendarEvent) => void; onEventCreate: (startTime: Date) => void }) {
     const { currentDate } = useCalendarDate()
     const days = useMemo(() => eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), end: endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }) }), [currentDate])
-    const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), [currentDate])
     const hours = useMemo(() => eachHourOfInterval({ start: startOfDay(currentDate), end: addHours(startOfDay(currentDate), 23) }), [currentDate])
     const allDayEvents = useMemo(() => events.filter((event) => event.allDay || checkIfMultiDayEvent(event)).filter((event) => days.some((day) => isSameDay(day, new Date(event.start)) || isSameDay(day, new Date(event.end)) || (day > new Date(event.start) && day < new Date(event.end)))), [events, days])
     const processedDayEvents = useMemo(() => {

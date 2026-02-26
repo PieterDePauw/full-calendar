@@ -3,7 +3,7 @@
 // Import modules
 import { createContext, useContext, useId, useRef, useState, type ReactNode } from "react"
 import { DndContext, DragOverlay, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragOverEvent, type DragStartEvent, type UniqueIdentifier } from "@dnd-kit/core"
-import { addMinutes, differenceInMinutes, isSameDay, startOfDay, endOfDay } from "date-fns"
+import { addMinutes, differenceInMinutes, startOfDay, endOfDay } from "date-fns"
 import { EventItem, compareDateTime, type CalendarEvent, type CalendarView, type DragHandlePositionType } from "@/components/full-calendar"
 
 // Define the type for drag-and-drop context
