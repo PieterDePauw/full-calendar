@@ -1,7 +1,7 @@
 "use client"
 
 // Import modules
-import { useState, useRef } from "react"
+import { useState, useRef, type ReactNode } from "react"
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 import { CalendarEvent, checkIfMultiDayEvent, EventItem, useCalendarDnd, useCalendarView, type CalendarView, type DragHandlePositionType } from "@/components/full-calendar"
@@ -18,6 +18,7 @@ interface DraggableEventProps {
     isLastDay?: boolean
     ariaHidden?: boolean | "true" | "false"
     isAllDay?: boolean
+    children?: ReactNode
 }
 
 // DraggableEvent component
@@ -30,7 +31,8 @@ export function DraggableEvent({
     isFirstDay = true, 
     isLastDay = true, 
     ariaHidden,
-    isAllDay = false 
+    isAllDay = false,
+    children
 }: DraggableEventProps) {
     const { activeId } = useCalendarDnd()
     const { currentView } = useCalendarView()
@@ -115,7 +117,9 @@ export function DraggableEvent({
                 dndListeners={listeners} 
                 dndAttributes={attributes} 
                 aria-hidden={ariaHidden} 
-            />
+            >
+                {children}
+            </EventItem>
         </div>
     )
 }
